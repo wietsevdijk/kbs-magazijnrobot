@@ -12,8 +12,8 @@ void setup() {
   pinMode(9, OUTPUT); //Initiates Brake Channel A pin
 
   //Setup Channel B
-  pinMode(13, OUTPUT); //Initiates Motor Channel A pin
-  pinMode(8, OUTPUT);  //Initiates Brake Channel A pin
+  pinMode(13, OUTPUT); //Initiates Motor Channel B pin
+  pinMode(8, OUTPUT);  //Initiates Brake Channel B pin
 }
 
 void loop() {
