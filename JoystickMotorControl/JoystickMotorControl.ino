@@ -62,7 +62,7 @@ void loop() {
 
       digitalWrite(13, LOW); //Establishes up direction of Channel B
       digitalWrite(8, LOW);   //Disengage the Brake for Channel B
-      analogWrite(11, 200);   //Spins the motor on Channel B at full speed
+      analogWrite(11, 255);   //Spins the motor on Channel B at full speed
 
       Serial.println("omhoog");
     break;
