@@ -60,18 +60,18 @@ void loop() {
 
     case 'u':
 
-      digitalWrite(13, HIGH); //Establishes forward direction of Channel B
+      digitalWrite(13, LOW); //Establishes up direction of Channel B
       digitalWrite(8, LOW);   //Disengage the Brake for Channel B
-      analogWrite(11, 200);   //Spins the motor on Channel A at full speed
+      analogWrite(11, 200);   //Spins the motor on Channel B at full speed
 
       Serial.println("omhoog");
     break;
 
     case 'd':
 
-      digitalWrite(13, LOW); //Establishes forward direction of Channel B
+      digitalWrite(13, HIGH); //Establishes down direction of Channel B
       digitalWrite(8, LOW);   //Disengage the Brake for Channel B
-      analogWrite(11, 200);   //Spins the motor on Channel A at full speed
+      analogWrite(11, 200);   //Spins the motor on Channel B at full speed
 
       Serial.println("omlaag");
     break;
