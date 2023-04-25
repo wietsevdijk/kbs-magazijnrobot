@@ -61,12 +61,12 @@ public class Database{
     }
 
     public String[] getProductLocatie(String[] productIDs){
-        String[] productLocatie = {"","",""};
+        String[] productLocatie = new String[3];
         try {
             for (int i = 0; i < 3; i++) {
                 Connection con = DriverManager.getConnection(url, uname, password);
                 Statement statement = con.createStatement();
-                String query3 = "SELECT productLocatie FROM producten WHERE productID = " + productIDs[i];
+                String query3 = "SELECT locatie FROM magazijn WHERE productID = " + productIDs[i];
                 ResultSet result3 = statement.executeQuery(query3);
                 while (result3.next()) {
                     productLocatie[i] = result3.getString(1);
@@ -79,7 +79,24 @@ public class Database{
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
-        return productLocatie;
+        if(productLocatie == null){
+            return null;
+        } else {
+            return productLocatie;
+        }
+    }
+
+    public void shipOrder(String orderID){
+        try {
+            Connection con = DriverManager.getConnection(url, uname, password);
+            Statement statement = con.createStatement();
+            String query = "UPDATE orders " + "SET pickingCompleet = 1 WHERE orderID = " + orderID + " AND (pickingCompleet=0)";
+            statement.executeUpdate(query);
+            con.close();
+            statement.close();
+        }catch (SQLException ex){
+            ex.printStackTrace();
+        }
     }
 }
 
