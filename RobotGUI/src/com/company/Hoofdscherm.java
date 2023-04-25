@@ -48,8 +48,7 @@ public class Hoofdscherm extends JFrame implements ActionListener {
     public String url = "jdbc:mysql://localhost:3306/nerdyrobot";
     public String uname = "root";
     public String password = null;
-    public String orderID = "";
-    public String productID = "";
+    public String orderID;
     public String[] productIDs = {"","",""};
     public String[] productLocatie = {"","",""};
 
@@ -64,9 +63,9 @@ public class Hoofdscherm extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == versturen) {
-            String orderID = db.getOrderID();
-            String productID[] = db.getProductID(orderID);
-            String productLocatie[] = db.getProductLocatie(productID);
+           orderID = db.getOrderID();
+           productIDs = db.getProductID(orderID);
+           productLocatie = db.getProductLocatie(productIDs);
 
 
             //NOG TOEVOEGEN:
@@ -388,7 +387,6 @@ public class Hoofdscherm extends JFrame implements ActionListener {
                         System.out.println("Er zijn geen zendingen beschikbaar");
                 }
             }
-            //tetetete
             db.shipOrder(orderID);
         }
 

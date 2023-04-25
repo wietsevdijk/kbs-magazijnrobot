@@ -90,7 +90,7 @@ public class Database{
         try {
             Connection con = DriverManager.getConnection(url, uname, password);
             Statement statement = con.createStatement();
-            String query = "UPDATE orders " + "SET pickingCompleet = 1 WHERE orderID = " + orderID + " AND (pickingCompleet=0)";
+            String query = "UPDATE orders SET pickingCompleet = 1 WHERE pickingCompleet = 0  AND orderID = " + orderID;
             statement.executeUpdate(query);
             con.close();
             statement.close();
