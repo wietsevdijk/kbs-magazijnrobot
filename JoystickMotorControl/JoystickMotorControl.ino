@@ -11,7 +11,8 @@ void setup() {
   pinMode(12, OUTPUT); //Initiates Motor Channel A pin
   pinMode(9, OUTPUT); //Initiates Brake Channel A pin
 
-  
+  //Setup Channel B
+  pinMode(13, OUTPUT); //Initiates Motor Channel B pin
   pinMode(8, OUTPUT); //Initiates Brake Channel B pin
   
 }
@@ -42,7 +43,7 @@ void loop() {
 
   switch(directie){
     case 'r':
-       //forward @ full speed
+       //forward
       digitalWrite(12, HIGH); //Establishes forward direction of Channel A
       digitalWrite(9, LOW);   //Disengage the Brake for Channel A
       analogWrite(3, 200);   //Spins the motor on Channel A at full speed
@@ -50,7 +51,7 @@ void loop() {
     break;
 
     case 'l':
-        //backward @ half speed
+        //backward
       digitalWrite(12, LOW); //Establishes backward direction of Channel A
       digitalWrite(9, LOW);   //Disengage the Brake for Channel A
       analogWrite(3, 200);   //Spins the motor on Channel A at full speed
@@ -59,18 +60,26 @@ void loop() {
 
     case 'u':
 
+      digitalWrite(13, HIGH); //Establishes forward direction of Channel B
+      digitalWrite(8, LOW);   //Disengage the Brake for Channel B
+      analogWrite(11, 200);   //Spins the motor on Channel A at full speed
+
       Serial.println("omhoog");
     break;
 
     case 'd':
+
+      digitalWrite(13, LOW); //Establishes forward direction of Channel B
+      digitalWrite(8, LOW);   //Disengage the Brake for Channel B
+      analogWrite(11, 200);   //Spins the motor on Channel A at full speed
 
       Serial.println("omlaag");
     break;
 
     case 's':
       Serial.println("niks");
-      digitalWrite(9, HIGH);   //Disengage the Brake for Channel A
-      digitalWrite(8, HIGH);   //Disengage the Brake for Channel B
+      digitalWrite(9, HIGH);   //Engage the Brake for Channel A
+      digitalWrite(8, HIGH);   //Engage the Brake for Channel B
       
     break;
     }
