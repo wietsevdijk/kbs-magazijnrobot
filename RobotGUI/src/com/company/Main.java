@@ -12,6 +12,7 @@ public class Main {
 
         // write your code here
         Hoofdscherm hoofdscherm = new Hoofdscherm();
+        Testscherm testscherm = new Testscherm();
     }
 }
 
