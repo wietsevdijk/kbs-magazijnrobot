@@ -1,11 +1,11 @@
-#define VRX_PIN  A0 // Arduino pin connected to VRX pin
-#define VRY_PIN  A1 // Arduino pin connected to VRY pin
+#define VRX_PIN  A2 // Arduino pin connected to VRX pin
+#define VRY_PIN  A3 // Arduino pin connected to VRY pin
 int xValue = 0; // To store value of the X axis
 int yValue = 0; // To store value of the Y axis
 
 void setup() {
   // put your setup code here, to run once:
-  Serial.begin(9600) ;
+  Serial.begin(9600);
 
   //Setup Channel A
   pinMode(12, OUTPUT); //Initiates Motor Channel A pin
@@ -30,6 +30,8 @@ void loop() {
           directie = 'u';
         } else if (xValue > 1000 && yValue > 500){
             directie = 'd';
+          } else {
+              directie = 's';
           }
 
   Serial.print("x = ");
@@ -67,7 +69,7 @@ void loop() {
       Serial.println("omlaag");
     break;
 
-    default:
+    case 's':
       digitalWrite(9, HIGH);  //Engage the Brake for Channel A
       digitalWrite(9, HIGH);  //Engage the Brake for Channel B
       Serial.println("niks");
