@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 25, 2023 at 12:25 PM
+-- Generation Time: Apr 25, 2023 at 12:29 PM
 -- Server version: 10.4.24-MariaDB
 -- PHP Version: 8.1.6
 
@@ -35,7 +35,7 @@ CREATE TABLE `klanten` (
   `klantAchternaam` varchar(50) NOT NULL,
   `klantAdres` varchar(255) NOT NULL,
   `klantPostcode` varchar(255) NOT NULL,
-  `klantWoonplaats` int(255) NOT NULL
+  `klantWoonplaats` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
@@ -43,7 +43,7 @@ CREATE TABLE `klanten` (
 --
 
 INSERT INTO `klanten` (`klantID`, `klantVoornaam`, `klantAchternaam`, `klantAdres`, `klantPostcode`, `klantWoonplaats`) VALUES
-(1, 'Dane', 'Schuijt', 'Soendastraat 5', '', 0);
+(1, 'Dane', 'Schuijt', 'Soendastraat 5', '', '0');
 
 -- --------------------------------------------------------
 
