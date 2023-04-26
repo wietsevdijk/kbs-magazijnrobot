@@ -1,6 +1,8 @@
 package com.company;
 import java.sql.*;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Database{
     public String url = "jdbc:mysql://localhost:3306/nerdyrobot";
@@ -37,6 +39,53 @@ public class Database{
             ex.printStackTrace();
         }
         return orderID;
+    }
+
+    public Map<Integer, Object> getAllProductLocations(){
+        //Deze return een map met de locatie van het product en het productID van het product.
+        Map<Integer, Object> map;
+        map = new HashMap<Integer, Object>();
+        try {
+            Connection con = DriverManager.getConnection(url, uname, password);
+            Statement statement = con.createStatement();
+            String query = "SELECT locatie,productID FROM magazijn";
+            ResultSet result = statement.executeQuery(query);
+            //De lengte van de for loop moet eigenlijk misschien nog met een globale variable gevuld worden.
+            for (int i = 0; i < 25; i++) {
+                result.next();
+                map.put(Integer.valueOf(result.getString(1)),result.getString(2));
+            }
+            con.close();
+            statement.close();
+            result.close();
+        } catch (
+                SQLException ex) {
+            ex.printStackTrace();
+        }
+        return map;
+    }
+
+    public String[] getAllOrders(){
+        String[] orderIDs = {"","",""};
+
+        try {
+            Connection con = DriverManager.getConnection(url, uname, password);
+            Statement statement = con.createStatement();
+            String query = "SELECT orderID FROM orders WHERE pickingCompleet = 0";
+            ResultSet result = statement.executeQuery(query);
+            for (int i = 0; i < 3; i++) {
+                result.next();
+                orderIDs[i] = result.getString(1);
+                System.out.println("OrderID: " + Arrays.toString(orderIDs));
+            }
+            con.close();
+            statement.close();
+            result.close();
+        } catch (
+                SQLException ex) {
+            ex.printStackTrace();
+        }
+        return orderIDs;
     }
 
     public String[] getProductID(String orderID){
