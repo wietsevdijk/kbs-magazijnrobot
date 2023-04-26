@@ -37,10 +37,10 @@ public class Testscherm extends JFrame{
 
         //Bereidt het linkerpanel voor
         links = new JPanel();
-        links.setLayout(new FlowLayout());
+        links.setLayout(new FlowLayout(FlowLayout.LEFT));
 
-        //Maakt de dropdowns en gooit het linkerpanel erin
-
+        //Maakt de lijst en gooit het linkerpanel erin
+        addList();
         add(links);
 
         //Initieert de layout voor het rechterpanel
@@ -62,7 +62,21 @@ public class Testscherm extends JFrame{
 
     }
 
-    public void addDropdowns() {
+    public void addList() {
+        DefaultListModel listModel = new DefaultListModel();
+
+        for(int i = 0; i < 20; i++) {
+            listModel.addElement("Order" + (i + 1));
+        }
+
+        JList<String> orderList = new JList<String>(listModel);
+        JScrollPane listScroller = new JScrollPane(orderList);
+        listScroller.setPreferredSize(new Dimension(250, 80));
+
+        links.add(orderList);
+    }
+
+    public void addDropdown() {
 
     }
 
