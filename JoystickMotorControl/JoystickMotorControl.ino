@@ -1,11 +1,19 @@
 #define VRX_PIN  A2 // Arduino pin connected to VRX pin
 #define VRY_PIN  A3 // Arduino pin connected to VRY pin
+
+#define noodstop 7
+
 int xValue = 0; // To store value of the X axis
 int yValue = 0; // To store value of the Y axis
+
+bool noodstopTriggered = false;
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
+
+  //NOODSTOP
+  pinMode(7, INPUT_PULLUP);
 
   //Setup Channel A
   pinMode(12, OUTPUT); //Initiates Motor Channel A pin
@@ -18,6 +26,12 @@ void setup() {
 }
 
 void loop() {
+
+  if(noodstopCheck()){
+    noodstopTriggered = true;
+  }
+
+  
   // put your main code here, to run repeatedly:
   xValue = analogRead(VRX_PIN);
   yValue = analogRead(VRY_PIN);
@@ -35,52 +49,81 @@ void loop() {
               directie = 's';
           }
 
+
+
+  if(noodstopTriggered){ //Check of de noodstop is ingedrukt
+    //Zet snelheid van beide motoren op 0
+    //Zet daarna de brake aan op beide motoren
+    
+    //A
+    analogWrite(3, 0);
+    digitalWrite(9, HIGH);
+    
+    //B
+    analogWrite(1, 0);
+    digitalWrite(8, HIGH);
+
+    Serial.println("NOODSTOP!!!");
+    delay(1000);
+
+  } else { //Normale code voor besturen van motoren
+
   Serial.print("x = ");
   Serial.print(xValue);
   Serial.print(", y = ");
   Serial.println(yValue);
   delay(200);
 
-  switch(directie){
-    case 'r':
-       //forward
-      digitalWrite(12, HIGH); //Establishes forward direction of Channel A
-      digitalWrite(9, LOW);   //Disengage the Brake for Channel A
-      analogWrite(3, 200);   //Spins the motor on Channel A at full speed
-      Serial.println("naar rechts");
-    break;
+    switch(directie){
+      case 'r':
+        //forward
+        digitalWrite(12, HIGH); //Establishes forward direction of Channel A
+        digitalWrite(9, LOW);   //Disengage the Brake for Channel A
+        analogWrite(3, 200);   //Spins the motor on Channel A at full speed
+        Serial.println("naar rechts");
+      break;
 
-    case 'l':
-        //backward
-      digitalWrite(12, LOW); //Establishes backward direction of Channel A
-      digitalWrite(9, LOW);   //Disengage the Brake for Channel A
-      analogWrite(3, 200);   //Spins the motor on Channel A at full speed
-      Serial.println("naar links");
-    break;
+      case 'l':
+          //backward
+        digitalWrite(12, LOW); //Establishes backward direction of Channel A
+        digitalWrite(9, LOW);   //Disengage the Brake for Channel A
+        analogWrite(3, 200);   //Spins the motor on Channel A at full speed
+        Serial.println("naar links");
+      break;
 
-    case 'u':
+      case 'u':
 
-      digitalWrite(13, LOW); //Establishes up direction of Channel B
-      digitalWrite(8, LOW);   //Disengage the Brake for Channel B
-      analogWrite(11, 255);   //Spins the motor on Channel B at full speed
+        digitalWrite(13, LOW); //Establishes up direction of Channel B
+        digitalWrite(8, LOW);   //Disengage the Brake for Channel B
+        analogWrite(11, 255);   //Spins the motor on Channel B at full speed
 
-      Serial.println("omhoog");
-    break;
+        Serial.println("omhoog");
+      break;
 
-    case 'd':
+      case 'd':
 
-      digitalWrite(13, HIGH); //Establishes down direction of Channel B
-      digitalWrite(8, LOW);   //Disengage the Brake for Channel B
-      analogWrite(11, 200);   //Spins the motor on Channel B at full speed
+        digitalWrite(13, HIGH); //Establishes down direction of Channel B
+        digitalWrite(8, LOW);   //Disengage the Brake for Channel B
+        analogWrite(11, 200);   //Spins the motor on Channel B at full speed
 
-      Serial.println("omlaag");
-    break;
+        Serial.println("omlaag");
+      break;
 
-    case 's':
-      Serial.println("niks");
-      digitalWrite(9, HIGH);   //Engage the Brake for Channel A
-      digitalWrite(8, HIGH);   //Engage the Brake for Channel B
-      
-    break;
+      case 's':
+        Serial.println("niks");
+        digitalWrite(9, HIGH);   //Engage the Brake for Channel A
+        digitalWrite(8, HIGH);   //Engage the Brake for Channel B
+        
+      break;
+      }
     }
+
+  
+
+  
 }
+
+bool noodstopCheck(){
+      bool ingedrukt = digitalRead(noodstop);
+      return !ingedrukt;
+    }
