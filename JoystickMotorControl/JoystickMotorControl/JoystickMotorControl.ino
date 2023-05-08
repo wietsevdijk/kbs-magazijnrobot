@@ -88,6 +88,8 @@ void loop() {
     yValue = analogRead(VRX_PIN);
 
     if(zAxisMode == 1){
+      digitalWrite(9, HIGH);
+      digitalWrite(8, HIGH);            
       if(yValue < 50){
         Serial.println("vooruit");
         sendCommand("VOOR");
@@ -99,7 +101,7 @@ void loop() {
       }
 
     } else {
-
+      sendCommand("");
       if (xValue < 50) {
         digitalWrite(12, HIGH);  //Establishes forward direction of Channel A
         digitalWrite(9, LOW);    //Disengage the Brake for Channel A
