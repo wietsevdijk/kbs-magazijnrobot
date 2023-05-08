@@ -63,14 +63,12 @@ public class Testscherm extends JFrame{
     public void addList() {
         DefaultListModel listModel = new DefaultListModel();
 
-        for(int i = 0; i < 20; i++) {
-            listModel.addElement("Order" + (i + 1));
+        for(int i = 0; i < 25; i++) {
+            listModel.addElement("Order " + (i + 1));
         }
 
         JList<String> orderList = new JList<String>(listModel);
         JScrollPane listScroller = new JScrollPane(orderList);
-        listScroller.setPreferredSize(new Dimension(250, 80));
-
         links.add(orderList);
     }
 
@@ -79,8 +77,8 @@ public class Testscherm extends JFrame{
     }
 
     public void addGridPanels() {
-        int c = 1;
-        int r = 1;
+        int c = 1; //Startkolom
+        int r = 1; //Startpunt van de rij
 
         for(int i = 0; i < this.squareArray.length; ++i) {
             JLabel naam = new JLabel();
@@ -89,12 +87,17 @@ public class Testscherm extends JFrame{
             int RowCount = 5;
             Panel panel = new Panel();
             panel.setBackground(Color.green);
+
+            //Als het kolomnummer tussen 1 en 5 zit
             if (c <= ColumnCount && c > 0) {
-                naam = new JLabel("" + c + "." + r);
+                naam = new JLabel("" + r + "." + c); //Zet de label van dit panel
+
+                //Als het rijnummer tussen 1 en 5 zit
                 if (r < RowCount && r > 0) {
-                    ++r;
-                } else {
-                    ++c;
+                    ++r; //Stap 1 naar rechts in de rij
+                }
+                else {
+                    ++c; //Stap 1 kolom omlaag
                     r = 1;
                 }
             }
