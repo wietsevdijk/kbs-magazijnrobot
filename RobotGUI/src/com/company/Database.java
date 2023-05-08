@@ -1,8 +1,12 @@
 package com.company;
+import java.io.PrintWriter;
+import java.io.Serial;
 import java.sql.*;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
+
 
 public class Database{
     public String url = "jdbc:mysql://localhost:3306/nerdyrobot";
@@ -17,7 +21,9 @@ public class Database{
         } catch (ClassNotFoundException ex) {
             ex.printStackTrace();
         }
+
     }
+
 
     public String getOrderID(){
         String orderID = null;
@@ -29,7 +35,6 @@ public class Database{
             ResultSet result = statement.executeQuery(query);
             while (result.next()) {
                 orderID = result.getString(1);
-                System.out.println("OrderID: " + orderID);
             }
             con.close();
             statement.close();
@@ -65,6 +70,31 @@ public class Database{
         return map;
     }
 
+    public Map<Integer, Object> getCurrentOrderProductLocations(){
+        //Deze return een map met de locatie van het product en het productID van het product.
+        Map<Integer, Object> map;
+        map = new HashMap<Integer, Object>();
+        try {
+            Connection con = DriverManager.getConnection(url, uname, password);
+            Statement statement = con.createStatement();
+            String query = "SELECT locatie,productID FROM magazijn WHERE productID IN (SELECT productID FROM orderregels WHERE orderID ="+ getOrderID()+" )";
+            ResultSet result = statement.executeQuery(query);
+            //De lengte van de for loop moet eigenlijk misschien nog met een globale variable gevuld worden.
+            for (int i = 0; i < 25; i++) {
+                    result.next();
+                    map.put(Integer.valueOf(result.getString(1)), result.getString(2));
+                    // hier gaat het fout omdat je maar 3 resultaten terug krijgt en 25 keer iets in de map probeert te zetten
+            }
+            con.close();
+            statement.close();
+            result.close();
+        } catch (
+                SQLException ex) {
+            ex.printStackTrace();
+        }
+        return map;
+    }
+
     public String[] getAllOrders(){
         String[] orderIDs = {"","",""};
 
@@ -76,7 +106,6 @@ public class Database{
             for (int i = 0; i < 3; i++) {
                 result.next();
                 orderIDs[i] = result.getString(1);
-                System.out.println("OrderID: " + Arrays.toString(orderIDs));
             }
             con.close();
             statement.close();
@@ -86,6 +115,28 @@ public class Database{
             ex.printStackTrace();
         }
         return orderIDs;
+    }
+
+    public String getProductName(String productID){
+        String productNaam = null;
+
+        try {
+            Connection con = DriverManager.getConnection(url, uname, password);
+            Statement statement = con.createStatement();
+            String query = "SELECT productNaam FROM producten WHERE productID = " + productID;
+            ResultSet result = statement.executeQuery(query);
+            while (result.next()) {
+                productNaam = result.getString(1);
+            }
+            con.close();
+            statement.close();
+            result.close();
+        } catch (
+                SQLException ex) {
+            ex.printStackTrace();
+        }
+        return productNaam;
+
     }
 
     public String[] getProductID(String orderID){
@@ -124,7 +175,6 @@ public class Database{
                 statement.close();
                 result3.close();
             }
-            System.out.println("product locatie: " + Arrays.toString(productLocatie));
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
