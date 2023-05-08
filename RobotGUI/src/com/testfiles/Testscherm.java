@@ -8,8 +8,6 @@ public class Testscherm extends JFrame{
 
     private int[] squareArray = new int[25];
 
-    private Color DarkGreen = new Color(0, 205, 0);
-
     private JPanel links;
     private JPanel rechts;
 
@@ -81,23 +79,28 @@ public class Testscherm extends JFrame{
     }
 
     public void addGridPanels() {
+        int c = 1;
+        int r = 1;
 
-        for(int i = 0; i < squareArray.length; i++) {
-
-            squareArray[i] = i;
+        for(int i = 0; i < this.squareArray.length; ++i) {
+            JLabel naam = new JLabel();
+            this.squareArray[i] = i;
+            int ColumnCount = 5;
+            int RowCount = 5;
             Panel panel = new Panel();
-            JLabel naam = new JLabel("" + (i+1));
-
-            if(i % 2 == 0) {
-                panel.setBackground(Color.green);
+            panel.setBackground(Color.green);
+            if (c <= ColumnCount && c > 0) {
+                naam = new JLabel("" + c + "." + r);
+                if (r < RowCount && r > 0) {
+                    ++r;
+                } else {
+                    ++c;
+                    r = 1;
+                }
             }
-            else {
-                panel.setBackground(DarkGreen);
-            }
 
-            rechts.add(panel);
+            this.rechts.add(panel);
             panel.add(naam);
-
         }
 
     }
