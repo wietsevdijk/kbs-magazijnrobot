@@ -55,21 +55,37 @@ void loop() {
 
 
   // put your main code here, to run repeatedly:
-  xValue = analogRead(VRX_PIN);
-  yValue = analogRead(VRY_PIN);
+  xValue = analogRead(VRY_PIN);
+  yValue = analogRead(VRX_PIN);
   char directie;
 
-  if(xValue > 500 && yValue < 50){
-      directie = 'r';
-    } else if (xValue > 500 && yValue > 950){
-        directie = 'l';
-      } else if (xValue < 50 && yValue > 500){
-          directie = 'u';
-        } else if (xValue > 1000 && yValue > 500){
-            directie = 'd';
+
+      if(xValue < 50){
+          digitalWrite(12, HIGH); //Establishes forward direction of Channel A
+          digitalWrite(9, LOW);   //Disengage the Brake for Channel A
+          analogWrite(3, 200);   //Spins the motor on Channel A at full speed
+          Serial.println("naar rechts");
+        } else if (xValue > 950){
+            digitalWrite(12, LOW); //Establishes backward direction of Channel A
+            digitalWrite(9, LOW);   //Disengage the Brake for Channel A
+            analogWrite(3, 200);   //Spins the motor on Channel A at full speed
+            Serial.println("naar links");
           } else {
-              directie = 's';
+              digitalWrite(9, HIGH);   //Disengage the Brake for Channel A
           }
+          
+      if (yValue < 50){
+              digitalWrite(13, LOW); //Establishes up direction of Channel B
+              digitalWrite(8, LOW);   //Disengage the Brake for Channel B
+              analogWrite(11, 255);   //Spins the motor on Channel B at full speed
+              Serial.println("omhoog");
+            } else if (yValue > 950){
+                digitalWrite(13, HIGH); //Establishes down direction of Channel B
+                digitalWrite(8, LOW);   //Disengage the Brake for Channel B
+                analogWrite(11, 200);   //Spins the motor on Channel B at full speed
+              } else {
+                  digitalWrite(8, HIGH);   //Disengage the Brake for Channel A
+              }
 
 
 
