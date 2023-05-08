@@ -110,55 +110,7 @@ void loop() {
   Serial.print(xValue);
   Serial.print(", y = ");
   Serial.println(yValue);
-  delay(200);
-
-    switch(directie){ //Controle X-as en Y-as
-      case 'r':
-        //forward
-        digitalWrite(12, HIGH); //Establishes forward direction of Channel A
-        digitalWrite(9, LOW);   //Disengage the Brake for Channel A
-        analogWrite(3, 200);   //Spins the motor on Channel A at full speed
-        Serial.println("naar rechts");
-      break;
-
-      case 'l':
-          //backward
-        digitalWrite(12, LOW); //Establishes backward direction of Channel A
-        digitalWrite(9, LOW);   //Disengage the Brake for Channel A
-        analogWrite(3, 200);   //Spins the motor on Channel A at full speed
-        Serial.println("naar links");
-      break;
-
-      case 'u':
-
-        digitalWrite(13, LOW); //Establishes up direction of Channel B
-        digitalWrite(8, LOW);   //Disengage the Brake for Channel B
-        analogWrite(11, 255);   //Spins the motor on Channel B at full speed
-
-        Serial.println("omhoog");
-      break;
-
-      case 'd':
-
-        digitalWrite(13, HIGH); //Establishes down direction of Channel B
-        digitalWrite(8, LOW);   //Disengage the Brake for Channel B
-        analogWrite(11, 200);   //Spins the motor on Channel B at full speed
-
-        Serial.println("omlaag");
-      break;
-
-      case 's':
-        Serial.println("niks");
-        digitalWrite(9, HIGH);   //Engage the Brake for Channel A
-        digitalWrite(8, HIGH);   //Engage the Brake for Channel B
-        
-      break;
-      }
-    }
-
-  
-
-  
+  delay(200);  
 }
 
 bool noodstopCheck(){
