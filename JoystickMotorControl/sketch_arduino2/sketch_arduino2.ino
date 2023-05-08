@@ -31,13 +31,12 @@ void receiveEvent(int bytes){
 
 void loop() {
   // put your main code here, to run repeatedly:
-  //Serial.println(x);
 
-  if(command.equals("AAN")){
+  if(command.equals("VOOR")){ //STUUR NAAR VOREN
     digitalWrite(12, LOW);
     digitalWrite(9, LOW);
     analogWrite(3, 200);
-  } else {
+  } else if(command.equals("ACHTER")){ //STUUR NAAR ACHTER
     digitalWrite(12, HIGH);
     digitalWrite(9, LOW);
     analogWrite(3, 200);
