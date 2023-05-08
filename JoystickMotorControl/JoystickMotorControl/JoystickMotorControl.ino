@@ -56,14 +56,10 @@ void loop() {
   //NOODSTOP
   if (noodstopCheck() && !noodstopTriggered) {
     noodstopTriggered = true;
-    digitalWrite(2, LOW);
-    digitalWrite(4, LOW);
     digitalWrite(5, HIGH);
     delay(300);
   } else if (noodstopCheck() && noodstopTriggered) {
     noodstopTriggered = false;
-    digitalWrite(2, LOW);
-    digitalWrite(4, LOW);
     digitalWrite(5, LOW);
     delay(300);
   } 
