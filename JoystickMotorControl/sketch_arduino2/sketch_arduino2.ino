@@ -25,8 +25,7 @@ void receiveEvent(int bytes){
   }
 
   //x = Wire.read();
-  Serial.println("RECEIVED");
-  Serial.println(command);
+  Serial.println("RECEIVED: " + command);
 }
 
 void loop() {
@@ -40,5 +39,8 @@ void loop() {
     digitalWrite(12, HIGH);
     digitalWrite(9, LOW);
     analogWrite(3, 200);
+  } else{
+    digitalWrite(9, HIGH); //ENGAGE BRAKES
+    analogWrite(3, 0);
   }
 }
