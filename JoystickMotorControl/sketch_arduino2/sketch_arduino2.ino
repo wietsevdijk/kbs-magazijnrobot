@@ -1,4 +1,5 @@
 #include <Wire.h>
+#include <ezButton.h>
 #define Encoder_output_x 2
 //#define Encoder_output_y 6
 //#define Encoder_output_z 7
@@ -7,6 +8,9 @@ byte x;
 String command = "";
 
 int Count_pulses = 0;
+
+ezButton limitSwitchX(4);  // create ezButton object that attach to pin 4
+ezButton limitSwitchY(5);  // create ezButton object that attach to pin 5
 
 void setup() {
   TCCR2B = TCCR2B & B11111000 | B00000111;  // for PWM frequency of 30.64 Hz
@@ -27,6 +31,9 @@ void setup() {
   //Setup Channel A
   pinMode(12, OUTPUT);  //Initiates Motor Channel A pin
   pinMode(9, OUTPUT);   //Initiates Brake Channel A pin
+
+  limitSwitchX.setDebounceTime(50); // set debounce time of limitswitch to 50 milliseconds
+  limitSwitchY.setDebounceTime(50); // set debounce time of limitswitch to 50 milliseconds
 }
 
 void receiveEvent(int bytes) {
@@ -66,4 +73,36 @@ void loop() {
   }
 
   Serial.println(Count_pulses);
+
+
+  //check limitswitchX
+  limitSwitchX.loop(); // MUST call the loop() function first
+
+  if (limitSwitchX.isPressed())
+    Serial.println("The limit switch: UNTOUCHED -> TOUCHED");
+
+  if (limitSwitchX.isReleased())
+    Serial.println("The limit switch: TOUCHED -> UNTOUCHED");
+
+  int stateX = limitSwitchX.getState();
+  if (stateX == LOW)
+    Serial.println("The limit switch on X-Axis is: UNTOUCHED");
+  else
+    Serial.println("The limit switch on X-Axis is: TOUCHED");
+
+
+  //check limitswitchY
+  limitSwitchY.loop(); // MUST call the loop() function first
+
+  if (limitSwitchY.isPressed())
+    Serial.println("The limit switch: UNTOUCHED -> TOUCHED");
+
+  if (limitSwitchY.isReleased())
+    Serial.println("The limit switch: TOUCHED -> UNTOUCHED");
+
+  int stateY = limitSwitchY.getState();
+  if (stateY == LOW)
+    Serial.println("The limit switch on Y-Axis is: UNTOUCHED");
+  else
+    Serial.println("The limit switch on Y-Axis is: TOUCHED");
 }
