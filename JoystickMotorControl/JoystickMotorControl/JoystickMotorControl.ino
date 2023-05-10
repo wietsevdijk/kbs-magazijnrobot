@@ -59,7 +59,7 @@ void loop() {
 
   //MODE CHECK
   if (!noodstopTriggered) {
-    digitalWrite(manual ? 2 : 4, HIGH);
+    digitalWrite(manual ? 4 : 2, HIGH);
   }
 
   //NOODSTOP
@@ -78,13 +78,13 @@ void loop() {
   //MODE SWITCH
   if (modeSwitch() && !noodstopTriggered && !manual) {
     manual = true;
-    digitalWrite(2, HIGH);
-    digitalWrite(4, LOW);
+    digitalWrite(2, LOW);
+    digitalWrite(4, HIGH);
     delay(300);
   } else if (modeSwitch() && !noodstopTriggered && manual) {
     manual = false;
-    digitalWrite(2, LOW);
-    digitalWrite(4, HIGH);
+    digitalWrite(2, HIGH);
+    digitalWrite(4, LOW);
     delay(300);
   }
 
@@ -108,7 +108,7 @@ void loop() {
   // }
 
   // UITLEZEN JOYSTICK
-  if (manual) {
+  if (manual && !noodstopTriggered) {
     xValue = analogRead(VRY_PIN);
     yValue = analogRead(VRX_PIN);
 
