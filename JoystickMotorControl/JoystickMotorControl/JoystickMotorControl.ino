@@ -3,13 +3,13 @@
 #define VRX_PIN A2  // Arduino pin connected to VRX pin
 #define VRY_PIN A3  // Arduino pin connected to VRY pin
 
+#define modeSwitchKnop 10
 #define noodstop 7
 #define jSwitch 6
 
 #define GroenLED 2
 #define GeelLED 4
 #define RoodLED 5
-
 
 int xValue = 0;  // To store value of the X axis
 int yValue = 0;  // To store value of the Y axis
@@ -20,6 +20,7 @@ int jSwitchLast;
 int jSwitchCurrent;
 
 bool noodstopTriggered = false;
+bool manual = true;
 
 void setup() {
   TCCR2B = TCCR2B & B11111000 | B00000111;  // for PWM frequency of 30.64 Hz
@@ -35,6 +36,9 @@ void setup() {
 
   //Joystick button
   pinMode(jSwitch, INPUT_PULLUP);
+
+  //modeSwitchKnop
+  pinMode(modeSwitchKnop, INPUT_PULLUP);
 
   //Setup Channel A
   pinMode(12, OUTPUT);  //Initiates Motor Channel A pin
@@ -53,21 +57,41 @@ void setup() {
 
 void loop() {
 
+  //MODE CHECK
+  if (!noodstopTriggered) {
+    digitalWrite(manual ? 2 : 4, HIGH);
+  }
+
   //NOODSTOP
   if (noodstopCheck() && !noodstopTriggered) {
     noodstopTriggered = true;
+    digitalWrite(2, LOW);
+    digitalWrite(4, LOW);
     digitalWrite(5, HIGH);
     delay(300);
   } else if (noodstopCheck() && noodstopTriggered) {
     noodstopTriggered = false;
     digitalWrite(5, LOW);
     delay(300);
-  } 
+  }
+
+  //MODE SWITCH
+  if (modeSwitch() && !noodstopTriggered && !manual) {
+    manual = true;
+    digitalWrite(2, HIGH);
+    digitalWrite(4, LOW);
+    delay(300);
+  } else if (modeSwitch() && !noodstopTriggered && manual) {
+    manual = false;
+    digitalWrite(2, LOW);
+    digitalWrite(4, HIGH);
+    delay(300);
+  }
 
   //TOGGLE Z-AXIS CONTROL
   jSwitchLast = jSwitchCurrent;
   jSwitchCurrent = joystickSwitch();
-  if(jSwitchLast == 1 & jSwitchCurrent == 0){
+  if (jSwitchLast == 1 & jSwitchCurrent == 0) {
     Serial.println("Toggled-Z");
 
     zAxisMode = !zAxisMode;
@@ -76,24 +100,25 @@ void loop() {
   }
 
 
-    // if(joystickSwitch()){
-    //   Serial.println("SWITCH");
-    //   sendCommand("AAN");
-    // } else {
-    //   sendCommand("UIT");
-    // }
+  // if(joystickSwitch()){
+  //   Serial.println("SWITCH");
+  //   sendCommand("AAN");
+  // } else {
+  //   sendCommand("UIT");
+  // }
 
-    // UITLEZEN JOYSTICK
+  // UITLEZEN JOYSTICK
+  if (manual) {
     xValue = analogRead(VRY_PIN);
     yValue = analogRead(VRX_PIN);
 
-    if(zAxisMode == 1){
+    if (zAxisMode == 1) {
       digitalWrite(9, HIGH);
-      digitalWrite(8, HIGH);            
-      if(yValue < 50){
+      digitalWrite(8, HIGH);
+      if (yValue < 50) {
         Serial.println("vooruit");
         sendCommand("VOOR");
-      } else if (yValue > 950){
+      } else if (yValue > 950) {
         Serial.println("achteruit");
         sendCommand("ACHTER");
       } else {
@@ -128,11 +153,12 @@ void loop() {
       } else {
         digitalWrite(8, HIGH);  //Disengage the Brake for Channel A
       }
-}
+    }
+  }
 
 
   // put your main code here, to run repeatedly:
- 
+
 
 
 
@@ -159,7 +185,6 @@ void loop() {
     Serial.println(yValue);
 
     delay(200);
-
   }
 }
 
@@ -171,6 +196,11 @@ bool noodstopCheck() {
 bool joystickSwitch() {
   bool ingedrukt = digitalRead(jSwitch);
   return !ingedrukt;
+}
+
+bool modeSwitch() {
+  bool manual = digitalRead(modeSwitchKnop);
+  return !manual;
 }
 
 //NIET AANRAKEN
