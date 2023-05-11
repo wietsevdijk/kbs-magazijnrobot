@@ -4,6 +4,10 @@
 //#define Encoder_output_y 6
 //#define Encoder_output_z 7
 
+#define pwmZ 11
+#define directionZ 13
+#define brakeZ 8
+
 byte x;
 String command = "";
 
@@ -28,9 +32,10 @@ void setup() {
   //pinMode(Encoder_output_z, INPUT);  // sets the Encoder_output_z pin as the input
   attachInterrupt(digitalPinToInterrupt(Encoder_output_x), DC_Motor_Encoder, RISING);
 
-  //Setup Channel A
-  pinMode(12, OUTPUT);  //Initiates Motor Channel A pin
-  pinMode(9, OUTPUT);   //Initiates Brake Channel A pin
+  //Setup Channel B
+  pinMode(pwmZ, OUTPUT);  //Initiates Motor Channel A pin
+  pinMode(brakeZ, OUTPUT);   //Initiates Brake Channel A pin
+  pinMode(directionZ, OUTPUT);
 
   limitSwitchX.setDebounceTime(50); // set debounce time of limitswitch to 50 milliseconds
   limitSwitchY.setDebounceTime(50); // set debounce time of limitswitch to 50 milliseconds
@@ -60,16 +65,16 @@ void loop() {
 
 
   if (command.equals("VOOR")) {  //STUUR NAAR VOREN
-    digitalWrite(12, LOW);
-    digitalWrite(9, LOW);
-    analogWrite(3, 200);
+    digitalWrite(directionZ, LOW);
+    digitalWrite(brakeZ, LOW);
+    analogWrite(pwmZ, 200);
   } else if (command.equals("ACHTER")) {  //STUUR NAAR ACHTER
-    digitalWrite(12, HIGH);
-    digitalWrite(9, LOW);
-    analogWrite(3, 200);
+    digitalWrite(directionZ, HIGH);
+    digitalWrite(brakeZ, LOW);
+    analogWrite(pwmZ, 200);
   } else {
-    digitalWrite(9, HIGH);  //ENGAGE BRAKES
-    analogWrite(3, 0);
+    digitalWrite(brakeZ, HIGH);  //ENGAGE BRAKES
+    analogWrite(pwmZ, 0);
   }
 
   Serial.println(Count_pulses);
