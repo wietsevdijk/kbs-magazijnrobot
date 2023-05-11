@@ -35,10 +35,14 @@ public class Testscherm extends JFrame{
 
         //Bereidt het linkerpanel voor
         links = new JPanel();
-        links.setLayout(new FlowLayout(FlowLayout.LEFT));
+        links.setLayout(new GridBagLayout());
+
+        //Specificeert de constraints
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.VERTICAL;
 
         //Maakt de lijst en gooit het linkerpanel erin
-        addList();
+        addList(c);
         add(links);
 
         //Initieert de layout voor het rechterpanel
@@ -60,19 +64,28 @@ public class Testscherm extends JFrame{
 
     }
 
-    public void addList() {
+    public void addList(GridBagConstraints constraints) {
         DefaultListModel listModel = new DefaultListModel();
 
-        for(int i = 0; i < 25; i++) {
+        for(int i = 0; i < 50; i++) {
             listModel.addElement("Order " + (i + 1));
         }
 
         JList<String> orderList = new JList<String>(listModel);
-        JScrollPane listScroller = new JScrollPane(orderList);
-        links.add(orderList);
+        JScrollPane listScroller = new JScrollPane(orderList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        JScrollBar bigBar = listScroller.getVerticalScrollBar();
+        bigBar.setPreferredSize(new Dimension(20, 1000));
+
+        constraints.ipady = 1000;
+        constraints.ipadx = 75;
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.gridwidth = 1;
+        constraints.gridheight = 3;
+        links.add(listScroller, constraints);
     }
 
-    public void addDropdown() {
+    public void addDetails() {
 
     }
 
