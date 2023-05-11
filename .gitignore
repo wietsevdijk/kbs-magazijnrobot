@@ -27,3 +27,5 @@ RobotGUI/.idea/vcs.xml
 .idea/modules.xml
 .idea/misc.xml
 .idea/kbs-magazijnrobot.iml
+.vscode/c_cpp_properties.json
+.vscode/arduino.json
