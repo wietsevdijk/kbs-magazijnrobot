@@ -56,7 +56,6 @@ void setup() {
 
 
 void loop() {
-
   //MODE CHECK
   if (!noodstopTriggered) {
     digitalWrite(manual ? 4 : 2, HIGH);
@@ -154,6 +153,7 @@ void loop() {
         digitalWrite(8, HIGH);  //Disengage the Brake for Channel A
       }
     }
+    receivedFromSlave();
   }
 
 
@@ -180,8 +180,8 @@ void loop() {
   } else {  //Normale code voor besturen van motoren
 
     Serial.print("x = ");
-    Serial.print(xValue);
-    Serial.print(", y = ");
+    Serial.println(xValue);
+    Serial.println(", y = ");
     Serial.println(yValue);
 
     delay(200);
@@ -212,21 +212,43 @@ void sendCommand(String cmd) {
   Wire.beginTransmission(9);
   Wire.write(buffer);
   Wire.endTransmission();
+}
 
+void omhoog(){
+    digitalWrite(13, LOW);  //Establishes up direction of Channel B
+    digitalWrite(8, LOW);   //Disengage the Brake for Channel B
+    analogWrite(11, 255);   //Spins the motor on Channel B at full speed
+    Serial.println("omhoog");
+  }
 
+  void omlaag(){
+      digitalWrite(13, HIGH);  //Establishes down direction of Channel B
+      digitalWrite(8, LOW);    //Disengage the Brake for Channel B
+      analogWrite(11, 200);    //Spins the motor on Channel B at full speed
+      Serial.println("omlaag");
+    }
 
-
-
-
+void receivedFromSlave(){
   //This is the part where the master request a data from the slave
   //Wire.requestFrom("address of slave", "amount of bytes to request", true or false to not cut or cut communication)
-  Wire.requestFrom(9, 32);
+  Wire.requestFrom(9, 9);
+  String message;
 
   //Returns the number of bytes available for retrieval with read().
   //This should be called on a master device after a call to requestFrom() or on a slave inside the onReceive() handler.
   while (Wire.available()) {
-    char c = Wire.read();
-    //Writes the ("stuff here") on the serial monitor
-    Serial.print(c);
+    message = String(message + (char)Wire.read());
+    Serial.print(message);
   }
+  Serial.print(message);
+
+//   Writes the ("stuff here") on the serial monitor
+    if(message.endsWith("naarBoven")){
+        omhoog();
+        delay(150);
+        message = "";
+      } else {
+        Serial.print("hallo");
+        }
+       
 }

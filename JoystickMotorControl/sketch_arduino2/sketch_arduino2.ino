@@ -13,7 +13,7 @@
 // Distance measuring unit
 #define ir A0       //signal pin for distance measuring unit
 #define model 1080  // used 1080 because model GP2Y0A21YK0F is used
-SharpIR IR_prox(ir, model);
+//SharpIR IR_prox(ir, model);
 
 
 //byte for communication between arduino's
@@ -21,7 +21,7 @@ byte x;
 
 //String to store received event command
 String command = "";
-char cmd = "";
+
 
 //Int to store pulses from encoder
 int Count_pulses = 0;
@@ -99,7 +99,7 @@ void loop() {
   unsigned long startTime = millis();
 
   // this returns the distance to the object you're measuring
-  int dis = IR_prox.getDistance();  // read distance in cm
+//  int dis = IR_prox.getDistance();  // read distance in cm
 
   // returns x-axis distance to the serial monitor
   // Serial.println("Mean distance: " + dis);
@@ -145,9 +145,11 @@ void loop() {
   int stateY = limitSwitchY.getState();
   if (stateY == HIGH) {
     Serial.println("The limit switch on Y-Axis is: TOUCHED");
-    message = "jemoeder";
+    message = "naarBoven";
     requestEvent();
   } else {
     Serial.println("The limit switch on Y-Axis is: UNTOUCHED");
+    message = "niks";
+    requestEvent();
   }
 }
