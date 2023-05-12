@@ -21,12 +21,15 @@ byte x;
 
 //String to store received event command
 String command = "";
+char cmd = "";
 
 //Int to store pulses from encoder
 int Count_pulses = 0;
 
 //To store the measurment data from z-axis
 String Data;
+
+String message = "";
 
 ezButton limitSwitchX(4);  // create ezButton object that attaches to pin 4
 ezButton limitSwitchY(6);  // create ezButton object that attaches to pin 5
@@ -38,6 +41,7 @@ void setup() {
   //Start Communication between arduino's
   Wire.begin(9);
   Wire.onReceive(receiveEvent);
+  Wire.onRequest(requestEvent);
 
   //Set encoders as input
   pinMode(Encoder_output_x, INPUT);  // sets the Encoder_output_x pin as the input
@@ -67,6 +71,15 @@ void receiveEvent(int bytes) {
   }
   //x = Wire.read();
   //Serial.println("RECEIVED: " + command);
+}
+
+// send command
+
+//this method is used to send data on the slave to the master
+//Basically, when master asks for data from slave
+void requestEvent() {
+  //Inside the wire.write is the data to be sent to the master upon request
+  Wire.write(message.c_str());
 }
 
 //count encoder pulses to measure distance
@@ -132,6 +145,8 @@ void loop() {
   int stateY = limitSwitchY.getState();
   if (stateY == HIGH) {
     Serial.println("The limit switch on Y-Axis is: TOUCHED");
+    message = "jemoeder";
+    requestEvent();
   } else {
     Serial.println("The limit switch on Y-Axis is: UNTOUCHED");
   }
