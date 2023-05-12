@@ -1,10 +1,9 @@
-#include <Wire.h> // Master/slave library
-#include <ezButton.h> // Button library
-#include <SharpIR.h> // measuring distance library
+#include <Wire.h>      // Master/slave library
+#include <ezButton.h>  // Button library
+#include <SharpIR.h>   // measuring distance library
 
-#define Encoder_output_x 2 // encoder output X-axis
-//#define Encoder_output_y 6
-//#define Encoder_output_z 7
+#define Encoder_output_x 2  // encoder output X-axis
+#define Encoder_output_y 5
 
 // z-axis pins
 #define pwmZ 11
@@ -12,9 +11,9 @@
 #define brakeZ 8
 
 // Distance measuring unit
-#define ir A0 //signal pin for distance measuring unit
-#define model 1080 // used 1080 because model GP2Y0A21YK0F is used
-SharpIR IR_prox(ir,model);
+#define ir A0       //signal pin for distance measuring unit
+#define model 1080  // used 1080 because model GP2Y0A21YK0F is used
+SharpIR IR_prox(ir, model);
 
 
 //byte for communication between arduino's
@@ -30,7 +29,7 @@ int Count_pulses = 0;
 String Data;
 
 ezButton limitSwitchX(4);  // create ezButton object that attaches to pin 4
-ezButton limitSwitchY(5);  // create ezButton object that attaches to pin 5
+ezButton limitSwitchY(6);  // create ezButton object that attaches to pin 5
 
 void setup() {
   // put your setup code here, to run once:
@@ -46,18 +45,18 @@ void setup() {
   //pinMode(Encoder_output_z, INPUT);  // sets the Encoder_output_z pin as the input
 
   //Interrupt function to read out encoders
-  attachInterrupt(digitalPinToInterrupt(Encoder_output_x), DC_Motor_Encoder, RISING)
+  attachInterrupt(digitalPinToInterrupt(Encoder_output_x), DC_Motor_Encoder, RISING);
 
   //Setup motor Channel B (Z-axis)
   TCCR2B = TCCR2B & B11111000 | B00000111;  // for PWM frequency for motors of 30.64 Hz
 
-  pinMode(pwmZ, OUTPUT);  //Initiates Motor Channel A pin
-  pinMode(brakeZ, OUTPUT);   //Initiates Brake Channel A pin
+  pinMode(pwmZ, OUTPUT);    //Initiates Motor Channel A pin
+  pinMode(brakeZ, OUTPUT);  //Initiates Brake Channel A pin
   pinMode(directionZ, OUTPUT);
 
   //Set debounce time for limit switches on x-axis and y-axis
-  limitSwitchX.setDebounceTime(50); // set debounce time of limitswitch to 50 milliseconds
-  limitSwitchY.setDebounceTime(50); // set debounce time of limitswitch to 50 milliseconds
+  limitSwitchX.setDebounceTime(50);  // set debounce time of limitswitch to 50 milliseconds
+  limitSwitchY.setDebounceTime(50);  // set debounce time of limitswitch to 50 milliseconds
 }
 
 //receive command for master arduino
@@ -83,18 +82,18 @@ void DC_Motor_Encoder() {
 void loop() {
   // put your main code here, to run repeatedly:
 
-  // takes the time before the loop on the library begins 
-  unsigned long startTime=millis();
+  // takes the time before the loop on the library begins
+  unsigned long startTime = millis();
 
   // this returns the distance to the object you're measuring
-  int dis = IR_prox.getDistance(); // read distance in cm
+  int dis = IR_prox.getDistance();  // read distance in cm
 
   // returns x-axis distance to the serial monitor
-  Serial.print("Mean distance: " + dis);
+  // Serial.println("Mean distance: " + dis);
 
   // the following gives you the time taken to get the measurement
-  unsigned long endTime=millis()-startTime;
-  Serial.print("Time taken (ms): " + endTime);
+  unsigned long endTime = millis() - startTime;
+  // Serial.println("Time taken ms): " + endTime);
 
   //receive event and turns motor on z-axis on or off
   if (command.equals("VOOR")) {  //STUUR NAAR VOREN
@@ -115,25 +114,25 @@ void loop() {
 
 
   //check limitswitchX
-  limitSwitchX.loop(); // MUST call the loop() function first
+  limitSwitchX.loop();  // MUST call the loop() function first
 
-  //Get state of limit switch on X-axis and do something
+  // //Get state of limit switch on X-axis and do something
   int stateX = limitSwitchX.getState();
-  if (stateX == LOW) {
-    Serial.println("The limit switch on X-Axis is: UNTOUCHED");
-  } else {
+  if (stateX == HIGH) {
     Serial.println("The limit switch on X-Axis is: TOUCHED");
+  } else {
+    Serial.println("The limit switch on X-Axis is: UNTOUCHED");
   }
 
 
   //check limitswitchY
-  limitSwitchY.loop(); // MUST call the loop() function first
+  limitSwitchY.loop();  // MUST call the loop() function first
 
   //Get state of limit switch on Y-axis and do something
   int stateY = limitSwitchY.getState();
-  if (stateY == LOW) {
-    Serial.println("The limit switch on Y-Axis is: UNTOUCHED");
-  } else {
+  if (stateY == HIGH) {
     Serial.println("The limit switch on Y-Axis is: TOUCHED");
+  } else {
+    Serial.println("The limit switch on Y-Axis is: UNTOUCHED");
   }
 }
