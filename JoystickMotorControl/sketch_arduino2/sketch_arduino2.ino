@@ -4,6 +4,7 @@
 
 #define Encoder_output_x 2  // encoder output X-axis
 #define Encoder_output_y 5
+#define Encode_output_z A3
 
 // z-axis pins
 #define pwmZ 11
@@ -46,7 +47,7 @@ void setup() {
   //Set encoders as input
   pinMode(Encoder_output_x, INPUT);  // sets the Encoder_output_x pin as the input
   //pinMode(Encoder_output_y, INPUT);  // sets the Encoder_output_y pin as the input
-  //pinMode(Encoder_output_z, INPUT);  // sets the Encoder_output_z pin as the input
+  pinMode(A3, INPUT);  // sets the Encoder_output_z pin as the input
 
   //Interrupt function to read out encoders
   attachInterrupt(digitalPinToInterrupt(Encoder_output_x), DC_Motor_Encoder, RISING);
@@ -92,7 +93,13 @@ void DC_Motor_Encoder() {
   }
 }
 
+void Read_z_encoder() {
+  int r = analogRead(Encode_output_z);
+  Serial.println(r);
+}
+
 void loop() {
+  Read_z_encoder();
   // put your main code here, to run repeatedly:
 
   // takes the time before the loop on the library begins
