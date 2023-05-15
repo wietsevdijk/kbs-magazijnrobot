@@ -21,6 +21,8 @@ int jSwitchCurrent;
 
 bool noodstopTriggered = false;
 bool manual = true;
+bool yLimit = false;
+bool xLimit = false;
 
 void setup() {
   TCCR2B = TCCR2B & B11111000 | B00000111;  // for PWM frequency of 30.64 Hz
@@ -111,6 +113,8 @@ void loop() {
     xValue = analogRead(VRY_PIN);
     yValue = analogRead(VRX_PIN);
 
+    Serial.print(yValue);
+
     if (zAxisMode == 1) {
       digitalWrite(9, HIGH);
       digitalWrite(8, HIGH);
@@ -131,7 +135,7 @@ void loop() {
         digitalWrite(9, LOW);    //Disengage the Brake for Channel A
         analogWrite(3, 200);     //Spins the motor on Channel A at full speed
         Serial.println("naar rechts");
-      } else if (xValue > 950) {
+      } else if (xValue > 950 && !xLimit) {
         digitalWrite(12, LOW);  //Establishes backward direction of Channel A
         digitalWrite(9, LOW);   //Disengage the Brake for Channel A
         analogWrite(3, 200);    //Spins the motor on Channel A at full speed
@@ -145,7 +149,7 @@ void loop() {
         digitalWrite(8, LOW);   //Disengage the Brake for Channel B
         analogWrite(11, 255);   //Spins the motor on Channel B at full speed
         Serial.println("omhoog");
-      } else if (yValue > 950) {
+      } else if (yValue > 950 && !yLimit) {
         digitalWrite(13, HIGH);  //Establishes down direction of Channel B
         digitalWrite(8, LOW);    //Disengage the Brake for Channel B
         analogWrite(11, 200);    //Spins the motor on Channel B at full speed
@@ -214,24 +218,24 @@ void sendCommand(String cmd) {
   Wire.endTransmission();
 }
 
-void omhoog(){
-    digitalWrite(13, LOW);  //Establishes up direction of Channel B
-    digitalWrite(8, LOW);   //Disengage the Brake for Channel B
-    analogWrite(11, 255);   //Spins the motor on Channel B at full speed
-    Serial.println("omhoog");
-  }
+void omhoog() {
+  digitalWrite(13, LOW);  //Establishes up direction of Channel B
+  digitalWrite(8, LOW);   //Disengage the Brake for Channel B
+  analogWrite(11, 0);     //Spins the motor on Channel B at full speed
+  Serial.println("omhoog");
+}
 
-  void omlaag(){
-      digitalWrite(13, HIGH);  //Establishes down direction of Channel B
-      digitalWrite(8, LOW);    //Disengage the Brake for Channel B
-      analogWrite(11, 200);    //Spins the motor on Channel B at full speed
-      Serial.println("omlaag");
-    }
+void omlaag() {
+  digitalWrite(13, HIGH);  //Establishes down direction of Channel B
+  digitalWrite(8, LOW);    //Disengage the Brake for Channel B
+  analogWrite(11, 200);    //Spins the motor on Channel B at full speed
+  Serial.println("omlaag");
+}
 
-void receivedFromSlave(){
+void receivedFromSlave() {
   //This is the part where the master request a data from the slave
   //Wire.requestFrom("address of slave", "amount of bytes to request", true or false to not cut or cut communication)
-  Wire.requestFrom(9, 9);
+  Wire.requestFrom(9, 5);
   String message;
 
   //Returns the number of bytes available for retrieval with read().
@@ -242,13 +246,28 @@ void receivedFromSlave(){
   }
   Serial.print(message);
 
-//   Writes the ("stuff here") on the serial monitor
-    if(message.endsWith("naarBoven")){
-        omhoog();
-        delay(150);
-        message = "";
-      } else {
-        Serial.print("hallo");
-        }
-       
+  //   Writes the ("stuff here") on the serial monitor
+  if (message.endsWith("yLim@")) {
+    yLimit = true;
+    if ((yValue > 950)) {
+      analogWrite(11, 0);      //Spins the motor on Channel B at full speedbool yBeneden = true;
+    }
+  } else if (message.endsWith("yLim!")) {
+    yLimit = false;
+    if ((yValue > 950)) {
+      analogWrite(11, 200);      //Spins the motor on Channel B at full speedbool yBeneden = true;
+    }
+  }
+
+  if (message.endsWith("xLim@")) {
+    xLimit = true;
+    if ((xValue > 950)) {
+      analogWrite(3, 0);      //Spins the motor on Channel B at full speedbool yBeneden = true;
+    }
+  } else if (message.endsWith("xLim!")) {
+    xLimit = false;
+    if ((xValue > 950)) {
+      analogWrite(3, 200);      //Spins the motor on Channel B at full speedbool yBeneden = true;
+    }
+}
 }

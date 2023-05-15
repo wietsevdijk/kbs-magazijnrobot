@@ -133,8 +133,12 @@ void loop() {
   int stateX = limitSwitchX.getState();
   if (stateX == HIGH) {
     Serial.println("The limit switch on X-Axis is: TOUCHED");
+    message = "xLim@";
+    requestEvent();
   } else {
     Serial.println("The limit switch on X-Axis is: UNTOUCHED");
+    message = "xLim!";
+    requestEvent();
   }
 
 
@@ -145,11 +149,11 @@ void loop() {
   int stateY = limitSwitchY.getState();
   if (stateY == HIGH) {
     Serial.println("The limit switch on Y-Axis is: TOUCHED");
-    message = "naarBoven";
+    message = "yLim@";
     requestEvent();
   } else {
     Serial.println("The limit switch on Y-Axis is: UNTOUCHED");
-    message = "niks";
+    message = "yLim!";
     requestEvent();
   }
 }
