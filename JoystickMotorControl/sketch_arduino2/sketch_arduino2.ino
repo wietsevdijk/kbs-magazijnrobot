@@ -94,12 +94,12 @@ void DC_Motor_Encoder() {
 }
 
 void Read_z_encoder() {
-  int r = analogRead(Encode_output_z);
+  long r = analogRead(Encode_output_z);
+  r = map(r, 285, 650, 100, 0);
   Serial.println(r);
 }
 
 void loop() {
-  Read_z_encoder();
   // put your main code here, to run repeatedly:
 
   // takes the time before the loop on the library begins
@@ -144,6 +144,8 @@ void loop() {
     Serial.println("The limit switch on X-Axis is: UNTOUCHED");
   }
 
+  //Read Z-axis
+  Read_z_encoder();
 
   //check limitswitchY
   limitSwitchY.loop();  // MUST call the loop() function first
