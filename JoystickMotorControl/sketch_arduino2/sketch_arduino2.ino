@@ -1,3 +1,4 @@
+//Defines and includes
 #include <Wire.h>      // Master/slave library
 #include <ezButton.h>  // Button library
 #include <SharpIR.h>   // measuring distance library
@@ -12,27 +13,20 @@
 
 // Distance measuring unit
 #define ir A0       //signal pin for distance measuring unit
-#define model 1080  // used 1080 because model GP2Y0A21YK0F is used
-//SharpIR IR_prox(ir, model);
+unsigned long model = 1080;  // used 1080 because model GP2Y0A21YK0F is used
+SharpIR IR_prox(ir, model);
 
-
-//byte for communication between arduino's
-byte x;
-
-//String to store received event command
-String command = "";
-
-
-//Int to store pulses from encoder
-int Count_pulses = 0;
-
-//To store the measurment data from z-axis
-String Data;
-
-String message = "";
-
+// pins for limit switches
 ezButton limitSwitchX(4);  // create ezButton object that attaches to pin 4
 ezButton limitSwitchY(6);  // create ezButton object that attaches to pin 5
+
+// Decleration of variables
+byte x; //byte for communication between arduino's
+String command = ""; //String to store received event command
+int countPulsesX = 0; //Int to store pulses from encoderX
+int countPulsesY = 0; //int to store pulses from encoderY
+String Data; //To store the measurment data from z-axis
+String message = ""; //To store the message received from slave
 
 void setup() {
   // put your setup code here, to run once:
@@ -45,11 +39,14 @@ void setup() {
 
   //Set encoders as input
   pinMode(Encoder_output_x, INPUT);  // sets the Encoder_output_x pin as the input
-  //pinMode(Encoder_output_y, INPUT);  // sets the Encoder_output_y pin as the input
+  pinMode(Encoder_output_y, INPUT);  // sets the Encoder_output_y pin as the input
   //pinMode(Encoder_output_z, INPUT);  // sets the Encoder_output_z pin as the input
 
   //Interrupt function to read out encoders
-  attachInterrupt(digitalPinToInterrupt(Encoder_output_x), DC_Motor_Encoder, RISING);
+  attachInterrupt(digitalPinToInterrupt(Encoder_output_x), DC_Motor_EncoderX, RISING);
+  attachInterrupt(digitalPinToInterrupt(Encoder_output_x), DC_Motor_EncoderX2, LOW);
+  attachInterrupt(digitalPinToInterrupt(Encoder_output_y), DC_Motor_EncoderY, RISING);
+  attachInterrupt(digitalPinToInterrupt(Encoder_output_y), DC_Motor_EncoderY2, RISING);
 
   //Setup motor Channel B (Z-axis)
   TCCR2B = TCCR2B & B11111000 | B00000111;  // for PWM frequency for motors of 30.64 Hz
@@ -74,7 +71,6 @@ void receiveEvent(int bytes) {
 }
 
 // send command
-
 //this method is used to send data on the slave to the master
 //Basically, when master asks for data from slave
 void requestEvent() {
@@ -82,13 +78,37 @@ void requestEvent() {
   Wire.write(message.c_str());
 }
 
-//count encoder pulses to measure distance
-void DC_Motor_Encoder() {
+//count encoder pulses to measure distance on x axis
+void DC_Motor_EncoderX() {
   int b = digitalRead(Encoder_output_x);
   if (b > 0) {
-    Count_pulses++;
+    countPulsesX++;
+  }
+}
+
+//decrease encoder pulses to measure distance on x axis
+void DC_Motor_EncoderX2() {
+  int b = digitalRead(Encoder_output_x);
+  if (b < 1) {
+    countPulsesX--;
+  }
+}
+
+//count encoder pulses to measure distance
+void DC_Motor_EncoderY() {
+  int b = digitalRead(Encoder_output_y);
+  if (b > 0) {
+    countPulsesY++;
   } else {
-    Count_pulses--;
+    countPulsesY--;
+  }
+}
+
+//decrease encoder pulses to measure distance on x axis
+void DC_Motor_EncoderY2() {
+  int b = digitalRead(Encoder_output_y);
+  if (b < 1) {
+    countPulsesY--;
   }
 }
 
@@ -99,7 +119,7 @@ void loop() {
   unsigned long startTime = millis();
 
   // this returns the distance to the object you're measuring
-//  int dis = IR_prox.getDistance();  // read distance in cm
+  int dis = IR_prox.getDistance();  // read distance in cm
 
   // returns x-axis distance to the serial monitor
   // Serial.println("Mean distance: " + dis);
@@ -123,7 +143,8 @@ void loop() {
   }
 
   //count pulses read by the encoder
-  Serial.println("Pulses: " + Count_pulses);
+  Serial.println("Pulses x-axis: " + countPulsesX);
+  Serial.println("Pulses y-axis: " + countPulsesY);
 
 
   //check limitswitchX
@@ -133,10 +154,14 @@ void loop() {
   int stateX = limitSwitchX.getState();
   if (stateX == HIGH) {
     Serial.println("The limit switch on X-Axis is: TOUCHED");
+    countPulsesX = 0; //reset X encoder pulses since it touched the home switch
+    message = "naarRechts"; //message to send to master
+    requestEvent(); // send message to master
   } else {
     Serial.println("The limit switch on X-Axis is: UNTOUCHED");
+    message = "niks"; //message to send to master
+    requestEvent(); // send message to master
   }
-
 
   //check limitswitchY
   limitSwitchY.loop();  // MUST call the loop() function first
@@ -145,11 +170,12 @@ void loop() {
   int stateY = limitSwitchY.getState();
   if (stateY == HIGH) {
     Serial.println("The limit switch on Y-Axis is: TOUCHED");
-    message = "naarBoven";
-    requestEvent();
+    countPulsesY = 0; //rest Y encoder pulses since it touched the home switch
+    message = "naarBoven"; //message to send to master
+    requestEvent(); // send message to master
   } else {
     Serial.println("The limit switch on Y-Axis is: UNTOUCHED");
-    message = "niks";
-    requestEvent();
+    message = "niks"; //message to send to master
+    requestEvent(); // send message to master
   }
 }
