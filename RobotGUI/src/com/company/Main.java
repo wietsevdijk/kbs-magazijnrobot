@@ -1,5 +1,8 @@
 package com.company;
 import com.fazecast.jSerialComm.SerialPort;
+import com.fazecast.jSerialComm.SerialPortDataListener;
+import com.fazecast.jSerialComm.SerialPortEvent;
+
 import java.io.IOException;
 import java.awt.*;
 import javax.swing.*;
@@ -22,13 +25,14 @@ public class Main {
         SerialPort sp = SerialPort.getCommPort("COM5"); // selecteer je gebruikte COM port
         sp.setComPortParameters(9600, 8, 1, 0); //Set Serial baudrate
         sp.setComPortTimeouts(SerialPort.TIMEOUT_NONBLOCKING, 0, 0); //timeouts uitzetten
+        boolean hasOpened = sp.openPort();
 
-        ts.addKeyListener(new KeyListener(){
+                ts.addKeyListener(new KeyListener(){
             //Controleert of de arrow keys ingedrukt zijn
             @Override
             public void keyPressed(KeyEvent event) {
                 if (event.getKeyCode() == KeyEvent.VK_UP) {
-                    if (sp.openPort()) { // opent de port
+                    if (hasOpened) { // opent de port
                         try {
                             ts.moveRobotUp(sp); // stuurt commando over port
                             Scanner data = new Scanner(sp.getInputStream()); // Krijgt iets terug van de serial

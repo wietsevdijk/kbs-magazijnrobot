@@ -1,5 +1,7 @@
 // Includes and defines
 #include <Wire.h>
+#include <LiquidCrystal_I2C.h> // LiquidCrystal_I2C library
+LiquidCrystal_I2C lcd(0x27, 20, 4); // 0x27 is the i2c address of the LCM1602 IIC v1 module (might differ)
 
 #define VRX_PIN A2  // Arduino pin connected to VRX pin
 #define VRY_PIN A3  // Arduino pin connected to VRY pin
@@ -12,6 +14,7 @@
 #define GeelLED 4
 #define RoodLED 5
 
+int currentMillis;
 
 //initialize variables
 int xValue = 0;  // To store value of the X axis from the joystick
@@ -35,6 +38,16 @@ void setup() {
 
   // put your setup code here, to run once:
   Serial.begin(9600);
+  Serial.setTimeout(10);
+
+  while (!Serial) {
+    ; // wait for serial port to connect.
+  }
+
+  lcd.init();                      // initialize the lcd
+  lcd.backlight();
+  lcd.clear();
+  lcd.setCursor(0, 0);
 
   //NOODSTOP
   pinMode(noodstop, INPUT_PULLUP);
@@ -61,7 +74,53 @@ void setup() {
 
 
 void loop() {
+  String HMIcommand = "";
+  String response = "";
   // put your main code here, to run repeatedly:
+   if (Serial.available()) {
+    // read serial data
+    HMIcommand = String(Serial.readString());
+    lcd.print(HMIcommand);
+  }
+
+  if (HMIcommand == "UP") {
+      response = "omhoog";
+        goUp();
+      //delay(1000);
+    }
+
+    if (HMIcommand == "DOWN") {
+      response = "omlaag";
+      goDown();
+      //delay(1000);
+    }
+
+    if (HMIcommand == "LEFT") {
+      response = "links";
+      goLeft();
+      //delay(1000);
+    }
+
+    if (HMIcommand == "RIGHT") {
+      goRight();
+      response = "rechts";
+      //delay(1000);
+    }
+
+    if (HMIcommand == "FORWARDS") {
+      //z-axis
+      response = "naar voren";
+    }
+
+    if (HMIcommand == "BACKWARDS") {
+      //z-axis
+      response = "naar achteren";
+    }
+
+  response = String(response);
+  Serial.print(response);
+
+  
   //MODE CHECK
   if (!noodstopTriggered) {
     digitalWrite(manual ? 4 : 2, HIGH);
@@ -140,12 +199,6 @@ void loop() {
     brakeBoth();
     delay(1000);
   } else {  //Normale code voor besturen van motoren
-
-    Serial.print("x = ");
-    Serial.println(xValue);
-    Serial.println(", y = ");
-    Serial.println(yValue);
-
     delay(200);
   }
 }
