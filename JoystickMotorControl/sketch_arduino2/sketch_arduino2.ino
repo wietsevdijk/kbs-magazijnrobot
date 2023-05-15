@@ -3,7 +3,8 @@
 #include <SharpIR.h>   // measuring distance library
 
 #define Encoder_output_x 2  // encoder output X-axis
-#define Encoder_output_y 5
+#define Encoder_output_y 5  // encoder output Y-axis
+#define Encode_output_z A3  // encoder output Z-axis
 
 // z-axis pins
 #define pwmZ 11
@@ -22,6 +23,8 @@ byte x;
 //String to store received event command
 String command = "";
 
+//Axis
+long z_axis = 0;
 
 //Int to store pulses from encoder
 int Count_pulses = 0;
@@ -46,7 +49,7 @@ void setup() {
   //Set encoders as input
   pinMode(Encoder_output_x, INPUT);  // sets the Encoder_output_x pin as the input
   //pinMode(Encoder_output_y, INPUT);  // sets the Encoder_output_y pin as the input
-  //pinMode(Encoder_output_z, INPUT);  // sets the Encoder_output_z pin as the input
+  pinMode(A3, INPUT);  // sets the Encoder_output_z pin as the input
 
   //Interrupt function to read out encoders
   attachInterrupt(digitalPinToInterrupt(Encoder_output_x), DC_Motor_Encoder, RISING);
@@ -92,6 +95,12 @@ void DC_Motor_Encoder() {
   }
 }
 
+void Read_z_encoder() {
+  z_axis = analogRead(Encode_output_z);
+  z_axis = map(z_axis, 285, 650, 20, 0);
+  Serial.print("Z-Axis: ");
+  Serial.println(z_axis);
+}
 void loop() {
   // put your main code here, to run repeatedly:
 
@@ -140,6 +149,9 @@ void loop() {
     message = "xLim!";
     requestEvent();
   }
+
+  //Read Z-axis
+  Read_z_encoder();
 
 
   //check limitswitchY
