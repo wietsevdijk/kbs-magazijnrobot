@@ -24,6 +24,9 @@ bool manual = true;
 bool yLimit = false;
 bool xLimit = false;
 
+long x_axis = 0;
+long y_axis = 0;
+
 void setup() {
   TCCR2B = TCCR2B & B11111000 | B00000111;  // for PWM frequency of 30.64 Hz
 
@@ -58,6 +61,13 @@ void setup() {
 
 
 void loop() {
+
+  //COARDS PRINTEN
+  Serial.print("X-Axis: ");
+  Serial.println(map(x_axis, 0, 450, 1, 500));
+  Serial.print("Y-Axis: ");
+  Serial.println(map(y_axis, 0, 500, 1, 500));
+
   //MODE CHECK
   if (!noodstopTriggered) {
     digitalWrite(manual ? 4 : 2, HIGH);
@@ -113,7 +123,7 @@ void loop() {
     xValue = analogRead(VRY_PIN);
     yValue = analogRead(VRX_PIN);
 
-    Serial.print(yValue);
+    // Serial.print(yValue);
 
     if (zAxisMode == 1) {
       digitalWrite(9, HIGH);
@@ -135,11 +145,13 @@ void loop() {
         digitalWrite(9, LOW);    //Disengage the Brake for Channel A
         analogWrite(3, 200);     //Spins the motor on Channel A at full speed
         Serial.println("naar rechts");
+        x_axis++;
       } else if (xValue > 950 && !xLimit) {
         digitalWrite(12, LOW);  //Establishes backward direction of Channel A
         digitalWrite(9, LOW);   //Disengage the Brake for Channel A
         analogWrite(3, 200);    //Spins the motor on Channel A at full speed
         Serial.println("naar links");
+        x_axis--;
       } else {
         digitalWrite(9, HIGH);  //Disengage the Brake for Channel A
       }
@@ -149,10 +161,13 @@ void loop() {
         digitalWrite(8, LOW);   //Disengage the Brake for Channel B
         analogWrite(11, 255);   //Spins the motor on Channel B at full speed
         Serial.println("omhoog");
+        y_axis++;
       } else if (yValue > 950 && !yLimit) {
         digitalWrite(13, HIGH);  //Establishes down direction of Channel B
         digitalWrite(8, LOW);    //Disengage the Brake for Channel B
         analogWrite(11, 200);    //Spins the motor on Channel B at full speed
+        Serial.println("omlaag");
+        y_axis--;
       } else {
         digitalWrite(8, HIGH);  //Disengage the Brake for Channel A
       }
@@ -183,12 +198,10 @@ void loop() {
 
   } else {  //Normale code voor besturen van motoren
 
-    Serial.print("x = ");
-    Serial.println(xValue);
-    Serial.println(", y = ");
-    Serial.println(yValue);
-
-    delay(200);
+    // Serial.print("x = ");
+    // Serial.println(xValue);
+    // Serial.println(", y = ");
+    // Serial.println(yValue);
   }
 }
 
@@ -242,13 +255,14 @@ void receivedFromSlave() {
   //This should be called on a master device after a call to requestFrom() or on a slave inside the onReceive() handler.
   while (Wire.available()) {
     message = String(message + (char)Wire.read());
-    Serial.print(message);
+    // Serial.print(message);
   }
-  Serial.print(message);
+  // Serial.print(message);
 
   //   Writes the ("stuff here") on the serial monitor
   if (message.endsWith("yLim@")) {
     yLimit = true;
+    y_axis = 0;
     if ((yValue > 950)) {
       analogWrite(11, 0);      //Spins the motor on Channel B at full speedbool yBeneden = true;
     }
@@ -261,6 +275,7 @@ void receivedFromSlave() {
 
   if (message.endsWith("xLim@")) {
     xLimit = true;
+    x_axis = 0;
     if ((xValue > 950)) {
       analogWrite(3, 0);      //Spins the motor on Channel B at full speedbool yBeneden = true;
     }
