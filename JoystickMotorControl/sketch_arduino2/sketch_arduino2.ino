@@ -3,8 +3,8 @@
 #include <SharpIR.h>   // measuring distance library
 
 #define Encoder_output_x 2  // encoder output X-axis
-#define Encoder_output_y 5
-#define Encode_output_z A3
+#define Encoder_output_y 5  // encoder output Y-axis
+#define Encode_output_z A3  // encoder output Z-axis
 
 // z-axis pins
 #define pwmZ 11
@@ -23,6 +23,8 @@ byte x;
 //String to store received event command
 String command = "";
 
+//Axis
+long z_axis = 0;
 
 //Int to store pulses from encoder
 int Count_pulses = 0;
@@ -94,11 +96,11 @@ void DC_Motor_Encoder() {
 }
 
 void Read_z_encoder() {
-  long r = analogRead(Encode_output_z);
-  r = map(r, 285, 650, 100, 0);
-  Serial.println(r);
+  z_axis = analogRead(Encode_output_z);
+  z_axis = map(z_axis, 285, 650, 20, 0);
+  Serial.print("Z-Axis: ");
+  Serial.println(z_axis);
 }
-
 void loop() {
   // put your main code here, to run repeatedly:
 
@@ -146,6 +148,7 @@ void loop() {
 
   //Read Z-axis
   Read_z_encoder();
+
 
   //check limitswitchY
   limitSwitchY.loop();  // MUST call the loop() function first
