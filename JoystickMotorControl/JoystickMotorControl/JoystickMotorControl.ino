@@ -260,26 +260,26 @@ void receivedFromSlave() {
   // Serial.print(message);
 
   //   Writes the ("stuff here") on the serial monitor
-  if (message.endsWith("yLim@")) {
+  if (message.endsWith("yLimY")) {
     yLimit = true;
     y_axis = 0;
     if ((yValue > 950)) {
       analogWrite(11, 0);      //Spins the motor on Channel B at full speedbool yBeneden = true;
     }
-  } else if (message.endsWith("yLim!")) {
+  } else if (message.endsWith("yLimN")) {
     yLimit = false;
     if ((yValue > 950)) {
       analogWrite(11, 200);      //Spins the motor on Channel B at full speedbool yBeneden = true;
     }
   }
 
-  if (message.endsWith("xLim@")) {
+  if (message.endsWith("xLimY")) {
     xLimit = true;
     x_axis = 0;
     if ((xValue > 950)) {
       analogWrite(3, 0);      //Spins the motor on Channel B at full speedbool yBeneden = true;
     }
-  } else if (message.endsWith("xLim!")) {
+  } else if (message.endsWith("xLimN")) {
     xLimit = false;
     if ((xValue > 950)) {
       analogWrite(3, 200);      //Spins the motor on Channel B at full speedbool yBeneden = true;
