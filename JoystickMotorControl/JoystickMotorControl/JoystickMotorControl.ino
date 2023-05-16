@@ -1,7 +1,5 @@
-// Includes and defines
+
 #include <Wire.h>
-#include <LiquidCrystal_I2C.h> // LiquidCrystal_I2C library
-LiquidCrystal_I2C lcd(0x27, 20, 4); // 0x27 is the i2c address of the LCM1602 IIC v1 module (might differ)
 
 #define VRX_PIN A2  // Arduino pin connected to VRX pin
 #define VRY_PIN A3  // Arduino pin connected to VRY pin
@@ -14,21 +12,28 @@ LiquidCrystal_I2C lcd(0x27, 20, 4); // 0x27 is the i2c address of the LCM1602 II
 #define GeelLED 4
 #define RoodLED 5
 
+
 int currentMillis;
 
 //initialize variables
 int xValue = 0;  // To store value of the X axis from the joystick
 int yValue = 0;  // To store value of the Y axis from the joystick
 
+
+
 int zAxisMode = 0;
 
 int jSwitchLast;
 int jSwitchCurrent;
 
+String message; //The message received from the slave
 bool noodstopTriggered = false; //boolean for emergency stop button
 bool manual = true; // boolean for manual/automatic mode button
+bool yLimit = false;
+bool xLimit = false;
 
-String message; //The message received from the slave
+long x_axis = 0;
+long y_axis = 0;
 
 void setup() {
   TCCR2B = TCCR2B & B11111000 | B00000111;  // for PWM frequency of 30.64 Hz
@@ -38,16 +43,12 @@ void setup() {
 
   // put your setup code here, to run once:
   Serial.begin(9600);
+
   Serial.setTimeout(10);
 
   while (!Serial) {
     ; // wait for serial port to connect.
   }
-
-  lcd.init();                      // initialize the lcd
-  lcd.backlight();
-  lcd.clear();
-  lcd.setCursor(0, 0);
 
   //NOODSTOP
   pinMode(noodstop, INPUT_PULLUP);
@@ -121,6 +122,14 @@ void loop() {
   Serial.print(response);
 
   
+
+
+  //COARDS PRINTEN
+  //Serial.print("X-Axis: ");
+  //Serial.println(map(x_axis, 0, 450, 1, 500));
+  //Serial.print("Y-Axis: ");
+  //Serial.println(map(y_axis, 0, 500, 1, 500));
+  
   //MODE CHECK
   if (!noodstopTriggered) {
     digitalWrite(manual ? 4 : 2, HIGH);
@@ -129,10 +138,14 @@ void loop() {
   //NOODSTOP
   if (noodstopCheck() && !noodstopTriggered) {
     noodstopTriggered = true;
-    brakeOn();
+    digitalWrite(2, LOW);
+    digitalWrite(4, LOW);
+    digitalWrite(5, HIGH);
+    delay(300);
   } else if (noodstopCheck() && noodstopTriggered) {
     noodstopTriggered = false;
-    brakeOff();
+    digitalWrite(5, LOW);
+    delay(300);
   }
 
   //MODE SWITCH
@@ -152,9 +165,21 @@ void loop() {
   jSwitchLast = jSwitchCurrent;
   jSwitchCurrent = joystickSwitch();
   if (jSwitchLast == 1 & jSwitchCurrent == 0) {
-    zAxisMode = !zAxisMode; //Toggled Z-axis
+    
+    Serial.println("Toggled-Z");
+
+    zAxisMode = !zAxisMode;
+
     Serial.println(zAxisMode);
   }
+
+
+  // if(joystickSwitch()){
+  //   Serial.println("SWITCH");
+  //   sendCommand("AAN");
+  // } else {
+  //   sendCommand("UIT");
+  // }
 
   // UITLEZEN JOYSTICK
   if (manual && !noodstopTriggered) {
@@ -165,9 +190,11 @@ void loop() {
       digitalWrite(9, HIGH);
       digitalWrite(8, HIGH);
       if (yValue < 50) {
-        sendCommand("VOOR"); //Send command to slave to make the z-axis go forwards
+        Serial.println("vooruit");
+        sendCommand("VOOR");
       } else if (yValue > 950) {
-        sendCommand("ACHTER"); //Send command to slave to make the z-axis go backwards
+        Serial.println("achteruit");
+        sendCommand("ACHTER");
       } else {
         sendCommand("");
       }
@@ -176,15 +203,16 @@ void loop() {
       sendCommand("");
       if (xValue < 50) {
         goRight(); //execute function to make robot go right
-      } else if (xValue > 950) {
+      } else if (xValue > 950 && !xLimit) {
         goLeft(); // execute function to make robot go left
       } else {
         digitalWrite(9, HIGH);  //Disengage the Brake for Channel A
       }
 
       if (yValue < 50) {
+
         goUp(); // execute function to make robot go up
-      } else if (yValue > 950) {
+      } else if (yValue > 950 && !yLimit) {
         goDown(); // execute function to make robot go down
       } else {
         digitalWrite(8, HIGH);  //Disengage the Brake for Channel A
@@ -192,32 +220,34 @@ void loop() {
     }
     receivedFromSlave();
   }
-
   if (noodstopTriggered) {  //Check of de noodstop is ingedrukt
     //Zet snelheid van beide motoren op 0
     //Zet daarna de brake aan op beide motoren
     brakeBoth();
     delay(1000);
   } else {  //Normale code voor besturen van motoren
-    delay(200);
+    
   }
 }
 
 //Functions from here
 
 //checks emergency button
+
 bool noodstopCheck() {
   bool ingedrukt = digitalRead(noodstop);
   return !ingedrukt;
 }
 
 //checks if joystick is pressed
+
 bool joystickSwitch() {
   bool ingedrukt = digitalRead(jSwitch);
   return !ingedrukt;
 }
 
 //switches between modes
+
 bool modeSwitch() {
   bool manual = digitalRead(modeSwitchKnop);
   return !manual;
@@ -277,26 +307,12 @@ void brakeOff() {
   delay(300);
 }
 
-//send robot a bit up when it touches the x-switch
-void robotTouchedLimitY() {
-  if (message.endsWith("naarBoven")) {
-    goUp();
-    delay(150);
-    message = "";
-  }
-}
-
-//send robot a bit to the right when it touches the y-switch
-void robotTouchedLimitX() {
-  if (message.endsWith("naarRechts")) {
-    goRight();
-    delay(150);
-    message = "";
-  }
-}
-
 //-----------------------------------------------------------------------DO NOT TOUCH!!!---------------------------------------------------------------//
 // sends command to slave
+
+//NIET AANRAKEN
+//FUNCTIE: Stuurt een command naar de andere Arduino
+
 void sendCommand(String cmd) {
   char buffer[cmd.length() + 10];
   cmd.toCharArray(buffer, sizeof(buffer));
@@ -306,19 +322,44 @@ void sendCommand(String cmd) {
   Wire.endTransmission();
 }
 
-// receives/requests command from slave
 void receivedFromSlave() {
-  Wire.requestFrom(9, 9); //("address of slave", "amount of bytes to request", true or false to not cut or cut communication)
+  //This is the part where the master request a data from the slave
+  //Wire.requestFrom("address of slave", "amount of bytes to request", true or false to not cut or cut communication)
+  Wire.requestFrom(9, 5);
+  String message;
 
+  //Returns the number of bytes available for retrieval with read().
   //This should be called on a master device after a call to requestFrom() or on a slave inside the onReceive() handler.
   while (Wire.available()) {
-    //Get message from slave and convert to string
     message = String(message + (char)Wire.read());
+    // Serial.print(message);
+  }
+  // Serial.print(message);
+
+  //   Writes the ("stuff here") on the serial monitor
+  if (message.endsWith("yLimY")) {
+    yLimit = true;
+    y_axis = 0;
+    if ((yValue > 950)) {
+      analogWrite(11, 0);      //Spins the motor on Channel B at full speedbool yBeneden = true;
+    }
+  } else if (message.endsWith("yLimN")) {
+    yLimit = false;
+    if ((yValue > 950)) {
+      analogWrite(11, 200);      //Spins the motor on Channel B at full speedbool yBeneden = true;
+    }
   }
 
-  //make robot go right a bit
-  robotTouchedLimitX();
-
-  //make robot go up a bit
-  robotTouchedLimitY();
+  if (message.endsWith("xLimY")) {
+    xLimit = true;
+    x_axis = 0;
+    if ((xValue > 950)) {
+      analogWrite(3, 0);      //Spins the motor on Channel B at full speedbool yBeneden = true;
+    }
+  } else if (message.endsWith("xLimN")) {
+    xLimit = false;
+    if ((xValue > 950)) {
+      analogWrite(3, 200);      //Spins the motor on Channel B at full speedbool yBeneden = true;
+    }
+}
 }
