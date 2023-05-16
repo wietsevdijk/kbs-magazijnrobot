@@ -27,7 +27,6 @@ public class Database{
 
     public String getOrderID(){
         String orderID = null;
-
         try {
             Connection con = DriverManager.getConnection(url, uname, password);
             Statement statement = con.createStatement();
@@ -96,17 +95,19 @@ public class Database{
     }
 
     public String[] getAllOrders(){
-        String[] orderIDs = {"","",""};
+        String[] orderIDs = new String[3];
 
         try {
             Connection con = DriverManager.getConnection(url, uname, password);
             Statement statement = con.createStatement();
             String query = "SELECT orderID FROM orders WHERE pickingCompleet = 0";
             ResultSet result = statement.executeQuery(query);
-            for (int i = 0; i < 3; i++) {
-                result.next();
-                orderIDs[i] = result.getString(1);
-            }
+                for (int i = 0; i < 3; i++) {
+                    result.next();
+                    orderIDs[i] = result.getString(1);
+                }
+
+
             con.close();
             statement.close();
             result.close();
@@ -117,17 +118,20 @@ public class Database{
         return orderIDs;
     }
 
-    public String getProductName(String productID){
-        String productNaam = null;
-
+    public String[] getProductName(String OrderID){
+        String[]productNaam = {"","",""};
         try {
             Connection con = DriverManager.getConnection(url, uname, password);
             Statement statement = con.createStatement();
-            String query = "SELECT productNaam FROM producten WHERE productID = " + productID;
+            String query = "SELECT productNaam FROM producten WHERE productID IN(SELECT productID FROM orderregels WHERE orderID =" + OrderID+ ")";
             ResultSet result = statement.executeQuery(query);
-            while (result.next()) {
-                productNaam = result.getString(1);
-            }
+
+                for(int i = 0; i < 3; i++) {
+                    result.next();
+                    productNaam[i] = result.getString(1);
+
+                }
+
             con.close();
             statement.close();
             result.close();
@@ -150,7 +154,6 @@ public class Database{
                 result2.next();
                 productIDs[i] = result2.getString(1);
             }
-            System.out.println("productID: " + Arrays.toString(productIDs));
             con.close();
             statement.close();
             result2.close();
@@ -160,29 +163,66 @@ public class Database{
         return productIDs;
     }
 
-    public String[] getProductLocatie(String[] productIDs){
+    public String[] getProductLocatie(String orderID){
         String[] productLocatie = new String[3];
         try {
-            for (int i = 0; i < 3; i++) {
                 Connection con = DriverManager.getConnection(url, uname, password);
                 Statement statement = con.createStatement();
-                String query3 = "SELECT locatie FROM magazijn WHERE productID = " + productIDs[i];
+                String query3 = "SELECT locatie FROM magazijn WHERE productID IN(SELECT productID FROM orderregels WHERE orderID = " + orderID + ")";
                 ResultSet result3 = statement.executeQuery(query3);
-                while (result3.next()) {
+                for (int i = 0; i < 3; i++) {
+                    result3.next();
                     productLocatie[i] = result3.getString(1);
                 }
                 con.close();
                 statement.close();
                 result3.close();
-            }
+
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
-        if(productLocatie == null){
-            return null;
-        } else {
-            return productLocatie;
+        return productLocatie;
+    }
+
+    public String getCustomerID(int orderID){
+            String customerID = null;
+        try {
+            Connection con = DriverManager.getConnection(url, uname, password);
+            Statement statement = con.createStatement();
+            String query = "SELECT klantID FROM orders WHERE orderID =" + orderID;
+            ResultSet result = statement.executeQuery(query);
+            while (result.next()) {
+                customerID = result.getString(1);
+            }
+            con.close();
+            statement.close();
+            result.close();
+        } catch (
+                SQLException ex) {
+            ex.printStackTrace();
         }
+        return customerID;
+    }
+
+    public String[] getCustomerDetails(int customerID){
+        String[] customerDetails = new String[6];
+        try {
+                Connection con = DriverManager.getConnection(url, uname, password);
+                Statement statement = con.createStatement();
+                String query3 = "SELECT * FROM klanten WHERE klantID = " + customerID;
+                ResultSet result3 = statement.executeQuery(query3);
+                while(result3.next()) {
+                    for (int i = 0; i < 6; i++) {
+                        customerDetails[i] = result3.getString((i + 1));
+                    }
+                }
+                con.close();
+                statement.close();
+                result3.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+            return customerDetails;
     }
 
     public void shipOrder(String orderID){

@@ -109,24 +109,6 @@ public class Hoofdscherm extends JFrame implements ActionListener {
                 ex.printStackTrace();
             }
 
-            try {
-                for (int i = 0; i < 3; i++) {
-                    Connection con = DriverManager.getConnection(url, uname, password);
-                    Statement statement = con.createStatement();
-                    String query3 = "SELECT productLocatie FROM producten WHERE productID = " + productIDs[i];
-                    ResultSet result3 = statement.executeQuery(query3);
-                    while (result3.next()) {
-                        productLocatie[i] = result3.getString(1);
-                    }
-                    con.close();
-                    statement.close();
-                    result3.close();
-                }
-                System.out.println("product locatie: " + Arrays.toString(productLocatie));
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-
             //NOG TOEVOEGEN:
             // heeft robot locatie bereikt maak background dan weer groen.
             // POPUP melding voor ongeldige waarde
@@ -134,175 +116,125 @@ public class Hoofdscherm extends JFrame implements ActionListener {
                 switch (productLocatie[i]) {
                     case "11":
                         p1.setBackground(Color.blue);
-                        circleX = p1.getX();
-                        circleY = p1.getY();
                         repaint();
                         break;
 
                     case "21":
                         p2.setBackground(Color.blue);
-                        int p2Xlocatie = p2.getX();
-                        int p2Ylocatie = p2.getY();
                         repaint();
                         break;
 
                     case "31":
                         p3.setBackground(Color.blue);
-                        int p3Xlocatie = p3.getX();
-                        int p3Ylocatie = p3.getY();
                         repaint();
                         break;
 
                     case "41":
                         p4.setBackground(Color.blue);
-                        int p4Xlocatie = p4.getX();
-                        int p4Ylocatie = p4.getY();
                         repaint();
                         break;
 
                     case "51":
                         p5.setBackground(Color.blue);
-                        int p5Xlocatie = p5.getX();
-                        int p5Ylocatie = p5.getY();
                         repaint();
                         break;
 
                     case "12":
                         p6.setBackground(Color.blue);
-                        int p6Xlocatie = p6.getX();
-                        int p6Ylocatie = p6.getY();
                         repaint();
                         break;
 
                     case "22":
                         p7.setBackground(Color.blue);
-                        int p7Xlocatie = p7.getX();
-                        int p7Ylocatie = p7.getY();
                         repaint();
                         break;
 
                     case "32":
                         p8.setBackground(Color.blue);
-                        int p8Xlocatie = p8.getX();
-                        int p8Ylocatie = p8.getY();
                         repaint();
                         break;
 
                     case "42":
                         p9.setBackground(Color.blue);
-                        int p9Xlocatie = p9.getX();
-                        int p9Ylocatie = p9.getY();
                         repaint();
                         break;
 
                     case "52":
                         p10.setBackground(Color.blue);
-                        int p10Xlocatie = p10.getX();
-                        int p10Ylocatie = p10.getY();
                         repaint();
                         break;
 
                     case "13":
                         p11.setBackground(Color.blue);
-                        int p11Xlocatie = p11.getX();
-                        int p11Ylocatie = p11.getY();
                         repaint();
                         break;
 
                     case "23":
                         p12.setBackground(Color.blue);
-                        int p12Xlocatie = p12.getX();
-                        int p12Ylocatie = p12.getY();
                         repaint();
                         break;
 
                     case "33":
                         p13.setBackground(Color.blue);
-                        int p13Xlocatie = p13.getX();
-                        int p13Ylocatie = p13.getY();
                         repaint();
                         break;
 
                     case "43":
                         p14.setBackground(Color.blue);
-                        int p14Xlocatie = p14.getX();
-                        int p14Ylocatie = p14.getY();
                         repaint();
                         break;
 
                     case "53":
                         p15.setBackground(Color.blue);
-                        int p15Xlocatie = p15.getX();
-                        int p15Ylocatie = p15.getY();
                         repaint();
                         break;
 
                     case "14":
                         p16.setBackground(Color.blue);
-                        int p16Xlocatie = p16.getX();
-                        int p16Ylocatie = p16.getY();
                         repaint();
                         break;
 
                     case "24":
                         p17.setBackground(Color.blue);
-                        int p17Xlocatie = p17.getX();
-                        int p17Ylocatie = p17.getY();
                         repaint();
                         break;
 
                     case "34":
                         p18.setBackground(Color.blue);
-                        int p18Xlocatie = p18.getX();
-                        int p18Ylocatie = p18.getY();
                         repaint();
                         break;
 
                     case "44":
                         p19.setBackground(Color.blue);
-                        int p19Xlocatie = p19.getX();
-                        int p19Ylocatie = p19.getY();
                         repaint();
                         break;
                     case "54":
                         p20.setBackground(Color.blue);
-                        int p20Xlocatie = p20.getX();
-                        int p20Ylocatie = p20.getY();
                         repaint();
                         break;
 
                     case "15":
                         p21.setBackground(Color.blue);
-                        int p21Xlocatie = p21.getX();
-                        int p21Ylocatie = p21.getY();
                         repaint();
                         break;
 
                     case "25":
                         p22.setBackground(Color.blue);
-                        int p22Xlocatie = p22.getX();
-                        int p22Ylocatie = p22.getY();
                         repaint();
                         break;
 
                     case "35":
                         p23.setBackground(Color.blue);
-                        int p23Xlocatie = p23.getX();
-                        int p23Ylocatie = p23.getY();
                         repaint();
                         break;
 
                     case "45":
                         p24.setBackground(Color.blue);
-                        int p24Xlocatie = p24.getX();
-                        int p24Ylocatie = p24.getY();
                         repaint();
                         break;
 
                     case "55":
                         p25.setBackground(Color.blue);
-                        int p25Xlocatie = p25.getX();
-                        int p25Ylocatie = p25.getY();
                         repaint();
                         break;
 
@@ -459,15 +391,6 @@ public class Hoofdscherm extends JFrame implements ActionListener {
         }
 
 
-    }
-
-
-    public int getCircleX() {
-        return circleX;
-    }
-
-    public int getCircleY() {
-        return circleY;
     }
 
     public void addStorageGrid(){

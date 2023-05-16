@@ -1,6 +1,10 @@
 package com.company;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
@@ -8,7 +12,6 @@ import com.fazecast.jSerialComm.*;
 
 public class Testscherm extends JFrame {
     Database db = new Database();
-
 
     private int[] squareArray = new int[25];
 
@@ -21,6 +24,9 @@ public class Testscherm extends JFrame {
 
     public Testscherm() throws SQLException {
         addStartScherm("HMI Startscherm", 1000, 550);
+
+        //uncomment om magazijn in te laden maar de werkt robot besturing niet meer.
+        Magazijn mg = new Magazijn(links, rechts, midden);
     }
 
     public void addStartScherm(String titel, int breedte, int hoogte) {
@@ -43,7 +49,7 @@ public class Testscherm extends JFrame {
 
         //Bereidt het linker paneel voor
         links = new JPanel();
-        links.setBackground(Color.GREEN);
+        links.setBorder(new LineBorder(Color.GRAY,2,false));
         //zet tekstlabels onder elkaar
         links.setLayout(new BoxLayout(links, BoxLayout.Y_AXIS));
 
@@ -54,6 +60,7 @@ public class Testscherm extends JFrame {
         //Bereidt het midden paneel voor
         midden = new JPanel();
         midden.setLayout(new FlowLayout());
+        midden.setBorder(new LineBorder(Color.GRAY,2,false));
 
         //Maakt de dropdowns en gooit het midden erin
         add(midden);
@@ -79,9 +86,29 @@ public class Testscherm extends JFrame {
     }
 
     public void addOrderList() {
+        JLabel openorders = new JLabel("Open orders: ");
+        openorders.setLocation((this.getWidth()-openorders.getWidth())/2,50);
+        links.add(openorders);
         String[] orders = db.getAllOrders();
+        String order= null;
         for (int x = 0; x < orders.length; x++) {
-            JLabel orderNaam = new JLabel("Order: " + orders[x]);
+            JLabel orderNaam = new JLabel("Ordernummer: " + orders[x]); //print alle open orders
+            orderNaam.setForeground(Color.blue);
+            order = orders[x]; //krijg order nummer
+            orderNaam.setCursor(new Cursor(Cursor.HAND_CURSOR)); // maak order nummer label clickable
+            String finalOrder = order;
+
+            orderNaam.addMouseListener(new MouseAdapter() { // voeg mouseclick listener toe aan ordernummer label
+                public void mouseClicked(MouseEvent me) {
+                    // your code
+                    try {
+                        Orderscherm os = new Orderscherm(finalOrder); // open order scherm uit Orderscherm klasse
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            });
             links.add(orderNaam);
         }
     }
@@ -93,25 +120,7 @@ public class Testscherm extends JFrame {
     }
 
     public void addGridPanels() {
-        for (int i = 0; i < squareArray.length; i++) {
 
-            squareArray[i] = i;
-            Panel panel = new Panel();
-            JLabel naam = new JLabel("" + (i + 1));
-            Integer[] magazijnLocatie = db.getAllProductLocations().keySet().toArray(new Integer[0]);
-            String[] productID = db.getAllProductLocations().values().toArray(new String[0]);
-            int labelInt = i;
-
-            if (i % 2 == 0) {
-                panel.setBackground(Color.green);
-            } else {
-                panel.setBackground(DarkGreen);
-            }
-
-            rechts.add(panel);
-            panel.add(naam);
-        }
-        repaint();
     }
 
     public void moveRobotUp(SerialPort sp) throws IOException {
