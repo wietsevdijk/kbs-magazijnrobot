@@ -2,8 +2,13 @@
   <library name="mysql-connector-j-8.0.33">
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/../mysql-connector-j-8.0.33/mysql-connector-j-8.0.33.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/jSerialComm-2.9.3.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/arduino.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/Downloads/arduino.jar!/" />
+      <root url="jar://$USER_HOME$/.ideaLibSources/jSerialComm-2.9.3-sources.jar!/" />
+    </SOURCES>
   </library>
 </component>
