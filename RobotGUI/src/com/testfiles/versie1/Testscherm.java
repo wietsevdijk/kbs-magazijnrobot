@@ -1,4 +1,4 @@
-package com.testfiles;
+package com.testfiles.versie1;
 
 import javax.swing.*;
 import java.awt.*;
@@ -35,14 +35,9 @@ public class Testscherm extends JFrame{
 
         //Bereidt het linkerpanel voor
         links = new JPanel();
-        links.setLayout(new GridBagLayout());
-
-        //Specificeert de constraints
-        GridBagConstraints c = new GridBagConstraints();
-        c.fill = GridBagConstraints.VERTICAL;
-
+        links.setLayout(new GridLayout(1, 2)); //Zet de layout klaar voor 2 panels
         //Maakt de lijst en gooit het linkerpanel erin
-        addList(c);
+        addList();
         add(links);
 
         //Initieert de layout voor het rechterpanel
@@ -64,7 +59,7 @@ public class Testscherm extends JFrame{
 
     }
 
-    public void addList(GridBagConstraints constraints) {
+    public void addList() {
         DefaultListModel listModel = new DefaultListModel();
 
         for(int i = 0; i < 50; i++) {
@@ -76,13 +71,13 @@ public class Testscherm extends JFrame{
         JScrollBar bigBar = listScroller.getVerticalScrollBar();
         bigBar.setPreferredSize(new Dimension(20, 1000));
 
-        constraints.ipady = 1000;
-        constraints.ipadx = 75;
-        constraints.gridx = 0;
-        constraints.gridy = 0;
-        constraints.gridwidth = 1;
-        constraints.gridheight = 3;
-        links.add(listScroller, constraints);
+//        constraints.ipady = 1000;
+//        constraints.ipadx = 75;
+//        constraints.gridx = 0;
+//        constraints.gridy = 0;
+//        constraints.gridwidth = 1;
+//        constraints.gridheight = 3;
+        links.add(listScroller);
     }
 
     public void addDetails() {

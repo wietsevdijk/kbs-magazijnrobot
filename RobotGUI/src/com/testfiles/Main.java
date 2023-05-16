@@ -1,9 +1,8 @@
 package com.testfiles;
-import java.awt.*;
-import javax.swing.*;
-import java.awt.event.*;
+import com.testfiles.versie1.Testscherm;
+import com.testfiles.versie2.Testscherm2;
+
 import java.sql.*;
-import java.util.Arrays;
 
 
 public class Main {
@@ -11,6 +10,7 @@ public class Main {
     public static void main(String[] args) throws SQLException {
 
         // write your code here
-        Testscherm testscherm = new Testscherm();
+        Testscherm schermpje = new Testscherm();
+        Testscherm2 testscherm = new Testscherm2();
     }
 }
