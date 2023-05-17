@@ -26,7 +26,7 @@ public class Testscherm extends JFrame {
         addStartScherm("HMI Startscherm", 1000, 550);
 
         //uncomment om magazijn in te laden maar de werkt robot besturing niet meer.
-        Magazijn mg = new Magazijn(links, rechts, midden);
+        //Magazijn mg = new Magazijn(links, rechts, midden);
     }
 
     public void addStartScherm(String titel, int breedte, int hoogte) {
@@ -165,7 +165,7 @@ public class Testscherm extends JFrame {
     }
 
     public SerialPort closeArduinoConnection(){
-        SerialPort sp = SerialPort.getCommPort("COM5");
+        SerialPort sp = SerialPort.getCommPort("COM7");
         if(sp.closePort()) { // sluit de connectie
             System.out.println("Failed to open port :(");
         }

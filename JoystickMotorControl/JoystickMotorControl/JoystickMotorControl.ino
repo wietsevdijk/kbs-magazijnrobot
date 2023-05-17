@@ -39,7 +39,7 @@ void setup() {
   TCCR2B = TCCR2B & B11111000 | B00000111;  // for PWM frequency of 30.64 Hz
 
   //Start I2C Bus as Master
-  Wire.begin();
+  Wire.begin(9);
 
   // put your setup code here, to run once:
   Serial.begin(9600);
@@ -81,31 +81,30 @@ void loop() {
    if (Serial.available()) {
     // read serial data
     HMIcommand = String(Serial.readString());
-    lcd.print(HMIcommand);
   }
 
   if (HMIcommand == "UP") {
       response = "omhoog";
         goUp();
-      //delay(1000);
+      delay(300);
     }
 
     if (HMIcommand == "DOWN") {
       response = "omlaag";
       goDown();
-      //delay(1000);
+      delay(300);
     }
 
     if (HMIcommand == "LEFT") {
       response = "links";
       goLeft();
-      //delay(1000);
+      delay(300);
     }
 
     if (HMIcommand == "RIGHT") {
       goRight();
       response = "rechts";
-      //delay(1000);
+      delay(300);
     }
 
     if (HMIcommand == "FORWARDS") {
@@ -270,6 +269,7 @@ void goDown() {
 
 //make robot go left
 void goLeft() {
+  sendCommand("LEFT");
   digitalWrite(12, LOW);  //Establishes backward direction of Channel A
   digitalWrite(9, LOW);   //Disengage the Brake for Channel A
   analogWrite(3, 200);    //Spins the motor on Channel A at full speed
@@ -277,6 +277,7 @@ void goLeft() {
 
 //make robot go right
 void goRight() {
+  sendCommand("RIGHT");
   digitalWrite(12, HIGH);  //Establishes forward direction of Channel A
   digitalWrite(9, LOW);    //Disengage the Brake for Channel A
   analogWrite(3, 200);     //Spins the motor on Channel A at full speed
@@ -293,7 +294,7 @@ void brakeBoth() {
   digitalWrite(8, HIGH);
 }
 
-//turn brake on
+//lights???
 void brakeOn() {
   digitalWrite(2, LOW);
   digitalWrite(4, LOW);
@@ -301,7 +302,7 @@ void brakeOn() {
   delay(300);
 }
 
-//turn brake off
+//lights???
 void brakeOff() {
   digitalWrite(5, LOW);
   delay(300);

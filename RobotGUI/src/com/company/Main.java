@@ -22,7 +22,7 @@ public class Main {
         Testscherm ts = new Testscherm();
 
         //Communicatie met arduino
-        SerialPort sp = SerialPort.getCommPort("COM5"); // selecteer je gebruikte COM port
+        SerialPort sp = SerialPort.getCommPort("COM7"); // selecteer je gebruikte COM port
         sp.setComPortParameters(9600, 8, 1, 0); //Set Serial baudrate
         sp.setComPortTimeouts(SerialPort.TIMEOUT_NONBLOCKING, 0, 0); //timeouts uitzetten
         boolean hasOpened = sp.openPort();

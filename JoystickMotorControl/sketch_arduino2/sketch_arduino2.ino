@@ -88,18 +88,24 @@ void requestEvent() {
 //count encoder pulses to measure distance
 void DC_Motor_Encoder() {
   int b = digitalRead(Encoder_output_x);
-  if (b > 0) {
+  int i = b - (b % 100);
+  if (command.equals("RIGHT") && b > 0) {
     Count_pulses++;
-  } else {
-    Count_pulses--;
+    Serial.println(Count_pulses);
   }
+
+  if (command.equals("LEFT") && b > 0) {
+    Count_pulses--;
+    Serial.println(Count_pulses);
+  }
+
 }
 
 void Read_z_encoder() {
   z_axis = analogRead(Encode_output_z);
   z_axis = map(z_axis, 285, 650, 20, 0);
-  Serial.print("Z-Axis: ");
-  Serial.println(z_axis);
+  //Serial.print("Z-Axis: ");
+  //Serial.println(z_axis);
 }
 void loop() {
   // put your main code here, to run repeatedly:
@@ -132,7 +138,7 @@ void loop() {
   }
 
   //count pulses read by the encoder
-  Serial.println("Pulses: " + Count_pulses);
+  //Serial.println("Pulses: " + Count_pulses);
 
 
   //check limitswitchX
@@ -141,11 +147,12 @@ void loop() {
   // //Get state of limit switch on X-axis and do something
   int stateX = limitSwitchX.getState();
   if (stateX == HIGH) {
-    Serial.println("The limit switch on X-Axis is: TOUCHED");
+    //Serial.println("The limit switch on X-Axis is: TOUCHED");
     message = "xLimY";
+    Count_pulses = 0;
     requestEvent();
   } else {
-    Serial.println("The limit switch on X-Axis is: UNTOUCHED");
+    //Serial.println("The limit switch on X-Axis is: UNTOUCHED");
     message = "xLimN";
     requestEvent();
   }
@@ -160,11 +167,11 @@ void loop() {
   //Get state of limit switch on Y-axis and do something
   int stateY = limitSwitchY.getState();
   if (stateY == HIGH) {
-    Serial.println("The limit switch on Y-Axis is: TOUCHED");
+    //Serial.println("The limit switch on Y-Axis is: TOUCHED");
     message = "yLimY";
     requestEvent();
   } else {
-    Serial.println("The limit switch on Y-Axis is: UNTOUCHED");
+    //Serial.println("The limit switch on Y-Axis is: UNTOUCHED");
     message = "yLimN";
     requestEvent();
   }
