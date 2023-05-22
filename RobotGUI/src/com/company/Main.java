@@ -15,7 +15,7 @@ import java.util.Scanner;
 
 public class Main {
 
-    public static void main(String[] args) throws IOException, InterruptedException, SQLException {
+    public static void main(String[] args) throws IOException, InterruptedException, SQLException, UnsupportedLookAndFeelException, ClassNotFoundException, InstantiationException, IllegalAccessException {
 
         // write your code here
         //Hoofdscherm hoofdscherm = new Hoofdscherm();
