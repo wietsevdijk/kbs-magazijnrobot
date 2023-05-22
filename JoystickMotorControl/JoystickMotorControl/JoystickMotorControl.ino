@@ -1,16 +1,34 @@
+#include <ezButton.h>  // Button library
+#include <Wire.h> //library voor I2C
 
-#include <Wire.h>
+#define VRX_PIN A2  // Joystick X-as pin
+#define VRY_PIN A3  // Joystick Z-as pin
 
-#define VRX_PIN A2  // Arduino pin connected to VRX pin
-#define VRY_PIN A3  // Arduino pin connected to VRY pin
+#define modeSwitchPin 10 // KNOP stoplicht modus switch
+#define noodstopPin 7 // KNOP noodstop
+#define jSwitchPin 6 // KNOP joystick
 
-#define modeSwitchKnop 10
-#define noodstop 7
-#define jSwitch 6
+#define groenLED 2
+#define geelLED 4
+#define roodLED 5
 
-#define GroenLED 2
-#define GeelLED 4
-#define RoodLED 5
+//Pins voor besturing X- en Y-as motoren
+#define pwmX 3
+#define directionX 12
+#define brakeX 9
+
+#define pwmY 11
+#define directionY 13
+#define brakeY 8
+
+ezButton noodstopKnop(noodstopPin);
+ezButton modeSwitchKnop(modeSwitchPin);
+ezButton jSwitchKnop(jSwitchPin);
+
+
+
+int globalButtonDebounce; // Value for debounce to be used for all buttons
+
 
 
 int currentMillis;
@@ -19,18 +37,17 @@ int currentMillis;
 int xValue = 0;  // To store value of the X axis from the joystick
 int yValue = 0;  // To store value of the Y axis from the joystick
 
-
-
-int zAxisMode = 0;
+int zAxisMode = 0; // bepaalt of X+Y-as of Z-as wordt aangestuurd
 
 int jSwitchLast;
 int jSwitchCurrent;
 
 String message; //The message received from the slave
+
 bool noodstopTriggered = false; //boolean for emergency stop button
 bool manual = true; // boolean for manual/automatic mode button
-bool yLimit = false;
-bool xLimit = false;
+bool yLimit = false; // boolean for checking if limit switch Y is hit
+bool xLimit = false; // boolean for checking if limit switch X is hit
 
 long x_axis = 0;
 long y_axis = 0;
@@ -39,42 +56,52 @@ void setup() {
   TCCR2B = TCCR2B & B11111000 | B00000111;  // for PWM frequency of 30.64 Hz
 
   //Start I2C Bus as Master
+  //nummer maakt niet uit, zolang dit hetzelfde is aan de slave kant
   Wire.begin(9);
 
   // put your setup code here, to run once:
   Serial.begin(9600);
 
-  Serial.setTimeout(10);
+  // haal delay van serial communicatie weg
+  Serial.setTimeout(10); 
 
   while (!Serial) {
     ; // wait for serial port to connect.
   }
 
-  //NOODSTOP
-  pinMode(noodstop, INPUT_PULLUP);
+  //Setup Channel A, X-as
+  pinMode(pwmX, OUTPUT); //Initiates PWM Channel A pin
+  pinMode(directionX, OUTPUT);  //Initiates Motor Channel A pin
+  pinMode(brakeX, OUTPUT);   //Initiates Brake Channel A pin
 
-  //Joystick button
-  pinMode(jSwitch, INPUT_PULLUP);
-
-  //modeSwitchKnop
-  pinMode(modeSwitchKnop, INPUT_PULLUP);
-
-  //Setup Channel A
-  pinMode(12, OUTPUT);  //Initiates Motor Channel A pin
-  pinMode(9, OUTPUT);   //Initiates Brake Channel A pin
-
-  //Setup Channel B
-  pinMode(13, OUTPUT);  //Initiates Motor Channel B pin
-  pinMode(8, OUTPUT);   //Initiates Brake Channel B pin
+  //Setup Channel B, Y-as
+  pinMode(pwmY, OUTPUT); //Initiates PWM Channel B pin
+  pinMode(directionY, OUTPUT);  //Initiates Motor Channel B pin
+  pinMode(brakeY, OUTPUT);   //Initiates Brake Channel B pin
 
   //Setup LEDs
-  pinMode(2, OUTPUT);
-  pinMode(4, OUTPUT);
-  pinMode(5, OUTPUT);
+  pinMode(groenLED, OUTPUT);
+  pinMode(geelLED, OUTPUT);
+  pinMode(roodLED, OUTPUT);
+
+  //Knoppen, stel debounce in.
+  noodstopKnop.setDebounceTime(globalButtonDebounce);
+  modeSwitchKnop.setDebounceTime(globalButtonDebounce);
+  jSwitchKnop.setDebounceTime(globalButtonDebounce);
 }
 
 
 void loop() {
+  //Nodig voor ezButton
+  noodstopKnop.loop();
+  modeSwitchKnop.loop();
+  jSwitchKnop.loop();
+  int noodstop = !noodstopKnop.getState();
+  int modeSwitch = !modeSwitchKnop.getState();
+  int jSwitch = !jSwitchKnop.getState();
+
+
+
   String HMIcommand = "";
   String response = "";
   // put your main code here, to run repeatedly:
@@ -121,8 +148,6 @@ void loop() {
   Serial.print(response);
 
   
-
-
   //COARDS PRINTEN
   //Serial.print("X-Axis: ");
   //Serial.println(map(x_axis, 0, 450, 1, 500));
@@ -135,34 +160,35 @@ void loop() {
   }
 
   //NOODSTOP
-  if (noodstopCheck() && !noodstopTriggered) {
+  if (noodstop && !noodstopTriggered) {
     noodstopTriggered = true;
     digitalWrite(2, LOW);
     digitalWrite(4, LOW);
     digitalWrite(5, HIGH);
     delay(300);
-  } else if (noodstopCheck() && noodstopTriggered) {
+  } else if (noodstop && noodstopTriggered) {
     noodstopTriggered = false;
     digitalWrite(5, LOW);
     delay(300);
   }
 
   //MODE SWITCH
-  if (modeSwitch() && !noodstopTriggered && !manual) {
+  if (modeSwitch && !noodstopTriggered && !manual) {
     manual = true;
     digitalWrite(2, LOW);
     digitalWrite(4, HIGH);
     delay(300);
-  } else if (modeSwitch() && !noodstopTriggered && manual) {
+  } else if (modeSwitch && !noodstopTriggered && manual) {
     manual = false;
     digitalWrite(2, HIGH);
     digitalWrite(4, LOW);
     delay(300);
   }
 
-  //TOGGLE Z-AXIS CONTROL
+  //TOGGLE Z-AXIS CONTROL 
+  //todo: zet om in functie
   jSwitchLast = jSwitchCurrent;
-  jSwitchCurrent = joystickSwitch();
+  jSwitchCurrent = jSwitch;
   if (jSwitchLast == 1 & jSwitchCurrent == 0) {
     
     Serial.println("Toggled-Z");
@@ -173,7 +199,7 @@ void loop() {
   }
 
 
-  // if(joystickSwitch()){
+  // if(jSwitch){
   //   Serial.println("SWITCH");
   //   sendCommand("AAN");
   // } else {
@@ -229,28 +255,29 @@ void loop() {
   }
 }
 
-//Functions from here
+
+//Functions for master
+
+
 
 //checks emergency button
+// bool noodstop {
+//   bool ingedrukt = digitalRead(noodstop);
+//   return !ingedrukt;
+// }
 
-bool noodstopCheck() {
-  bool ingedrukt = digitalRead(noodstop);
-  return !ingedrukt;
-}
+// //checks if joystick is pressed
+// bool jSwitch {
+//   bool ingedrukt = digitalRead(jSwitch);
+//   return !ingedrukt;
+// }
 
-//checks if joystick is pressed
+// //switches between modes
 
-bool joystickSwitch() {
-  bool ingedrukt = digitalRead(jSwitch);
-  return !ingedrukt;
-}
-
-//switches between modes
-
-bool modeSwitch() {
-  bool manual = digitalRead(modeSwitchKnop);
-  return !manual;
-}
+// bool modeSwitch {
+//   bool manual = digitalRead(modeSwitch);
+//   return !manual;
+// }
 
 //make robot go up
 void goUp() {

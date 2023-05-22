@@ -1,0 +1,14 @@
+Functions:
+
+noodstop
+
+stoplicht
+- handmatige bediening
+- automatische modus
+
+pins
+-alles motor A 
+-alles motor B 
+
+
+-alle knoppen overzetten naar ezButton
