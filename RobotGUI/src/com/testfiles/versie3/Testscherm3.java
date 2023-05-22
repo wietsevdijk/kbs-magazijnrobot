@@ -1,6 +1,5 @@
 package com.testfiles.versie3;
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -12,7 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import com.fazecast.jSerialComm.*;
 
-public class Testscherm extends JFrame {
+public class Testscherm3 extends JFrame {
     Database db = new Database();
 
     private int[] squareArray = new int[25];
@@ -24,7 +23,7 @@ public class Testscherm extends JFrame {
     private JPanel rechts;
 
 
-    public Testscherm() throws SQLException {
+    public Testscherm3() throws SQLException {
         addStartScherm("HMI Startscherm", 1000, 550);
 
         //uncomment om magazijn in te laden maar de werkt robot besturing niet meer.
