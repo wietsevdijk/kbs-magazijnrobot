@@ -3,10 +3,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
@@ -22,12 +19,16 @@ public class Testscherm extends JFrame {
     private JPanel links;
     private JPanel midden;
     private JPanel rechts;
+    public SerialPort sp;
 
 
     public Testscherm() throws SQLException {
         addStartScherm("HMI Startscherm", 1000, 550);
 
-        //uncomment om magazijn in te laden maar de werkt robot besturing niet meer.
+        //Serialcomm instellen
+        sp = SerialPort.getCommPort("COM5"); // selecteer je gebruikte COM port
+        sp.setComPortParameters(9600, 8, 1, 0); //Set Serial baudrate
+        sp.setComPortTimeouts(SerialPort.TIMEOUT_NONBLOCKING, 0, 0); //timeouts uitzetten
     }
 
     public void addStartScherm(String titel, int breedte, int hoogte) {
@@ -38,7 +39,6 @@ public class Testscherm extends JFrame {
         setLayout(new GridLayout(1, 3)); //Zet de layout klaar voor 2 panels
 
         addPanels();
-        addButtons();
         addOrderList();
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -75,6 +75,259 @@ public class Testscherm extends JFrame {
 
         //Zet de layout en tussenlijntjes (Voorgeinitieerde layout voor nodig!)
         rechts.setLayout(null);
+        rechts.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                //See where the mouse clicks on the grid and send location to robot
+                if(e.getX() < 65 && e.getY() < 65){
+                    System.out.println("A1");
+                    try {
+                        moveRobotToLocation(sp, "A1");
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+                if(e.getX() > 65 && e.getX() < 130 && e.getY() < 65){
+                    System.out.println("A2");
+                    try {
+                        moveRobotToLocation(sp, "A2");
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+                if(e.getX() > 130 && e.getX() < 195 && e.getY() < 65){
+                    System.out.println("A3");
+                    try {
+                        moveRobotToLocation(sp, "A3");
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+                if(e.getX() > 195 && e.getX() < 260 && e.getY() < 65){
+                    System.out.println("A4");
+                    try {
+                        moveRobotToLocation(sp, "A4");
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+                if(e.getX() > 260 && e.getX() < 325 && e.getY() < 65){
+                    System.out.println("A5");
+                    try {
+                        moveRobotToLocation(sp, "A5");
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+                if(e.getX() < 65 && e.getY() > 65 && e.getY() < 130){
+                    System.out.println("B1");
+                    try {
+                        moveRobotToLocation(sp, "B1");
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+                if(e.getX() > 65 && e.getX() < 130 && e.getY() > 65 && e.getY() < 130){
+                    System.out.println("B2");
+                    try {
+                        moveRobotToLocation(sp, "B2");
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+                if(e.getX() > 130 && e.getX() < 195 && e.getY() > 65 && e.getY() < 130){
+                    System.out.println("B3");
+                    try {
+                        moveRobotToLocation(sp, "B3");
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+                if(e.getX() > 195 && e.getX() < 260 && e.getY() > 65 && e.getY() < 130){
+                    System.out.println("B4");
+                    try {
+                        moveRobotToLocation(sp, "B4");
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+                if(e.getX() > 260 && e.getX() < 325 && e.getY() > 65 && e.getY() < 130){
+                    System.out.println("B5");
+                    try {
+                        moveRobotToLocation(sp, "B5");
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+                if(e.getX() < 65 && e.getY() > 130 && e.getY() < 195){
+                    System.out.println("C1");
+                    try {
+                        moveRobotToLocation(sp, "C1");
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+                if(e.getX() > 65 && e.getX() < 130 && e.getY() > 130 && e.getY() < 195){
+                    System.out.println("C2");
+                    try {
+                        moveRobotToLocation(sp, "C2");
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+                if(e.getX() > 130 && e.getX() < 195 && e.getY() > 130 && e.getY() < 195){
+                    System.out.println("C3");
+                    try {
+                        moveRobotToLocation(sp, "C3");
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+                if(e.getX() > 195 && e.getX() < 260 && e.getY() > 130 && e.getY() < 195){
+                    System.out.println("C4");
+                    try {
+                        moveRobotToLocation(sp, "C4");
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+                if(e.getX() > 260 && e.getX() < 325 && e.getY() > 130 && e.getY() < 195){
+                    System.out.println("C5");
+                    try {
+                        moveRobotToLocation(sp, "C5");
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+                if(e.getX() < 65 && e.getY() > 195 && e.getY() < 260){
+                    System.out.println("D1");
+                    try {
+                        moveRobotToLocation(sp, "D1");
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+                if(e.getX() > 65 && e.getX() < 130 && e.getY() > 195 && e.getY() < 260){
+                    System.out.println("D2");
+                    try {
+                        moveRobotToLocation(sp, "D2");
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+                if(e.getX() > 130 && e.getX() < 195 && e.getY() > 195 && e.getY() < 260) {
+                    System.out.println("D3");
+                    try {
+                        moveRobotToLocation(sp, "D3");
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+                if(e.getX() > 195 && e.getX() < 260 && e.getY() > 195 && e.getY() < 260){
+                    System.out.println("D4");
+                    try {
+                        moveRobotToLocation(sp, "D4");
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+                if(e.getX() > 260 && e.getX() < 325 && e.getY() > 195 && e.getY() < 260){
+                    System.out.println("D5");
+                    try {
+                        moveRobotToLocation(sp, "D5");
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+                if(e.getX() < 65 && e.getY() > 260 && e.getY() < 325){
+                    System.out.println("E1");
+                    try {
+                        moveRobotToLocation(sp, "E1");
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+                if(e.getX() > 65 && e.getX() < 130 && e.getY() > 260 && e.getY() < 325){
+                    System.out.println("E2");
+                    try {
+                        moveRobotToLocation(sp, "E2");
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+                if(e.getX() > 130 && e.getX() < 195 && e.getY() > 260 && e.getY() < 325){
+                    System.out.println("E3");
+                    try {
+                        moveRobotToLocation(sp, "E3");
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+                if(e.getX() > 195 && e.getX() < 260 && e.getY() > 260 && e.getY() < 325){
+                    System.out.println("E4");
+                    try {
+                        moveRobotToLocation(sp, "E4");
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+                if(e.getX() > 260 && e.getX() < 325 && e.getY() > 260 && e.getY() < 325){
+                    System.out.println("E5");
+                    try {
+                        moveRobotToLocation(sp, "E5");
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+
+
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+            }
+        });
 
         //addGridPanels(false);
         add(rechts);
@@ -86,6 +339,7 @@ public class Testscherm extends JFrame {
             int rows;
 
             int cols;
+
 
             GridsCanvas(int w, int h) {
                 setSize(width = w, height = h);
@@ -106,14 +360,15 @@ public class Testscherm extends JFrame {
                         System.out.println();
                     }
                 }
+
                 g.setColor(Color.green);
                 //X-axis and Y-axis move in increments of 65
-                g.drawOval(xCoords("A"),yCoords("4"),35,35);
+
 
                 g.setColor(Color.blue);
 
                //A1->E5               //X en Y van beginpunt lijn         //X en Y van eindpunt lijn
-               g.drawLine(xCoords("A"), yCoords("1"),xCoords("E"), yCoords("5"));
+               //g.drawLine(xCoords("A"), yCoords("1"),xCoords("E"), yCoords("5"));
 
             }
         }
@@ -126,28 +381,6 @@ public class Testscherm extends JFrame {
     public void drawRectangle(Graphics g){
         g.setColor(Color.green);
         g.drawRect(10,10,63,63);
-    }
-
-    public int xCoords (String locatieX){
-        return switch (locatieX) {
-            case "A" -> 14;
-            case "B" -> 79;
-            case "C" -> 143;
-            case "D" -> 208;
-            case "E" -> 273;
-            default -> 0;
-        };
-    }
-
-    public int yCoords (String locatieY){
-        return switch (locatieY) {
-            case "1" -> 14;
-            case "2" -> 79;
-            case "3" -> 143;
-            case "4" -> 208;
-            case "5" -> 273;
-            default -> 0;
-        };
     }
 
     public void addOrderList() {
@@ -178,149 +411,6 @@ public class Testscherm extends JFrame {
         }
     }
 
-    public void addButtons(){
-        JButton zendingLaden = new JButton("Zending laden");
-        JButton zendingVersturen = new JButton("Zending versturen");
-
-        midden.add(zendingLaden);
-        midden.add(zendingVersturen);
-
-        zendingVersturen.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String orderID = db.getOrderID(); // krijgt orderID
-                String[] productLocatie = db.getProductLocatie(orderID); // krijgt product locaties
-
-                //Als de locatie overeenkomt met de case zet dan de background kleur op groen.
-                for (int i = 0; i < productLocatie.length; i++) {
-                    switch (productLocatie[i]) {
-                        case "A1":
-                            // do something
-                            rechts.getGraphics().drawRect(xCoords("A"),yCoords("1"),65,65);
-                            break;
-
-                        case "A2":
-                            // do something
-                            break;
-
-                        case "A3":
-                            // do something
-                            break;
-
-                        case "A4":
-                            // do something
-                            break;
-
-                        case "A5":
-                            // do something
-                            rechts.getGraphics().setColor(Color.green);
-                            rechts.getGraphics().drawRect(xCoords("A"),yCoords("5"),2000,2000);
-                            break;
-
-                        case "B1":
-                            // do something
-                            break;
-
-                        case "B2":
-                            // do something
-                            break;
-
-                        case "B3":
-                            // do something
-                            break;
-
-                        case "B4":
-                            // do something
-                            break;
-
-                        case "B5":
-                            // do something
-                            break;
-
-                        case "C1":
-                            // do something
-                            break;
-
-                        case "C2":
-                            // do something
-                            break;
-
-                        case "C3":
-                            // do something
-                            break;
-
-                        case "C4":
-                            // do something
-                            break;
-
-                        case "C5":
-                            // do something
-                            break;
-
-                        case "D1":
-                            // do something
-                            break;
-
-                        case "D2":
-                            // do something
-                            break;
-
-                        case "D3":
-                            // do something
-                            break;
-
-                        case "D4":
-                            // do something
-                            break;
-                        case "D5":
-                            // do something
-                            break;
-
-                        case "E1":
-                            // do something
-                            break;
-
-                        case "E2":
-                            // do something
-                            break;
-
-                        case "E3":
-                            // do something
-                            break;
-
-                        case "E4":
-                            // do something
-                            break;
-
-                        case "E5":
-                            // do something
-                            break;
-
-                        default:
-                            //maak hier nog een popup melding met ongeldige waarde
-                            System.out.println("Er zijn geen zendingen beschikbaar");
-                    }
-                }
-            }
-        });
-
-        zendingLaden.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-            }
-        });
-    }
-
-    public int sendXLocation(int xCoords){
-        int xCoord = xCoords;
-        return xCoord;
-    }
-
-    public int sendYLocation(int yCoords){
-        int yCoord = yCoords;
-        return yCoord;
-    }
 
     public void addDropdowns() {
     }
@@ -330,6 +420,13 @@ public class Testscherm extends JFrame {
 
     public void addGridPanels() {
 
+    }
+
+    public void moveRobotToLocation(SerialPort sp, String location) throws IOException {
+        byte[] bytes;
+        bytes = location.getBytes(StandardCharsets.UTF_8); //Zet string om naar bytes en stuurt naar arduino
+        sp.getOutputStream().write(bytes);
+        sp.getOutputStream().flush();
     }
 
     public void moveRobotUp(SerialPort sp) throws IOException {

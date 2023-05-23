@@ -15,27 +15,22 @@ import java.util.Scanner;
 
 public class Main {
 
-    public static void main(String[] args) throws IOException, InterruptedException, SQLException, UnsupportedLookAndFeelException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+    public static void main(String[] args) throws IOException, InterruptedException, SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
 
         // write your code here
         //Hoofdscherm hoofdscherm = new Hoofdscherm();
         Testscherm ts = new Testscherm();
 
-        //Communicatie met arduino
-        SerialPort sp = SerialPort.getCommPort("COM7"); // selecteer je gebruikte COM port
-        sp.setComPortParameters(9600, 8, 1, 0); //Set Serial baudrate
-        sp.setComPortTimeouts(SerialPort.TIMEOUT_NONBLOCKING, 0, 0); //timeouts uitzetten
-        boolean hasOpened = sp.openPort();
 
                 ts.addKeyListener(new KeyListener(){
             //Controleert of de arrow keys ingedrukt zijn
             @Override
             public void keyPressed(KeyEvent event) {
                 if (event.getKeyCode() == KeyEvent.VK_UP) {
-                    if (hasOpened) { // opent de port
+                    if (ts.sp.openPort()) { // opent de port
                         try {
-                            ts.moveRobotUp(sp); // stuurt commando over port
-                            Scanner data = new Scanner(sp.getInputStream()); // Krijgt iets terug van de serial
+                            ts.moveRobotUp(ts.sp); // stuurt commando over port
+                            Scanner data = new Scanner(ts.sp.getInputStream()); // Krijgt iets terug van de serial
                             while (data.hasNextLine()) {
                                 //print vanuit de arduino serial MAAR loopt één commando achter EN werkt heel langzaam
                                 System.out.println(data.nextLine());
@@ -47,10 +42,10 @@ public class Main {
                 }
 
                 if (event.getKeyCode() == KeyEvent.VK_DOWN) {
-                    if (sp.openPort()) { // opent de port
+                    if (ts.sp.openPort()) { // opent de port
                         try {
-                            ts.moveRobotDown(sp); // stuurt commando over port
-                            Scanner data = new Scanner(sp.getInputStream());
+                            ts.moveRobotDown(ts.sp); // stuurt commando over port
+                            Scanner data = new Scanner(ts.sp.getInputStream());
                             while (data.hasNextLine()) {
                                 System.out.println(data.nextLine());
                             }
@@ -61,10 +56,10 @@ public class Main {
                 }
 
                 if (event.getKeyCode() == KeyEvent.VK_LEFT) {
-                    if (sp.openPort()) { // opent de port
+                    if (ts.sp.openPort()) { // opent de port
                         try {
-                            ts.moveRobotLeft(sp); // stuurt commando over port
-                            Scanner data = new Scanner(sp.getInputStream());
+                            ts.moveRobotLeft(ts.sp); // stuurt commando over port
+                            Scanner data = new Scanner(ts.sp.getInputStream());
                             while (data.hasNextLine()) {
                                 System.out.println(data.nextLine());
                             }
@@ -75,10 +70,10 @@ public class Main {
                 }
 
                 if (event.getKeyCode() == KeyEvent.VK_RIGHT) {
-                    if (sp.openPort()) { // opent de port
+                    if (ts.sp.openPort()) { // opent de port
                         try {
-                            ts.moveRobotRight(sp); // stuurt commando over port
-                            Scanner data = new Scanner(sp.getInputStream());
+                            ts.moveRobotRight(ts.sp); // stuurt commando over port
+                            Scanner data = new Scanner(ts.sp.getInputStream());
                             while (data.hasNextLine()) {
                                 System.out.println(data.nextLine());
                             }
