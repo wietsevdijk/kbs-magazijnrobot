@@ -6,6 +6,7 @@
 
 #define modeSwitchKnop 10
 #define noodstop 7
+#define noodstopRelease 1
 #define jSwitch 6
 
 #define GroenLED 2
@@ -54,6 +55,7 @@ void setup() {
 
   //NOODSTOP
   pinMode(noodstop, INPUT_PULLUP);
+  pinMode(noodstopRelease, INPUT_PULLUP);
 
   //Joystick button
   pinMode(jSwitch, INPUT_PULLUP);
@@ -144,7 +146,7 @@ void loop() {
     digitalWrite(4, LOW);
     digitalWrite(5, HIGH);
     delay(300);
-  } else if (noodstopCheck() && noodstopTriggered) {
+  } else if (noodstopReleaseCheck() && noodstopTriggered) {
     noodstopTriggered = false;
     digitalWrite(5, LOW);
     delay(300);
@@ -245,6 +247,11 @@ void loop() {
 
 bool noodstopCheck() {
   bool ingedrukt = digitalRead(noodstop);
+  return !ingedrukt;
+}
+
+bool noodstopReleaseCheck() {
+  bool ingedrukt = digitalRead(noodstopRelease);
   return !ingedrukt;
 }
 
