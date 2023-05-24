@@ -31,6 +31,7 @@ bool noodstopTriggered = false; //boolean for emergency stop button
 bool manual = true; // boolean for manual/automatic mode button
 bool yLimit = false;
 bool xLimit = false;
+bool goingHome = false;
 
 long x_axis = 0;
 long y_axis = 0;
@@ -156,6 +157,7 @@ void loop() {
     delay(300);
   } else if (modeSwitch() && !noodstopTriggered && manual) {
     manual = false;
+    goingHome = true;
     digitalWrite(2, HIGH);
     digitalWrite(4, LOW);
     delay(300);
@@ -228,6 +230,11 @@ void loop() {
   } else {  //Normale code voor besturen van motoren
     
   }
+
+  //Startprocedure
+  if(goingHome) {
+    goToStartingPoint();
+  }
 }
 
 //Functions from here
@@ -255,6 +262,7 @@ bool modeSwitch() {
 
 //make robot go up
 void goUp() {
+  sendCommand("UP");
   digitalWrite(13, LOW);  //Establishes up direction of Channel B
   digitalWrite(8, LOW);   //Disengage the Brake for Channel B
   analogWrite(11, 255);   //Spins the motor on Channel B at full speed
@@ -263,6 +271,7 @@ void goUp() {
 
 //make robot go down
 void goDown() {
+  sendCommand("DOWN");
   digitalWrite(13, HIGH);  //Establishes down direction of Channel B
   digitalWrite(8, LOW);    //Disengage the Brake for Channel B
   analogWrite(11, 200);    //Spins the motor on Channel B at full speed
@@ -280,6 +289,18 @@ void goRight() {
   digitalWrite(12, HIGH);  //Establishes forward direction of Channel A
   digitalWrite(9, LOW);    //Disengage the Brake for Channel A
   analogWrite(3, 200);     //Spins the motor on Channel A at full speed
+}
+
+void goToStartingPoint() {
+  receivedFromSlave();
+  if(!xLimit) {
+    goLeft();
+    Serial.println("kaas");
+  } else if(xLimit && ) {
+    analogWrite(3, 200);
+  } else if(xLimit && ) {
+    analogWrite(3, 0);
+  }
 }
 
 //turn on brakes for both X and Y
@@ -351,6 +372,7 @@ void receivedFromSlave() {
   }
 
   if (message.endsWith("xLimY")) {
+    Serial.println("kaas2");
     xLimit = true;
     x_axis = 0;
     if ((xValue > 950)) {
@@ -361,5 +383,9 @@ void receivedFromSlave() {
     if ((xValue > 950)) {
       analogWrite(3, 200);      //Spins the motor on Channel B at full speedbool yBeneden = true;
     }
-}
+  }
+  
+  // if(message.endsWith("StrtX")) {
+  //   Serial.println("STARTPUNT");
+  // }   
 }
