@@ -89,15 +89,27 @@ void requestEvent() {
 }
 
 //count encoder pulses to measure distance
+// void DC_Motor_Encoder_x() {
+//   int b = digitalRead(Encoder_output_x);
+//   int i = b - (b % 100);
+//   // if (b > 0) {
+//   //   Count_pulses_x++;
+//   // } else {
+//   //   Count_pulses_x--;
+//   // }
+  
+//   if (command.equals("RIGHT") && b > 0) {
+//     Count_pulses_x++;
+//     Serial.println(Count_pulses_x);
+//   }
+
+//   if (command.equals("LEFT") && b > 0) {
+//     Count_pulses_x--;
+//     Serial.println(Count_pulses_x);
+//   }
+// }
 void DC_Motor_Encoder_x() {
   int b = digitalRead(Encoder_output_x);
-<<<<<<< Updated upstream
-  if (b > 0) {
-    Count_pulses++;
-  } else {
-    Count_pulses--;
-  }
-=======
   int i = b - (b % 100);
   if (command.equals("RIGHT") && b > 0) {
     Count_pulses_x++;
@@ -115,25 +127,24 @@ void DC_Motor_Encoder_y() {
   int i = b - (b % 100);
   if (command.equals("UP") && b > 0) {
     Count_pulses_y++;
-    Serial.println(Count_pulses_y);
+    // Serial.println(Count_pulses_y);
   }
 
   if (command.equals("DOWN") && b > 0) {
     Count_pulses_y--;
-    Serial.println(Count_pulses_y);
+    // Serial.println(Count_pulses_y);
   }
->>>>>>> Stashed changes
 }
 
 void Read_z_encoder() {
   z_axis = analogRead(Encode_output_z);
   z_axis = map(z_axis, 285, 650, 20, 0);
-  Serial.print("Z-Axis: ");
-  Serial.println(z_axis);
+  // Serial.print("Z-Axis: ");
+  // Serial.println(z_axis);
 }
 
 void sendStartingPoint() {
-  if(Count_pulses_x < 15) {
+  if(Count_pulses_x > 100) {
     message = "StrtX";
     requestEvent();
   }
@@ -144,6 +155,7 @@ void sendStartingPoint() {
 }
 
 void loop() {
+  Serial.println(Count_pulses_x);
   // put your main code here, to run repeatedly:
 
   // takes the time before the loop on the library begins
@@ -174,13 +186,10 @@ void loop() {
   }
 
   //count pulses read by the encoder
-<<<<<<< Updated upstream
-  Serial.println("Pulses: " + Count_pulses);
 
-=======
+  // Serial.println("Pulses: " + Count_pulses_y);
+
   //Serial.println("Pulses: " + Count_pulses_x);
-  
->>>>>>> Stashed changes
 
   //check limitswitchX
   limitSwitchX.loop();  // MUST call the loop() function first
@@ -188,16 +197,12 @@ void loop() {
   // //Get state of limit switch on X-axis and do something
   int stateX = limitSwitchX.getState();
   if (stateX == HIGH) {
-    Serial.println("The limit switch on X-Axis is: TOUCHED");
+    // Serial.println("The limit switch on X-Axis is: TOUCHED");
     message = "xLimY";
-<<<<<<< Updated upstream
-=======
-    Serial.println(message);
     Count_pulses_x = 0;
->>>>>>> Stashed changes
     requestEvent();
   } else {
-    Serial.println("The limit switch on X-Axis is: UNTOUCHED");
+    // Serial.println("The limit switch on X-Axis is: UNTOUCHED");
     message = "xLimN";
     requestEvent();
   }
@@ -208,6 +213,9 @@ void loop() {
   //Read Y-axis
   DC_Motor_Encoder_y();
 
+  //Read X-axis
+  DC_Motor_Encoder_x();
+
   //Send starting point
   sendStartingPoint();
 
@@ -217,12 +225,12 @@ void loop() {
   //Get state of limit switch on Y-axis and do something
   int stateY = limitSwitchY.getState();
   if (stateY == HIGH) {
-    Serial.println("The limit switch on Y-Axis is: TOUCHED");
+    // Serial.println("The limit switch on Y-Axis is: TOUCHED");
     message = "yLimY";
     Count_pulses_y = 0;
     requestEvent();
   } else {
-    Serial.println("The limit switch on Y-Axis is: UNTOUCHED");
+    // Serial.println("The limit switch on Y-Axis is: UNTOUCHED");
     message = "yLimN";
     requestEvent();
   }

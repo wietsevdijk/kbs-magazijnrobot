@@ -27,13 +27,15 @@ int zAxisMode = 0;
 int jSwitchLast;
 int jSwitchCurrent;
 
-String message; //The message received from the slave
-bool noodstopTriggered = false; //boolean for emergency stop button
-bool manual = true; // boolean for manual/automatic mode button
+String message;                  //The message received from the slave
+bool noodstopTriggered = false;  //boolean for emergency stop button
+bool manual = true;              // boolean for manual/automatic mode button
 bool yLimit = false;
 bool xLimit = false;
 bool goingHome = false;
 bool calibrating = false;
+bool isAtStart_x = false;
+bool isAtStart_y = false;
 
 long x_axis = 0;
 long y_axis = 0;
@@ -50,7 +52,7 @@ void setup() {
   Serial.setTimeout(10);
 
   while (!Serial) {
-    ; // wait for serial port to connect.
+    ;  // wait for serial port to connect.
   }
 
   //NOODSTOP
@@ -82,50 +84,50 @@ void loop() {
   String HMIcommand = "";
   String response = "";
   // put your main code here, to run repeatedly:
-   if (Serial.available()) {
+  if (Serial.available()) {
     // read serial data
     HMIcommand = String(Serial.readString());
-    lcd.print(HMIcommand);
+    // lcd.print(HMIcommand);
   }
 
   if (HMIcommand == "UP") {
-      response = "omhoog";
-        goUp();
-      //delay(1000);
-    }
+    response = "omhoog";
+    goUp();
+    //delay(1000);
+  }
 
-    if (HMIcommand == "DOWN") {
-      response = "omlaag";
-      goDown();
-      //delay(1000);
-    }
+  if (HMIcommand == "DOWN") {
+    response = "omlaag";
+    goDown();
+    //delay(1000);
+  }
 
-    if (HMIcommand == "LEFT") {
-      response = "links";
-      goLeft();
-      //delay(1000);
-    }
+  if (HMIcommand == "LEFT") {
+    response = "links";
+    goLeft();
+    //delay(1000);
+  }
 
-    if (HMIcommand == "RIGHT") {
-      goRight();
-      response = "rechts";
-      //delay(1000);
-    }
+  if (HMIcommand == "RIGHT") {
+    goRight();
+    response = "rechts";
+    //delay(1000);
+  }
 
-    if (HMIcommand == "FORWARDS") {
-      //z-axis
-      response = "naar voren";
-    }
+  if (HMIcommand == "FORWARDS") {
+    //z-axis
+    response = "naar voren";
+  }
 
-    if (HMIcommand == "BACKWARDS") {
-      //z-axis
-      response = "naar achteren";
-    }
+  if (HMIcommand == "BACKWARDS") {
+    //z-axis
+    response = "naar achteren";
+  }
 
   response = String(response);
   Serial.print(response);
 
-  
+
 
 
   //COARDS PRINTEN
@@ -133,7 +135,7 @@ void loop() {
   //Serial.println(map(x_axis, 0, 450, 1, 500));
   //Serial.print("Y-Axis: ");
   //Serial.println(map(y_axis, 0, 500, 1, 500));
-  
+
   //MODE CHECK
   if (!noodstopTriggered) {
     digitalWrite(manual ? 4 : 2, HIGH);
@@ -161,7 +163,6 @@ void loop() {
   } else if (modeSwitch() && !noodstopTriggered && manual) {
     manual = false;
     goingHome = true;
-    calibrating = true;
     digitalWrite(2, HIGH);
     digitalWrite(4, LOW);
     delay(300);
@@ -171,7 +172,7 @@ void loop() {
   jSwitchLast = jSwitchCurrent;
   jSwitchCurrent = joystickSwitch();
   if (jSwitchLast == 1 & jSwitchCurrent == 0) {
-    
+
     Serial.println("Toggled-Z");
 
     zAxisMode = !zAxisMode;
@@ -208,18 +209,18 @@ void loop() {
     } else {
       sendCommand("");
       if (xValue < 50) {
-        goRight(); //execute function to make robot go right
+        goRight();  //execute function to make robot go right
       } else if (xValue > 950 && !xLimit) {
-        goLeft(); // execute function to make robot go left
+        goLeft();  // execute function to make robot go left
       } else {
         digitalWrite(9, HIGH);  //Disengage the Brake for Channel A
       }
 
       if (yValue < 50) {
 
-        goUp(); // execute function to make robot go up
+        goUp();  // execute function to make robot go up
       } else if (yValue > 950 && !yLimit) {
-        goDown(); // execute function to make robot go down
+        goDown();  // execute function to make robot go down
       } else {
         digitalWrite(8, HIGH);  //Disengage the Brake for Channel A
       }
@@ -232,12 +233,13 @@ void loop() {
     brakeBoth();
     delay(1000);
   } else {  //Normale code voor besturen van motoren
-    
   }
 
   //Startprocedure
-  if(goingHome) {
-    goToStartingPoint();
+  if (!manual && !noodstopTriggered) {
+    if (goingHome) {
+      goToStartingPoint();
+    }
   }
 }
 
@@ -275,7 +277,6 @@ void goUp() {
   digitalWrite(13, LOW);  //Establishes up direction of Channel B
   digitalWrite(8, LOW);   //Disengage the Brake for Channel B
   analogWrite(11, 255);   //Spins the motor on Channel B at full speed
-
 }
 
 //make robot go down
@@ -302,13 +303,15 @@ void goRight() {
 
 void goToStartingPoint() {
   receivedFromSlave();
-  if(!xLimit) {
+  if (!xLimit && !calibrating) {
     goLeft();
-    Serial.println("kaas");
-  } else if(xLimit && ) {
-    analogWrite(3, 200);
-  } else if(xLimit && ) {
+  } else if (xLimit && !isAtStart_x) {
+    goRight();
+    calibrating = true;
+  } else if (xLimit && isAtStart_x) {
     analogWrite(3, 0);
+    calibrating = false;
+    goingHome = false;
   }
 }
 
@@ -371,12 +374,12 @@ void receivedFromSlave() {
     yLimit = true;
     y_axis = 0;
     if ((yValue > 950)) {
-      analogWrite(11, 0);      //Spins the motor on Channel B at full speedbool yBeneden = true;
+      analogWrite(11, 0);  //Spins the motor on Channel B at full speedbool yBeneden = true;
     }
   } else if (message.endsWith("yLimN")) {
     yLimit = false;
     if ((yValue > 950)) {
-      analogWrite(11, 200);      //Spins the motor on Channel B at full speedbool yBeneden = true;
+      analogWrite(11, 200);  //Spins the motor on Channel B at full speedbool yBeneden = true;
     }
   }
 
@@ -385,16 +388,17 @@ void receivedFromSlave() {
     xLimit = true;
     x_axis = 0;
     if ((xValue > 950)) {
-      analogWrite(3, 0);      //Spins the motor on Channel B at full speedbool yBeneden = true;
+      analogWrite(3, 0);  //Spins the motor on Channel B at full speedbool yBeneden = true;
     }
   } else if (message.endsWith("xLimN")) {
     xLimit = false;
     if ((xValue > 950)) {
-      analogWrite(3, 200);      //Spins the motor on Channel B at full speedbool yBeneden = true;
+      analogWrite(3, 200);  //Spins the motor on Channel B at full speedbool yBeneden = true;
     }
   }
-  
-  // if(message.endsWith("StrtX")) {
-  //   Serial.println("STARTPUNT");
-  // }   
+
+  if (message.endsWith("StrtX")) {
+    isAtStart_x = true;
+    Serial.println("banaan");
+  }
 }
