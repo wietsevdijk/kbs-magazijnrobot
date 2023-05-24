@@ -32,6 +32,7 @@ bool manual = true; // boolean for manual/automatic mode button
 bool yLimit = false;
 bool xLimit = false;
 bool goingHome = false;
+bool calibrating = false;
 
 long x_axis = 0;
 long y_axis = 0;
@@ -158,6 +159,7 @@ void loop() {
   } else if (modeSwitch() && !noodstopTriggered && manual) {
     manual = false;
     goingHome = true;
+    calibrating = true;
     digitalWrite(2, HIGH);
     digitalWrite(4, LOW);
     delay(300);
