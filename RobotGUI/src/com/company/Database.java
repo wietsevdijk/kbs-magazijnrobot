@@ -94,18 +94,32 @@ public class Database{
         return map;
     }
 
-    public String[] getAllOrders(){
-        String[] orderIDs = new String[3];
-
+    public String[] getAllOrders() {
+        //Bepaal eerst hoeveel orders er zijn
+        String aantal = "0";
         try {
+            Connection con = DriverManager.getConnection(url, uname, password);
+            Statement statement = con.createStatement();
+            String query = "SELECT COUNT(orderID) FROM orders WHERE pickingCompleet = 0";
+            ResultSet result = statement.executeQuery(query);
+            result.first();
+            aantal = result.getString(1);
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        String[] orderIDs = new String[Integer.parseInt(aantal)];
+
+        try { //Haal alle orders op die nog niet compleet zijn
             Connection con = DriverManager.getConnection(url, uname, password);
             Statement statement = con.createStatement();
             String query = "SELECT orderID FROM orders WHERE pickingCompleet = 0";
             ResultSet result = statement.executeQuery(query);
-                for (int i = 0; i < 3; i++) {
-                    result.next();
-                    orderIDs[i] = result.getString(1);
-                }
+            for (int i = 0; i < 3; i++) {
+                result.next();
+                orderIDs[i] = result.getString(1);
+            }
 
 
             con.close();
