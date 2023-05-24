@@ -113,12 +113,12 @@ void DC_Motor_Encoder_x() {
   int i = b - (b % 100);
   if (command.equals("RIGHT") && b > 0) {
     Count_pulses_x++;
-    Serial.println(Count_pulses_x);
+    // Serial.println(Count_pulses_x);
   }
 
   if (command.equals("LEFT") && b > 0) {
     Count_pulses_x--;
-    Serial.println(Count_pulses_x);
+    // Serial.println(Count_pulses_x);
   }
 }
 
@@ -127,12 +127,12 @@ void DC_Motor_Encoder_y() {
   int i = b - (b % 100);
   if (command.equals("UP") && b > 0) {
     Count_pulses_y++;
-    // Serial.println(Count_pulses_y);
+    Serial.println(Count_pulses_y);
   }
 
   if (command.equals("DOWN") && b > 0) {
     Count_pulses_y--;
-    // Serial.println(Count_pulses_y);
+    Serial.println(Count_pulses_y);
   }
 }
 
@@ -144,18 +144,17 @@ void Read_z_encoder() {
 }
 
 void sendStartingPoint() {
-  if(Count_pulses_x > 100) {
+  if(Count_pulses_x > 0) {
     message = "StrtX";
     requestEvent();
   }
-  if(Count_pulses_y > 100) {
+  if(Count_pulses_y > 25) {
     message = "StrtY";
     requestEvent();
   } 
 }
 
 void loop() {
-  Serial.println(Count_pulses_x);
   // put your main code here, to run repeatedly:
 
   // takes the time before the loop on the library begins
@@ -212,9 +211,6 @@ void loop() {
 
   //Read Y-axis
   DC_Motor_Encoder_y();
-
-  //Read X-axis
-  DC_Motor_Encoder_x();
 
   //Send starting point
   sendStartingPoint();

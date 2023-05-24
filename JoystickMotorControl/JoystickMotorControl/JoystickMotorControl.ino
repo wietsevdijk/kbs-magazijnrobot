@@ -282,6 +282,7 @@ void goDown() {
 
 //make robot go left
 void goLeft() {
+  sendCommand("LEFT");
   digitalWrite(12, LOW);  //Establishes backward direction of Channel A
   digitalWrite(9, LOW);   //Disengage the Brake for Channel A
   analogWrite(3, 200);    //Spins the motor on Channel A at full speed
@@ -289,6 +290,7 @@ void goLeft() {
 
 //make robot go right
 void goRight() {
+  sendCommand("RIGHT");
   digitalWrite(12, HIGH);  //Establishes forward direction of Channel A
   digitalWrite(9, LOW);    //Disengage the Brake for Channel A
   analogWrite(3, 200);     //Spins the motor on Channel A at full speed
@@ -298,11 +300,29 @@ void goToStartingPoint() {
   receivedFromSlave();
   if (!xLimit && !calibrating) {
     goLeft();
-  } else if (xLimit && !isAtStart_x) {
+    isAtStart_x = false;
+  } else if (!isAtStart_x && calibrating) {
     goRight();
-    calibrating = true;
-  } else if (xLimit && isAtStart_x) {
+  } else if (isAtStart_x) {
     analogWrite(3, 0);
+    digitalWrite(9, HIGH);
+  }
+
+  if (!yLimit && !calibrating) {
+    goDown();
+    isAtStart_y = false;
+  } else if (!isAtStart_y && calibrating) {
+    goUp();
+  } else if (isAtStart_y) {
+    analogWrite(11, 0);
+    digitalWrite(8, HIGH);
+  }
+
+  if(xLimit && yLimit) {
+    calibrating = true;
+  }
+
+  if(isAtStart_x && isAtStart_y) {
     calibrating = false;
     goingHome = false;
   }
@@ -377,7 +397,6 @@ void receivedFromSlave() {
   }
 
   if (message.endsWith("xLimY")) {
-    Serial.println("kaas2");
     xLimit = true;
     x_axis = 0;
     if ((xValue > 950)) {
@@ -392,6 +411,9 @@ void receivedFromSlave() {
 
   if (message.endsWith("StrtX")) {
     isAtStart_x = true;
-    Serial.println("banaan");
+  }
+  
+  if (message.endsWith("StrtY")) {
+    isAtStart_y = true;
   }
 }
