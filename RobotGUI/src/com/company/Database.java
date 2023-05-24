@@ -102,8 +102,10 @@ public class Database{
             Statement statement = con.createStatement();
             String query = "SELECT COUNT(orderID) FROM orders WHERE pickingCompleet = 0";
             ResultSet result = statement.executeQuery(query);
-            result.first();
-            aantal = result.getString(1);
+            while(result.next()){
+                aantal = result.getString(1);
+            }
+
 
         } catch (SQLException ex) {
             ex.printStackTrace();
