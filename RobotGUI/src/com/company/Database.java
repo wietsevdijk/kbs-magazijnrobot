@@ -9,9 +9,11 @@ import java.util.Scanner;
 
 
 public class Database{
-    public String url = "jdbc:mysql://localhost:3306/nerdyrobot";
-    public String uname = "root";
-    public String password = null;
+    private String url = "jdbc:mysql://localhost:3306/nerdyrobot";
+    private String uname = "root";
+    private String password = null;
+    
+    private Connection con = DriverManager.getConnection(url, uname, password);
 
     public Database() throws SQLException {
 
@@ -28,7 +30,7 @@ public class Database{
     public String getOrderID(){
         String orderID = null;
         try {
-            Connection con = DriverManager.getConnection(url, uname, password);
+            
             Statement statement = con.createStatement();
             String query = "SELECT orderID FROM orders WHERE pickingCompleet = 0 LIMIT 1";
             ResultSet result = statement.executeQuery(query);
@@ -50,7 +52,7 @@ public class Database{
         Map<Integer, Object> map;
         map = new HashMap<Integer, Object>();
         try {
-            Connection con = DriverManager.getConnection(url, uname, password);
+            
             Statement statement = con.createStatement();
             String query = "SELECT locatie,productID FROM magazijn";
             ResultSet result = statement.executeQuery(query);
@@ -74,7 +76,7 @@ public class Database{
         Map<Integer, Object> map;
         map = new HashMap<Integer, Object>();
         try {
-            Connection con = DriverManager.getConnection(url, uname, password);
+            
             Statement statement = con.createStatement();
             String query = "SELECT locatie,productID FROM magazijn WHERE productID IN (SELECT productID FROM orderregels WHERE orderID ="+ getOrderID()+" )";
             ResultSet result = statement.executeQuery(query);
@@ -98,7 +100,7 @@ public class Database{
         //Bepaal eerst hoeveel orders er zijn
         String aantal = "0";
         try {
-            Connection con = DriverManager.getConnection(url, uname, password);
+            
             Statement statement = con.createStatement();
             String query = "SELECT COUNT(orderID) FROM orders WHERE pickingCompleet = 0";
             ResultSet result = statement.executeQuery(query);
@@ -114,7 +116,7 @@ public class Database{
         String[] orderIDs = new String[Integer.parseInt(aantal)];
 
         try { //Haal alle orders op die nog niet compleet zijn
-            Connection con = DriverManager.getConnection(url, uname, password);
+            
             Statement statement = con.createStatement();
             String query = "SELECT orderID FROM orders WHERE pickingCompleet = 0";
             ResultSet result = statement.executeQuery(query);
@@ -137,7 +139,7 @@ public class Database{
     public String[] getProductName(String OrderID){
         String[]productNaam = {"","",""};
         try {
-            Connection con = DriverManager.getConnection(url, uname, password);
+            
             Statement statement = con.createStatement();
             String query = "SELECT productNaam FROM producten WHERE productID IN(SELECT productID FROM orderregels WHERE orderID =" + OrderID+ ")";
             ResultSet result = statement.executeQuery(query);
@@ -162,7 +164,7 @@ public class Database{
     public String[] getProductID(String orderID){
         String[] productIDs = {"","",""};
         try {
-            Connection con = DriverManager.getConnection(url, uname, password);
+            
             Statement statement = con.createStatement();
             String query2 = "SELECT productID FROM orderRegels WHERE orderID = " + orderID;
             ResultSet result2 = statement.executeQuery(query2);
@@ -182,7 +184,7 @@ public class Database{
     public String[] getProductLocatie(String orderID){
         String[] productLocatie = new String[3];
         try {
-                Connection con = DriverManager.getConnection(url, uname, password);
+                
                 Statement statement = con.createStatement();
                 String query3 = "SELECT locatie FROM magazijn WHERE productID IN(SELECT productID FROM orderregels WHERE orderID = " + orderID + ")";
                 ResultSet result3 = statement.executeQuery(query3);
@@ -203,7 +205,7 @@ public class Database{
     public String getCustomerID(int orderID){
             String customerID = null;
         try {
-            Connection con = DriverManager.getConnection(url, uname, password);
+            
             Statement statement = con.createStatement();
             String query = "SELECT klantID FROM orders WHERE orderID =" + orderID;
             ResultSet result = statement.executeQuery(query);
@@ -223,7 +225,7 @@ public class Database{
     public String[] getCustomerDetails(int customerID){
         String[] customerDetails = new String[6];
         try {
-                Connection con = DriverManager.getConnection(url, uname, password);
+                
                 Statement statement = con.createStatement();
                 String query3 = "SELECT * FROM klanten WHERE klantID = " + customerID;
                 ResultSet result3 = statement.executeQuery(query3);
@@ -243,7 +245,7 @@ public class Database{
 
     public void shipOrder(String orderID){
         try {
-            Connection con = DriverManager.getConnection(url, uname, password);
+            
             Statement statement = con.createStatement();
             String query = "UPDATE orders SET pickingCompleet = 1 WHERE pickingCompleet = 0  AND orderID = " + orderID;
             statement.executeUpdate(query);
