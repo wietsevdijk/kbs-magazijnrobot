@@ -45,6 +45,7 @@ public class Database{
         return orderID;
     }
 
+
     public Map<Integer, Object> getAllProductLocations(){
         //Deze return een map met de locatie van het product en het productID van het product.
         Map<Integer, Object> map;
@@ -116,6 +117,32 @@ public class Database{
             ex.printStackTrace();
         }
         return orderIDs;
+    }
+
+    public String[] getProductData (String productLocatie){
+        String[]productData = new String[3];
+
+        try {
+            Connection con = DriverManager.getConnection(url, uname, password);
+            Statement statement = con.createStatement();
+            String query = "SELECT productNaam, productPrijs, productAantal FROM producten WHERE productID IN (SELECT productID FROM magazijn WHERE locatie = " + "\"" + productLocatie + "\"" + ")";
+            ResultSet result = statement.executeQuery(query);
+
+            while(result.next()){
+                productData[0] = result.getString(1);
+                productData[1] = result.getString(2);
+                productData[2] = result.getString(3);
+            }
+
+            con.close();
+            statement.close();
+            result.close();
+        } catch (
+                SQLException ex) {
+            ex.printStackTrace();
+        }
+        return productData;
+
     }
 
     public String[] getProductName(String OrderID){

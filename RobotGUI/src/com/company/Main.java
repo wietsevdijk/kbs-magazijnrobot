@@ -1,15 +1,10 @@
 package com.company;
+
 import com.fazecast.jSerialComm.SerialPort;
-import com.fazecast.jSerialComm.SerialPortDataListener;
-import com.fazecast.jSerialComm.SerialPortEvent;
 
 import java.io.IOException;
-import java.awt.*;
-import javax.swing.*;
 import java.awt.event.*;
-import java.nio.charset.StandardCharsets;
 import java.sql.*;
-import java.util.Arrays;
 import java.util.Scanner;
 
 
@@ -19,18 +14,23 @@ public class Main {
 
         // write your code here
         //Hoofdscherm hoofdscherm = new Hoofdscherm();
-        Testscherm ts = new Testscherm();
+        Hoofdscherm hs = new Hoofdscherm();
+        RobotCommands rc = new RobotCommands();
+        SerialPort sp = rc.getSp();
+        hs.setFocusable(true);
+        hs.requestFocus();
 
 
-                ts.addKeyListener(new KeyListener(){
+        hs.addKeyListener(new KeyListener(){
             //Controleert of de arrow keys ingedrukt zijn
             @Override
             public void keyPressed(KeyEvent event) {
                 if (event.getKeyCode() == KeyEvent.VK_UP) {
-                    if (ts.sp.openPort()) { // opent de port
+                    System.out.println("UP");
+                    if (sp.openPort()) { // opent de port
                         try {
-                            ts.moveRobotUp(ts.sp); // stuurt commando over port
-                            Scanner data = new Scanner(ts.sp.getInputStream()); // Krijgt iets terug van de serial
+                            rc.moveRobotUp(rc.sp); // stuurt commando over port
+                            Scanner data = new Scanner(rc.sp.getInputStream()); // Krijgt iets terug van de serial
                             while (data.hasNextLine()) {
                                 //print vanuit de arduino serial MAAR loopt één commando achter EN werkt heel langzaam
                                 System.out.println(data.nextLine());
@@ -42,10 +42,11 @@ public class Main {
                 }
 
                 if (event.getKeyCode() == KeyEvent.VK_DOWN) {
-                    if (ts.sp.openPort()) { // opent de port
+                    System.out.println("DOWN");
+                    if (sp.openPort()) { // opent de port
                         try {
-                            ts.moveRobotDown(ts.sp); // stuurt commando over port
-                            Scanner data = new Scanner(ts.sp.getInputStream());
+                            rc.moveRobotDown(rc.sp); // stuurt commando over port
+                            Scanner data = new Scanner(rc.sp.getInputStream());
                             while (data.hasNextLine()) {
                                 System.out.println(data.nextLine());
                             }
@@ -56,10 +57,11 @@ public class Main {
                 }
 
                 if (event.getKeyCode() == KeyEvent.VK_LEFT) {
-                    if (ts.sp.openPort()) { // opent de port
+                    System.out.println("LEFT");
+                    if (sp.openPort()) { // opent de port
                         try {
-                            ts.moveRobotLeft(ts.sp); // stuurt commando over port
-                            Scanner data = new Scanner(ts.sp.getInputStream());
+                            rc.moveRobotLeft(rc.sp); // stuurt commando over port
+                            Scanner data = new Scanner(rc.sp.getInputStream());
                             while (data.hasNextLine()) {
                                 System.out.println(data.nextLine());
                             }
@@ -70,10 +72,11 @@ public class Main {
                 }
 
                 if (event.getKeyCode() == KeyEvent.VK_RIGHT) {
-                    if (ts.sp.openPort()) { // opent de port
+                    System.out.println("RIGHT");
+                    if (sp.openPort()) { // opent de port
                         try {
-                            ts.moveRobotRight(ts.sp); // stuurt commando over port
-                            Scanner data = new Scanner(ts.sp.getInputStream());
+                            rc.moveRobotRight(rc.sp); // stuurt commando over port
+                            Scanner data = new Scanner(rc.sp.getInputStream());
                             while (data.hasNextLine()) {
                                 System.out.println(data.nextLine());
                             }
@@ -85,14 +88,10 @@ public class Main {
             }
 
             //NIET VERWIJDEREN!!! deze moet erin anders krijg je een error
-            public void keyReleased(KeyEvent e) {
-
-            }
+            public void keyReleased(KeyEvent e) {}
 
             //NIET VERWIJDEREN!!! deze moet erin anders krijg je een error
-            public void keyTyped(KeyEvent e) {
-
-            }
+            public void keyTyped(KeyEvent e) {}
         });
     }
 }
