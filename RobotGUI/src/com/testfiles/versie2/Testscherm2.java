@@ -37,6 +37,7 @@ public class Testscherm2 extends JFrame{
         //Bereidt het linkerpanel voor
         links = new JPanel();
         links.setLayout(new GridLayout(1, 2)); //Zet de layout klaar voor 2 panels
+        ButtonInterface TSPbesturing = new ButtonInterface(links);
         //Gooit het linkerpanel erin
         add(links);
 
@@ -53,7 +54,8 @@ public class Testscherm2 extends JFrame{
 
     public void addGridPanels() {
 
-        GridTekenPanel gridje = new GridTekenPanel();
+        GridTekenPanel gridje = new GridTekenPanel(5, 5);
+        gridje.setTSPLine(true);
         rechts.add(gridje);
 
     }

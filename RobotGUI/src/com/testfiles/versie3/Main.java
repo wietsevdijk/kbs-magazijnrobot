@@ -1,4 +1,4 @@
-package com.testfiles;
+package com.testfiles.versie3;
 import com.testfiles.versie1.Testscherm;
 import com.testfiles.versie2.Testscherm2;
 import com.testfiles.versie3.Testscherm3;
@@ -17,6 +17,7 @@ public class Main {
         // write your code here
         Testscherm schermpje = new Testscherm();
         Testscherm2 testscherm = new Testscherm2();
+        Testscherm3 ts = new Testscherm3();
 
         //Communicatie met arduino
         SerialPort sp = SerialPort.getCommPort("COM7"); // selecteer je gebruikte COM port
