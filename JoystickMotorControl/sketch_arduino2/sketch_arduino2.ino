@@ -27,7 +27,8 @@ String command = "";
 long z_axis = 0;
 
 //Int to store pulses from encoder
-int Count_pulses = 0;
+int Count_pulses_x = 0;
+int Count_pulses_y = 0;
 
 //To store the measurment data from z-axis
 String Data;
@@ -52,7 +53,8 @@ void setup() {
   pinMode(A3, INPUT);  // sets the Encoder_output_z pin as the input
 
   //Interrupt function to read out encoders
-  attachInterrupt(digitalPinToInterrupt(Encoder_output_x), DC_Motor_Encoder, RISING);
+  attachInterrupt(digitalPinToInterrupt(Encoder_output_x), DC_Motor_Encoder_x, RISING);
+  attachInterrupt(digitalPinToInterrupt(Encoder_output_y), DC_Motor_Encoder_y, RISING);
 
   //Setup motor Channel B (Z-axis)
   TCCR2B = TCCR2B & B11111000 | B00000111;  // for PWM frequency for motors of 30.64 Hz
@@ -86,12 +88,31 @@ void requestEvent() {
 }
 
 //count encoder pulses to measure distance
-void DC_Motor_Encoder() {
+void DC_Motor_Encoder_x() {
   int b = digitalRead(Encoder_output_x);
-  if (b > 0) {
-    Count_pulses++;
-  } else {
-    Count_pulses--;
+  int i = b - (b % 100);
+  if (command.equals("RIGHT") && b > 0) {
+    Count_pulses_x++;
+    // Serial.println(Count_pulses_x);
+  }
+
+  if (command.equals("LEFT") && b > 0) {
+    Count_pulses_x--;
+    // Serial.println(Count_pulses_x);
+  }
+}
+
+void DC_Motor_Encoder_y() {
+  int b = digitalRead(Encoder_output_y);
+  int i = b - (b % 100);
+  if (command.equals("UP") && b > 0) {
+    Count_pulses_y++;
+    Serial.println(Count_pulses_y);
+  }
+
+  if (command.equals("DOWN") && b > 0) {
+    Count_pulses_y--;
+    Serial.println(Count_pulses_y);
   }
 }
 
@@ -132,7 +153,8 @@ void loop() {
   }
 
   //count pulses read by the encoder
-  // Serial.println("Pulses: " + Count_pulses);
+  // Serial.println("Pulses: " + Count_pulses_y);
+  //Serial.println("Pulses: " + Count_pulses_x);
 
 
   //check limitswitchX
@@ -152,7 +174,6 @@ void loop() {
 
   //Read Z-axis
   Read_z_encoder();
-
 
   //check limitswitchY
   limitSwitchY.loop();  // MUST call the loop() function first
