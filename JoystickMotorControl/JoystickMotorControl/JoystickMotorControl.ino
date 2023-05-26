@@ -1,4 +1,3 @@
-
 #include <Wire.h>
 
 #define VRX_PIN A2  // Arduino pin connected to VRX pin
@@ -6,36 +5,24 @@
 
 #define modeSwitchKnop 10
 #define noodstop 7
-#define noodstopRelease 1
 #define jSwitch 6
 
 #define GroenLED 2
 #define GeelLED 4
 #define RoodLED 5
 
-
-int currentMillis;
-
-//initialize variables
-int xValue = 0;  // To store value of the X axis from the joystick
-int yValue = 0;  // To store value of the Y axis from the joystick
-
-
+int xValue = 0;  // To store value of the X axis
+int yValue = 0;  // To store value of the Y axis
 
 int zAxisMode = 0;
 
 int jSwitchLast;
 int jSwitchCurrent;
 
-String message;                  //The message received from the slave
-bool noodstopTriggered = false;  //boolean for emergency stop button
-bool manual = true;              // boolean for manual/automatic mode button
+bool noodstopTriggered = false;
+bool manual = true;
 bool yLimit = false;
 bool xLimit = false;
-bool goingHome = false;
-bool calibrating = false;
-bool isAtStart_x = false;
-bool isAtStart_y = false;
 
 long x_axis = 0;
 long y_axis = 0;
@@ -49,15 +36,8 @@ void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
 
-  Serial.setTimeout(10);
-
-  while (!Serial) {
-    ;  // wait for serial port to connect.
-  }
-
   //NOODSTOP
   pinMode(noodstop, INPUT_PULLUP);
-  pinMode(noodstopRelease, INPUT_PULLUP);
 
   //Joystick button
   pinMode(jSwitch, INPUT_PULLUP);
@@ -81,60 +61,12 @@ void setup() {
 
 
 void loop() {
-  String HMIcommand = "";
-  String response = "";
-  // put your main code here, to run repeatedly:
-  if (Serial.available()) {
-    // read serial data
-    HMIcommand = String(Serial.readString());
-    // lcd.print(HMIcommand);
-  }
-
-  if (HMIcommand == "UP") {
-    response = "omhoog";
-    goUp();
-    //delay(1000);
-  }
-
-  if (HMIcommand == "DOWN") {
-    response = "omlaag";
-    goDown();
-    //delay(1000);
-  }
-
-  if (HMIcommand == "LEFT") {
-    response = "links";
-    goLeft();
-    //delay(1000);
-  }
-
-  if (HMIcommand == "RIGHT") {
-    goRight();
-    response = "rechts";
-    //delay(1000);
-  }
-
-  if (HMIcommand == "FORWARDS") {
-    //z-axis
-    response = "naar voren";
-  }
-
-  if (HMIcommand == "BACKWARDS") {
-    //z-axis
-    response = "naar achteren";
-  }
-
-  response = String(response);
-  Serial.print(response);
-
-
-
 
   //COARDS PRINTEN
-  //Serial.print("X-Axis: ");
-  //Serial.println(map(x_axis, 0, 450, 1, 500));
-  //Serial.print("Y-Axis: ");
-  //Serial.println(map(y_axis, 0, 500, 1, 500));
+  // Serial.print("X-Axis: ");
+  // Serial.println(map(x_axis, 0, 450, 1, 500));
+  // Serial.print("Y-Axis: ");
+  // Serial.println(map(y_axis, 0, 500, 1, 500));
 
   //MODE CHECK
   if (!noodstopTriggered) {
@@ -148,7 +80,7 @@ void loop() {
     digitalWrite(4, LOW);
     digitalWrite(5, HIGH);
     delay(300);
-  } else if (noodstopReleaseCheck() && noodstopTriggered) {
+  } else if (noodstopCheck() && noodstopTriggered) {
     noodstopTriggered = false;
     digitalWrite(5, LOW);
     delay(300);
@@ -162,7 +94,6 @@ void loop() {
     delay(300);
   } else if (modeSwitch() && !noodstopTriggered && manual) {
     manual = false;
-    goingHome = true;
     digitalWrite(2, HIGH);
     digitalWrite(4, LOW);
     delay(300);
@@ -172,12 +103,11 @@ void loop() {
   jSwitchLast = jSwitchCurrent;
   jSwitchCurrent = joystickSwitch();
   if (jSwitchLast == 1 & jSwitchCurrent == 0) {
-
-    Serial.println("Toggled-Z");
+    // Serial.println("Toggled-Z");
 
     zAxisMode = !zAxisMode;
 
-    Serial.println(zAxisMode);
+    // Serial.println(zAxisMode);
   }
 
 
@@ -193,14 +123,16 @@ void loop() {
     xValue = analogRead(VRY_PIN);
     yValue = analogRead(VRX_PIN);
 
+    // Serial.println(yValue);
+
     if (zAxisMode == 1) {
       digitalWrite(9, HIGH);
       digitalWrite(8, HIGH);
-      if (yValue < 50) {
-        Serial.println("vooruit");
+      if (yValue < 100) {
+        // Serial.println("vooruit");
         sendCommand("VOOR");
-      } else if (yValue > 950) {
-        Serial.println("achteruit");
+      } else if (yValue > 800) {
+        // Serial.println("achteruit");
         sendCommand("ACHTER");
       } else {
         sendCommand("");
@@ -208,164 +140,88 @@ void loop() {
 
     } else {
       sendCommand("");
-      if (xValue < 50) {
-        goRight();  //execute function to make robot go right
-      } else if (xValue > 950 && !xLimit) {
-        goLeft();  // execute function to make robot go left
+      if (xValue < 100) {
+        digitalWrite(12, HIGH);  //Establishes forward direction of Channel A
+        digitalWrite(9, LOW);    //Disengage the Brake for Channel A
+        analogWrite(3, 200);     //Spins the motor on Channel A at full speed
+        // Serial.println("naar rechts");
+        x_axis++;
+      } else if (xValue > 800 && !xLimit) {
+        digitalWrite(12, LOW);  //Establishes backward direction of Channel A
+        digitalWrite(9, LOW);   //Disengage the Brake for Channel A
+        analogWrite(3, 200);    //Spins the motor on Channel A at full speed
+        // Serial.println("naar links");
+        x_axis--;
       } else {
         digitalWrite(9, HIGH);  //Disengage the Brake for Channel A
       }
 
       if (yValue < 50) {
-
-        goUp();  // execute function to make robot go up
+        digitalWrite(13, LOW);  //Establishes up direction of Channel B
+        digitalWrite(8, LOW);   //Disengage the Brake for Channel B
+        analogWrite(11, 255);   //Spins the motor on Channel B at full speed
+        // Serial.println("omhoog");
+        y_axis++;
       } else if (yValue > 950 && !yLimit) {
-        goDown();  // execute function to make robot go down
+        digitalWrite(13, HIGH);  //Establishes down direction of Channel B
+        digitalWrite(8, LOW);    //Disengage the Brake for Channel B
+        analogWrite(11, 200);    //Spins the motor on Channel B at full speed
+        // Serial.println("omlaag");
+        y_axis--;
       } else {
         digitalWrite(8, HIGH);  //Disengage the Brake for Channel A
       }
     }
     receivedFromSlave();
   }
+
+
+  // put your main code here, to run repeatedly:
+
+
+
+
   if (noodstopTriggered) {  //Check of de noodstop is ingedrukt
     //Zet snelheid van beide motoren op 0
     //Zet daarna de brake aan op beide motoren
-    brakeBoth();
-    delay(1000);
-  } else {  //Normale code voor besturen van motoren
-  }
 
-  //Startprocedure
-  if (!manual && !noodstopTriggered) {
-    if (goingHome) {
-      goToStartingPoint();
-    }
+    //A
+    analogWrite(3, 0);
+    digitalWrite(9, HIGH);
+
+    //B
+    analogWrite(1, 0);
+    digitalWrite(8, HIGH);
+
+    // Serial.println("NOODSTOP!!!");
+    delay(1000);
+
+  } else {  //Normale code voor besturen van motoren
+
+    // Serial.print("x = ");
+    // Serial.println(xValue);
+    // Serial.println(", y = ");
+    // Serial.println(yValue);
   }
 }
-
-//Functions from here
-
-//checks emergency button
 
 bool noodstopCheck() {
   bool ingedrukt = digitalRead(noodstop);
   return !ingedrukt;
 }
 
-bool noodstopReleaseCheck() {
-  bool ingedrukt = digitalRead(noodstopRelease);
-  return !ingedrukt;
-}
-
-//checks if joystick is pressed
-
 bool joystickSwitch() {
   bool ingedrukt = digitalRead(jSwitch);
   return !ingedrukt;
 }
-
-//switches between modes
 
 bool modeSwitch() {
   bool manual = digitalRead(modeSwitchKnop);
   return !manual;
 }
 
-//make robot go up
-void goUp() {
-  sendCommand("UP");
-  digitalWrite(13, LOW);  //Establishes up direction of Channel B
-  digitalWrite(8, LOW);   //Disengage the Brake for Channel B
-  analogWrite(11, 255);   //Spins the motor on Channel B at full speed
-}
-
-//make robot go down
-void goDown() {
-  sendCommand("DOWN");
-  digitalWrite(13, HIGH);  //Establishes down direction of Channel B
-  digitalWrite(8, LOW);    //Disengage the Brake for Channel B
-  analogWrite(11, 200);    //Spins the motor on Channel B at full speed
-}
-
-//make robot go left
-void goLeft() {
-  sendCommand("LEFT");
-  digitalWrite(12, LOW);  //Establishes backward direction of Channel A
-  digitalWrite(9, LOW);   //Disengage the Brake for Channel A
-  analogWrite(3, 200);    //Spins the motor on Channel A at full speed
-}
-
-//make robot go right
-void goRight() {
-  sendCommand("RIGHT");
-  digitalWrite(12, HIGH);  //Establishes forward direction of Channel A
-  digitalWrite(9, LOW);    //Disengage the Brake for Channel A
-  analogWrite(3, 200);     //Spins the motor on Channel A at full speed
-}
-
-void goToStartingPoint() {
-  receivedFromSlave();
-  if (!xLimit && !calibrating) {
-    goLeft();
-    isAtStart_x = false;
-  } else if (!isAtStart_x && calibrating) {
-    goRight();
-  } else if (isAtStart_x) {
-    analogWrite(3, 0);
-    digitalWrite(9, HIGH);
-  }
-
-  if (!yLimit && !calibrating) {
-    goDown();
-    isAtStart_y = false;
-  } else if (!isAtStart_y && calibrating) {
-    goUp();
-  } else if (isAtStart_y) {
-    analogWrite(11, 0);
-    digitalWrite(8, HIGH);
-  }
-
-  if(xLimit && yLimit) {
-    calibrating = true;
-  }
-
-  if(isAtStart_x && isAtStart_y) {
-    calibrating = false;
-    goingHome = false;
-  }
-}
-
-//turn on brakes for both X and Y
-void brakeBoth() {
-  //A
-  analogWrite(3, 0);
-  digitalWrite(9, HIGH);
-
-  //B
-  analogWrite(1, 0);
-  digitalWrite(8, HIGH);
-}
-
-//turn brake on
-void brakeOn() {
-  digitalWrite(2, LOW);
-  digitalWrite(4, LOW);
-  digitalWrite(5, HIGH);
-  delay(300);
-}
-
-//turn brake off
-void brakeOff() {
-  digitalWrite(5, LOW);
-  delay(300);
-}
-
-//-----------------------------------------------------------------------DO NOT TOUCH!!!---------------------------------------------------------------//
-// sends command to slave
-
 //NIET AANRAKEN
 //FUNCTIE: Stuurt een command naar de andere Arduino
-
 void sendCommand(String cmd) {
   char buffer[cmd.length() + 10];
   cmd.toCharArray(buffer, sizeof(buffer));
@@ -373,6 +229,20 @@ void sendCommand(String cmd) {
   Wire.beginTransmission(9);
   Wire.write(buffer);
   Wire.endTransmission();
+}
+
+void omhoog() {
+  digitalWrite(13, LOW);  //Establishes up direction of Channel B
+  digitalWrite(8, LOW);   //Disengage the Brake for Channel B
+  analogWrite(11, 0);     //Spins the motor on Channel B at full speed
+  // Serial.println("omhoog");
+}
+
+void omlaag() {
+  digitalWrite(13, HIGH);  //Establishes down direction of Channel B
+  digitalWrite(8, LOW);    //Disengage the Brake for Channel B
+  analogWrite(11, 200);    //Spins the motor on Channel B at full speed
+  // Serial.println("omlaag");
 }
 
 void receivedFromSlave() {
@@ -393,34 +263,26 @@ void receivedFromSlave() {
   if (message.endsWith("yLimY")) {
     yLimit = true;
     y_axis = 0;
-    if ((yValue > 950)) {
-      analogWrite(11, 0);  //Spins the motor on Channel B at full speedbool yBeneden = true;
+    if ((yValue > 800)) {
+      analogWrite(11, 0);      //Spins the motor on Channel B at full speedbool yBeneden = true;
     }
   } else if (message.endsWith("yLimN")) {
     yLimit = false;
-    if ((yValue > 950)) {
-      analogWrite(11, 200);  //Spins the motor on Channel B at full speedbool yBeneden = true;
+    if ((yValue > 800)) {
+      analogWrite(11, 200);      //Spins the motor on Channel B at full speedbool yBeneden = true;
     }
   }
 
   if (message.endsWith("xLimY")) {
     xLimit = true;
     x_axis = 0;
-    if ((xValue > 950)) {
-      analogWrite(3, 0);  //Spins the motor on Channel B at full speedbool yBeneden = true;
+    if ((xValue > 800)) {
+      analogWrite(3, 0);      //Spins the motor on Channel B at full speedbool yBeneden = true;
     }
   } else if (message.endsWith("xLimN")) {
     xLimit = false;
-    if ((xValue > 950)) {
-      analogWrite(3, 200);  //Spins the motor on Channel B at full speedbool yBeneden = true;
+    if ((xValue > 800)) {
+      analogWrite(3, 200);      //Spins the motor on Channel B at full speedbool yBeneden = true;
     }
-  }
-
-  if (message.endsWith("StrtX")) {
-    isAtStart_x = true;
-  }
-  
-  if (message.endsWith("StrtY")) {
-    isAtStart_y = true;
-  }
+}
 }
