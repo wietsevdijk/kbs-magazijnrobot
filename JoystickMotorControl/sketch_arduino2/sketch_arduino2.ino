@@ -98,8 +98,8 @@ void DC_Motor_Encoder() {
 void Read_z_encoder() {
   z_axis = analogRead(Encode_output_z);
   z_axis = map(z_axis, 285, 650, 20, 0);
-  Serial.print("Z-Axis: ");
-  Serial.println(z_axis);
+//   Serial.print("Z-Axis: ");
+//   Serial.println(z_axis);
 }
 void loop() {
   // put your main code here, to run repeatedly:
@@ -132,7 +132,7 @@ void loop() {
   }
 
   //count pulses read by the encoder
-  Serial.println("Pulses: " + Count_pulses);
+  // Serial.println("Pulses: " + Count_pulses);
 
 
   //check limitswitchX
@@ -141,11 +141,11 @@ void loop() {
   // //Get state of limit switch on X-axis and do something
   int stateX = limitSwitchX.getState();
   if (stateX == HIGH) {
-    Serial.println("The limit switch on X-Axis is: TOUCHED");
+    // Serial.println("The limit switch on X-Axis is: TOUCHED");
     message = "xLimY";
     requestEvent();
   } else {
-    Serial.println("The limit switch on X-Axis is: UNTOUCHED");
+    // Serial.println("The limit switch on X-Axis is: UNTOUCHED");
     message = "xLimN";
     requestEvent();
   }
@@ -160,11 +160,11 @@ void loop() {
   //Get state of limit switch on Y-axis and do something
   int stateY = limitSwitchY.getState();
   if (stateY == HIGH) {
-    Serial.println("The limit switch on Y-Axis is: TOUCHED");
+    // Serial.println("The limit switch on Y-Axis is: TOUCHED");
     message = "yLimY";
     requestEvent();
   } else {
-    Serial.println("The limit switch on Y-Axis is: UNTOUCHED");
+    // Serial.println("The limit switch on Y-Axis is: UNTOUCHED");
     message = "yLimN";
     requestEvent();
   }

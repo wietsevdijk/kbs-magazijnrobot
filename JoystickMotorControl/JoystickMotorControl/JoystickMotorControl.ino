@@ -63,10 +63,10 @@ void setup() {
 void loop() {
 
   //COARDS PRINTEN
-  Serial.print("X-Axis: ");
-  Serial.println(map(x_axis, 0, 450, 1, 500));
-  Serial.print("Y-Axis: ");
-  Serial.println(map(y_axis, 0, 500, 1, 500));
+  // Serial.print("X-Axis: ");
+  // Serial.println(map(x_axis, 0, 450, 1, 500));
+  // Serial.print("Y-Axis: ");
+  // Serial.println(map(y_axis, 0, 500, 1, 500));
 
   //MODE CHECK
   if (!noodstopTriggered) {
@@ -103,11 +103,11 @@ void loop() {
   jSwitchLast = jSwitchCurrent;
   jSwitchCurrent = joystickSwitch();
   if (jSwitchLast == 1 & jSwitchCurrent == 0) {
-    Serial.println("Toggled-Z");
+    // Serial.println("Toggled-Z");
 
     zAxisMode = !zAxisMode;
 
-    Serial.println(zAxisMode);
+    // Serial.println(zAxisMode);
   }
 
 
@@ -123,16 +123,16 @@ void loop() {
     xValue = analogRead(VRY_PIN);
     yValue = analogRead(VRX_PIN);
 
-    // Serial.print(yValue);
+    // Serial.println(yValue);
 
     if (zAxisMode == 1) {
       digitalWrite(9, HIGH);
       digitalWrite(8, HIGH);
-      if (yValue < 50) {
-        Serial.println("vooruit");
+      if (yValue < 100) {
+        // Serial.println("vooruit");
         sendCommand("VOOR");
-      } else if (yValue > 950) {
-        Serial.println("achteruit");
+      } else if (yValue > 800) {
+        // Serial.println("achteruit");
         sendCommand("ACHTER");
       } else {
         sendCommand("");
@@ -140,17 +140,17 @@ void loop() {
 
     } else {
       sendCommand("");
-      if (xValue < 50) {
+      if (xValue < 100) {
         digitalWrite(12, HIGH);  //Establishes forward direction of Channel A
         digitalWrite(9, LOW);    //Disengage the Brake for Channel A
         analogWrite(3, 200);     //Spins the motor on Channel A at full speed
-        Serial.println("naar rechts");
+        // Serial.println("naar rechts");
         x_axis++;
-      } else if (xValue > 950 && !xLimit) {
+      } else if (xValue > 800 && !xLimit) {
         digitalWrite(12, LOW);  //Establishes backward direction of Channel A
         digitalWrite(9, LOW);   //Disengage the Brake for Channel A
         analogWrite(3, 200);    //Spins the motor on Channel A at full speed
-        Serial.println("naar links");
+        // Serial.println("naar links");
         x_axis--;
       } else {
         digitalWrite(9, HIGH);  //Disengage the Brake for Channel A
@@ -160,13 +160,13 @@ void loop() {
         digitalWrite(13, LOW);  //Establishes up direction of Channel B
         digitalWrite(8, LOW);   //Disengage the Brake for Channel B
         analogWrite(11, 255);   //Spins the motor on Channel B at full speed
-        Serial.println("omhoog");
+        // Serial.println("omhoog");
         y_axis++;
       } else if (yValue > 950 && !yLimit) {
         digitalWrite(13, HIGH);  //Establishes down direction of Channel B
         digitalWrite(8, LOW);    //Disengage the Brake for Channel B
         analogWrite(11, 200);    //Spins the motor on Channel B at full speed
-        Serial.println("omlaag");
+        // Serial.println("omlaag");
         y_axis--;
       } else {
         digitalWrite(8, HIGH);  //Disengage the Brake for Channel A
@@ -193,7 +193,7 @@ void loop() {
     analogWrite(1, 0);
     digitalWrite(8, HIGH);
 
-    Serial.println("NOODSTOP!!!");
+    // Serial.println("NOODSTOP!!!");
     delay(1000);
 
   } else {  //Normale code voor besturen van motoren
@@ -235,14 +235,14 @@ void omhoog() {
   digitalWrite(13, LOW);  //Establishes up direction of Channel B
   digitalWrite(8, LOW);   //Disengage the Brake for Channel B
   analogWrite(11, 0);     //Spins the motor on Channel B at full speed
-  Serial.println("omhoog");
+  // Serial.println("omhoog");
 }
 
 void omlaag() {
   digitalWrite(13, HIGH);  //Establishes down direction of Channel B
   digitalWrite(8, LOW);    //Disengage the Brake for Channel B
   analogWrite(11, 200);    //Spins the motor on Channel B at full speed
-  Serial.println("omlaag");
+  // Serial.println("omlaag");
 }
 
 void receivedFromSlave() {
