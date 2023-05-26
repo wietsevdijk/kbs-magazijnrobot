@@ -9,9 +9,9 @@ import java.util.Scanner;
 
 
 public class Database{
-    public String url = "jdbc:mysql://localhost:3306/nerdyrobot";
-    public String uname = "root";
-    public String password = null;
+    private String url = "jdbc:mysql://localhost:3306/nerdyrobot";
+    private String uname = "root";
+    private String password = null;
 
     public Database() throws SQLException {
 

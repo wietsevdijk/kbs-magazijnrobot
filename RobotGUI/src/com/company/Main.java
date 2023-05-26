@@ -29,8 +29,8 @@ public class Main {
                     System.out.println("UP");
                     if (sp.openPort()) { // opent de port
                         try {
-                            rc.moveRobotUp(rc.sp); // stuurt commando over port
-                            Scanner data = new Scanner(rc.sp.getInputStream()); // Krijgt iets terug van de serial
+                            rc.moveRobotUp(rc.getSp()); // stuurt commando over port
+                            Scanner data = new Scanner(rc.getSp().getInputStream()); // Krijgt iets terug van de serial
                             while (data.hasNextLine()) {
                                 //print vanuit de arduino serial MAAR loopt één commando achter EN werkt heel langzaam
                                 System.out.println(data.nextLine());
@@ -45,8 +45,8 @@ public class Main {
                     System.out.println("DOWN");
                     if (sp.openPort()) { // opent de port
                         try {
-                            rc.moveRobotDown(rc.sp); // stuurt commando over port
-                            Scanner data = new Scanner(rc.sp.getInputStream());
+                            rc.moveRobotDown(rc.getSp()); // stuurt commando over port
+                            Scanner data = new Scanner(rc.getSp().getInputStream());
                             while (data.hasNextLine()) {
                                 System.out.println(data.nextLine());
                             }
@@ -60,8 +60,8 @@ public class Main {
                     System.out.println("LEFT");
                     if (sp.openPort()) { // opent de port
                         try {
-                            rc.moveRobotLeft(rc.sp); // stuurt commando over port
-                            Scanner data = new Scanner(rc.sp.getInputStream());
+                            rc.moveRobotLeft(rc.getSp()); // stuurt commando over port
+                            Scanner data = new Scanner(rc.getSp().getInputStream());
                             while (data.hasNextLine()) {
                                 System.out.println(data.nextLine());
                             }
@@ -75,8 +75,8 @@ public class Main {
                     System.out.println("RIGHT");
                     if (sp.openPort()) { // opent de port
                         try {
-                            rc.moveRobotRight(rc.sp); // stuurt commando over port
-                            Scanner data = new Scanner(rc.sp.getInputStream());
+                            rc.moveRobotRight(rc.getSp()); // stuurt commando over port
+                            Scanner data = new Scanner(rc.getSp().getInputStream());
                             while (data.hasNextLine()) {
                                 System.out.println(data.nextLine());
                             }

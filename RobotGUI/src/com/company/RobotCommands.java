@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets;
 
 
 public class RobotCommands {
-    public SerialPort sp;
+    private SerialPort sp;
 
     public RobotCommands(){
         sp = SerialPort.getCommPort("COM5"); // selecteer je gebruikte COM port
