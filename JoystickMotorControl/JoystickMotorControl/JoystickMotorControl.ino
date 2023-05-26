@@ -120,7 +120,7 @@ void loop() {
   }
 
   response = String(response);
-  Serial.print(response);
+  // Serial.print(response);
 
   //MODE CHECK
   if (!noodstopTriggered) {
@@ -156,11 +156,11 @@ void loop() {
   jSwitchCurrent = joystickSwitch();
   if (jSwitchLast == 1 & jSwitchCurrent == 0) {
 
-    Serial.println("Toggled-Z");
+    // Serial.println("Toggled-Z");
 
     zAxisMode = !zAxisMode;
 
-    Serial.println(zAxisMode);
+    // Serial.println(zAxisMode);
   }
 
 
@@ -180,10 +180,10 @@ void loop() {
       digitalWrite(9, HIGH);
       digitalWrite(8, HIGH);
       if (yValue < 50) {
-        Serial.println("vooruit");
+        // Serial.println("vooruit");
         sendCommand("VOOR");
       } else if (yValue > 950) {
-        Serial.println("achteruit");
+        // Serial.println("achteruit");
         sendCommand("ACHTER");
       } else {
         sendCommand("");

@@ -3,7 +3,7 @@
 #include <SharpIR.h>   // measuring distance library
 
 #define Encoder_output_x 2  // encoder output X-axis
-#define Encoder_output_y 5  // encoder output Y-axis
+#define Encoder_output_y 3  // encoder output Y-axis
 #define Encode_output_z A3  // encoder output Z-axis
 
 // z-axis pins
@@ -53,8 +53,8 @@ void setup() {
   pinMode(A3, INPUT);  // sets the Encoder_output_z pin as the input
 
   //Interrupt function to read out encoders
-  attachInterrupt(digitalPinToInterrupt(Encoder_output_x), DC_Motor_Encoder_x, RISING);
-  attachInterrupt(digitalPinToInterrupt(Encoder_output_y), DC_Motor_Encoder_y, RISING);
+  // attachInterrupt(digitalPinToInterrupt(Encoder_output_x), DC_Motor_Encoder_x, RISING);
+  // attachInterrupt(digitalPinToInterrupt(Encoder_output_y), DC_Motor_Encoder_y, RISING);
 
   //Setup motor Channel B (Z-axis)
   TCCR2B = TCCR2B & B11111000 | B00000111;  // for PWM frequency for motors of 30.64 Hz
@@ -107,12 +107,12 @@ void DC_Motor_Encoder_y() {
   int i = b - (b % 100);
   if (command.equals("UP") && b > 0) {
     Count_pulses_y++;
-    Serial.println(Count_pulses_y);
+    // Serial.println(Count_pulses_y);
   }
 
   if (command.equals("DOWN") && b > 0) {
     Count_pulses_y--;
-    Serial.println(Count_pulses_y);
+    // Serial.println(Count_pulses_y);
   }
 }
 
@@ -153,8 +153,10 @@ void loop() {
   }
 
   //count pulses read by the encoder
-  // Serial.println("Pulses: " + Count_pulses_y);
-  //Serial.println("Pulses: " + Count_pulses_x);
+  DC_Motor_Encoder_x();
+  DC_Motor_Encoder_y();
+  // Serial.println(Count_pulses_x);
+  // Serial.println(Count_pulses_y);
 
 
   //check limitswitchX
@@ -164,6 +166,7 @@ void loop() {
   int stateX = limitSwitchX.getState();
   if (stateX == HIGH) {
     // Serial.println("The limit switch on X-Axis is: TOUCHED");
+    Count_pulses_x = 0;
     message = "xLimY";
     requestEvent();
   } else {
@@ -182,6 +185,7 @@ void loop() {
   int stateY = limitSwitchY.getState();
   if (stateY == HIGH) {
     // Serial.println("The limit switch on Y-Axis is: TOUCHED");
+    Count_pulses_y = 0;
     message = "yLimY";
     requestEvent();
   } else {
