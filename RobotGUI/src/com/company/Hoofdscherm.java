@@ -14,6 +14,7 @@ public class Hoofdscherm extends JFrame {
     Artikelscherm as = new Artikelscherm();
     RobotCommands rc = new RobotCommands();
     SerialPort sp = rc.getSp();
+    GridTekenPanel gridje;
 
     private Color DarkGreen = new Color(0, 205, 0);
     private JPanel links;
@@ -23,8 +24,9 @@ public class Hoofdscherm extends JFrame {
     private boolean noodstopknop = false;
 
 
+
     public Hoofdscherm() throws SQLException {
-        addStartScherm("HMI Startscherm", 1000, 550);
+        addStartScherm("HMI Startscherm", 1440, 720);
 
         //Serialcomm instellen
     }
@@ -33,18 +35,26 @@ public class Hoofdscherm extends JFrame {
 
         setTitle(titel);
         setSize(breedte, hoogte);
+        setResizable(false);
 
-        setLayout(new GridLayout(1, 3)); //Zet de layout klaar voor 2 panels
+        setLayout(new GridLayout(1, 3)); //Zet de layout klaar voor 3 panels
 
         addPanels();
-        addHuidigeOrder();
         addGrid();
+        addHuidigeOrder();
         addOrderList();
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
 
     }
+
+    public void addGrid(){
+        //draw grid
+        gridje = new GridTekenPanel(5, 5);
+        rechts.add(gridje);
+    }
+
 
     public void addPanels() {
 
@@ -60,7 +70,7 @@ public class Hoofdscherm extends JFrame {
 
         //Bereidt het midden paneel voor
         midden = new JPanel();
-        GridLayout layout = new GridLayout(11,1);
+        GridLayout layout = new GridLayout(14,1);
         midden.setLayout(layout);
         midden.setBorder(new LineBorder(Color.GRAY,2,false));
 
@@ -68,15 +78,8 @@ public class Hoofdscherm extends JFrame {
         //Maakt de dropdowns en gooit het midden erin
         add(midden);
 
-        //Initieert de layout voor het rechterpanel
-        GridLayout grLay = new GridLayout(5, 5);
-
-
         //Bereidt het rechterpanel voor
         rechts = new JPanel();
-
-        //Zet de layout en tussenlijntjes (Voorgeinitieerde layout voor nodig!)
-        rechts.setLayout(null);
 
         //addGridPanels(false);
         add(rechts);
@@ -105,6 +108,31 @@ public class Hoofdscherm extends JFrame {
             artikellocatie.setHorizontalAlignment(JLabel.CENTER);
             midden.add(artikellocatie);
         }
+        JButton genereerCoords = new JButton("Genereer coordinaten");
+        JLabel coords = new JLabel();
+        genereerCoords.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+       
+                gridje.setTSPLine(true);
+                gridje.setVak1(getRandomNumber(0,24) );
+                gridje.setVak2(getRandomNumber(0,24));
+                gridje.setVak3(getRandomNumber(0,24));
+
+                int vak1 = gridje.getVak1() + 1;
+                int vak2 = gridje.getVak2() + 1;
+                int vak3 = gridje.getVak3() + 1;
+
+                coords.setText("" + vak1 + ", " + vak2 + ", " + vak3);
+
+                midden.add(coords);
+                rechts.repaint();
+                rechts.revalidate();
+            }
+        });
+
+        midden.add(genereerCoords);
+
         JButton nieuweOrder = new JButton("Nieuwe order inladen");
         midden.add(nieuweOrder);
 
@@ -141,76 +169,6 @@ public class Hoofdscherm extends JFrame {
         });
         midden.add(noodstop);
 
-    }
-
-    public void addGrid(){
-        //draw grid
-        class GridsCanvas extends JPanel {
-            int width, height;
-
-            int rows;
-
-            int cols;
-
-
-            GridsCanvas(int w, int h) {
-                setSize(width = w, height = h);
-            }
-
-            public void paint(Graphics g) {
-                // draw grid
-                int width=63;
-                int height=63;
-                int yGap = 65;
-                int xGap = 65;
-                for(int x=0;x<5;x++)
-                {
-                    for(int y=0;y<5;y++)
-                    {
-                        g.setColor(DarkGreen);
-                        g.fillRect(x*xGap,y*yGap,width,height);
-                        System.out.println();
-                    }
-                }
-
-                g.setColor(Color.green);
-                //X-axis and Y-axis move in increments of 65
-
-
-                g.setColor(Color.blue);
-
-                //A1->E5               //X en Y van beginpunt lijn         //X en Y van eindpunt lijn
-                //g.drawLine(xCoords("A"), yCoords("1"),xCoords("E"), yCoords("5"));
-
-            }
-        }
-
-        GridsCanvas xyz = new GridsCanvas(325, 325);
-        xyz.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                int xLocatie = e.getX();
-                int yLocatie = e.getY();
-
-                as.openArtikel(xLocatie, yLocatie);
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {}
-
-            @Override
-            public void mouseReleased(MouseEvent e) {}
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                xyz.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {}
-        });
-
-        rechts.add(xyz);
     }
 
     public void addDialogBox() {
@@ -358,6 +316,15 @@ public class Hoofdscherm extends JFrame {
     public boolean isAutomatisch() {
         return automatisch;
     }
+
+    public int getRandomNumber(int min, int max) {
+        return (int) ((Math.random() * (max - min)) + min); //Nodig voor actionperformed
+    }
+
 }
+
+
+
+
 
 
