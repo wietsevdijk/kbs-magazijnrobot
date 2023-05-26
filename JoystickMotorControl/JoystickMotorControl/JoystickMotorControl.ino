@@ -263,12 +263,12 @@ void receivedFromSlave() {
   if (message.endsWith("yLimY")) {
     yLimit = true;
     y_axis = 0;
-    if ((yValue > 950)) {
+    if ((yValue > 800)) {
       analogWrite(11, 0);      //Spins the motor on Channel B at full speedbool yBeneden = true;
     }
   } else if (message.endsWith("yLimN")) {
     yLimit = false;
-    if ((yValue > 950)) {
+    if ((yValue > 800)) {
       analogWrite(11, 200);      //Spins the motor on Channel B at full speedbool yBeneden = true;
     }
   }
@@ -276,12 +276,12 @@ void receivedFromSlave() {
   if (message.endsWith("xLimY")) {
     xLimit = true;
     x_axis = 0;
-    if ((xValue > 950)) {
+    if ((xValue > 800)) {
       analogWrite(3, 0);      //Spins the motor on Channel B at full speedbool yBeneden = true;
     }
   } else if (message.endsWith("xLimN")) {
     xLimit = false;
-    if ((xValue > 950)) {
+    if ((xValue > 800)) {
       analogWrite(3, 200);      //Spins the motor on Channel B at full speedbool yBeneden = true;
     }
 }
