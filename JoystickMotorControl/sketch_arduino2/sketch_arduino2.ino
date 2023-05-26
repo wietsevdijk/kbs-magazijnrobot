@@ -27,8 +27,8 @@ String command = "";
 long z_axis = 0;
 
 //Int to store pulses from encoder
-int Count_pulses_x = 0;
-int Count_pulses_y = 0;
+volatile int Count_pulses_x = 0;
+volatile int Count_pulses_y = 0;
 
 //To store the measurment data from z-axis
 String Data;
@@ -122,6 +122,20 @@ void Read_z_encoder() {
 //   Serial.print("Z-Axis: ");
 //   Serial.println(z_axis);
 }
+
+void sendStartingPoint() {
+  if(Count_pulses_x > 5) {
+    message = "StrtX";
+    requestEvent();
+    Serial.println(message);
+  }
+  if(Count_pulses_y > 100) {
+    message = "StrtY";
+    requestEvent();
+    Serial.println(message);
+  } 
+}
+
 void loop() {
   // put your main code here, to run repeatedly:
 
@@ -177,6 +191,9 @@ void loop() {
 
   //Read Z-axis
   Read_z_encoder();
+
+  //Send starting point
+  sendStartingPoint();
 
   //check limitswitchY
   limitSwitchY.loop();  // MUST call the loop() function first

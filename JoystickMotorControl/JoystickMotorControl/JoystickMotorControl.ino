@@ -32,6 +32,11 @@ bool manual = true;              // boolean for manual/automatic mode button
 bool yLimit = false;
 bool xLimit = false;
 
+bool goingHome = false;
+bool calibrating = false;
+bool isAtStart_x = false;
+bool isAtStart_y = false;
+
 long x_axis = 0;
 long y_axis = 0;
 
@@ -120,7 +125,16 @@ void loop() {
   }
 
   response = String(response);
-  // Serial.print(response);
+  Serial.print(response);
+
+
+
+
+  //COARDS PRINTEN
+  //Serial.print("X-Axis: ");
+  //Serial.println(map(x_axis, 0, 450, 1, 500));
+  //Serial.print("Y-Axis: ");
+  //Serial.println(map(y_axis, 0, 500, 1, 500));
 
   //MODE CHECK
   if (!noodstopTriggered) {
@@ -133,9 +147,11 @@ void loop() {
     digitalWrite(2, LOW);
     digitalWrite(4, LOW);
     digitalWrite(5, HIGH);
+    delay(300);
   } else if (noodstopReleaseCheck() && noodstopTriggered) {
     noodstopTriggered = false;
     digitalWrite(5, LOW);
+    delay(300);
   }
 
   //MODE SWITCH
@@ -146,6 +162,7 @@ void loop() {
     delay(300);
   } else if (modeSwitch() && !noodstopTriggered && manual) {
     manual = false;
+    goingHome = true;
     digitalWrite(2, HIGH);
     digitalWrite(4, LOW);
     delay(300);
@@ -156,11 +173,11 @@ void loop() {
   jSwitchCurrent = joystickSwitch();
   if (jSwitchLast == 1 & jSwitchCurrent == 0) {
 
-    // Serial.println("Toggled-Z");
+    Serial.println("Toggled-Z");
 
     zAxisMode = !zAxisMode;
 
-    // Serial.println(zAxisMode);
+    Serial.println(zAxisMode);
   }
 
 
@@ -179,11 +196,11 @@ void loop() {
     if (zAxisMode == 1) {
       digitalWrite(9, HIGH);
       digitalWrite(8, HIGH);
-      if (yValue < 50) {
-        // Serial.println("vooruit");
+      if (yValue < 100) {
+        Serial.println("vooruit");
         sendCommand("VOOR");
-      } else if (yValue > 950) {
-        // Serial.println("achteruit");
+      } else if (yValue > 800) {
+        Serial.println("achteruit");
         sendCommand("ACHTER");
       } else {
         sendCommand("");
@@ -191,18 +208,18 @@ void loop() {
 
     } else {
       sendCommand("");
-      if (xValue < 50) {
+      if (xValue < 100) {
         goRight();  //execute function to make robot go right
-      } else if (xValue > 950 && !xLimit) {
+      } else if (xValue > 800 && !xLimit) {
         goLeft();  // execute function to make robot go left
       } else {
         digitalWrite(9, HIGH);  //Disengage the Brake for Channel A
       }
 
-      if (yValue < 50) {
+      if (yValue < 100) {
 
         goUp();  // execute function to make robot go up
-      } else if (yValue > 950 && !yLimit) {
+      } else if (yValue > 800 && !yLimit) {
         goDown();  // execute function to make robot go down
       } else {
         digitalWrite(8, HIGH);  //Disengage the Brake for Channel A
@@ -217,11 +234,19 @@ void loop() {
     delay(1000);
   } else {  //Normale code voor besturen van motoren
   }
+
+  //Startprocedure
+  if (!manual && !noodstopTriggered) {
+    if (goingHome) {
+      goToStartingPoint();
+    }
+  }
 }
 
 //Functions from here
 
 //checks emergency button
+
 bool noodstopCheck() {
   bool ingedrukt = digitalRead(noodstop);
   return !ingedrukt;
@@ -233,12 +258,14 @@ bool noodstopReleaseCheck() {
 }
 
 //checks if joystick is pressed
+
 bool joystickSwitch() {
   bool ingedrukt = digitalRead(jSwitch);
   return !ingedrukt;
 }
 
 //switches between modes
+
 bool modeSwitch() {
   bool manual = digitalRead(modeSwitchKnop);
   return !manual;
@@ -274,6 +301,46 @@ void goRight() {
   digitalWrite(12, HIGH);  //Establishes forward direction of Channel A
   digitalWrite(9, LOW);    //Disengage the Brake for Channel A
   analogWrite(3, 200);     //Spins the motor on Channel A at full speed
+}
+
+void goToStartingPoint() {
+  receivedFromSlave();
+  if(!xLimit && !calibrating) {
+    goLeft();
+    isAtStart_x = false;
+  } else if(xLimit && !calibrating) {
+    isAtStart_x = false;
+    analogWrite(3, 0);    
+  }
+
+  if(!yLimit && !calibrating) {
+    goDown();
+    isAtStart_y = false;
+  } else if(yLimit && !calibrating) {
+    isAtStart_y = false;
+    analogWrite(3, 0);    
+  }
+
+  if(xLimit && yLimit) {
+    calibrating = true;
+  }
+
+  if(calibrating) {
+    if(!isAtStart_x) {
+      goRight();
+    } else {
+      analogWrite(3, 0);
+    }
+    if(!isAtStart_y) {
+      goUp();
+    } else {
+      analogWrite(11, 0);
+    }
+    if(isAtStart_x && isAtStart_y) {
+      calibrating = false;
+      goingHome = false;
+    }
+  }
 }
 
 //turn on brakes for both X and Y
@@ -332,28 +399,39 @@ void receivedFromSlave() {
 
   //   Writes the ("stuff here") on the serial monitor
   if (message.endsWith("yLimY")) {
+
     yLimit = true;
     y_axis = 0;
-    if ((yValue > 950)) {
+    if ((yValue > 800)) {
       analogWrite(11, 0);  //Spins the motor on Channel B at full speedbool yBeneden = true;
     }
   } else if (message.endsWith("yLimN")) {
     yLimit = false;
-    if ((yValue > 950)) {
+    if ((yValue > 800)) {
       analogWrite(11, 200);  //Spins the motor on Channel B at full speedbool yBeneden = true;
     }
   }
 
   if (message.endsWith("xLimY")) {
+    Serial.println("kajshdfkjhadskjfhkjasdfkj");
     xLimit = true;
     x_axis = 0;
-    if ((xValue > 950)) {
+    if ((xValue > 800)) {
       analogWrite(3, 0);  //Spins the motor on Channel B at full speedbool yBeneden = true;
     }
   } else if (message.endsWith("xLimN")) {
     xLimit = false;
-    if ((xValue > 950)) {
+    if ((xValue > 800)) {
       analogWrite(3, 200);  //Spins the motor on Channel B at full speedbool yBeneden = true;
     }
+  }
+
+  //Tijdelijke oplossing voor limitswitch probleem
+  if (message.endsWith("StrtX")) {
+    isAtStart_x = true;
+  }
+  
+  if (message.endsWith("StrtY")) {
+    isAtStart_y = true;
   }
 }
