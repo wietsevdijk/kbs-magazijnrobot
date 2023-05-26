@@ -81,7 +81,6 @@ void loop() {
    if (Serial.available()) {
     // read serial data
     HMIcommand = String(Serial.readString());
-    lcd.print(HMIcommand);
   }
 
   if (HMIcommand == "UP") {
