@@ -17,7 +17,7 @@ public class Database{
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException ex) {
-            ex.printStackTrace();
+            ex.printStackTrace();;
         }
 
     }
@@ -97,9 +97,8 @@ public class Database{
             
             statement.close();
             result.close();
-        } catch (
-                SQLException ex) {
-            ex.printStackTrace();
+        } catch (SQLException ex) {
+            System.out.println(printSqlException(ex));
         }
         return orderID;
     }
@@ -124,7 +123,7 @@ public class Database{
             result.close();
         } catch (
                 SQLException ex) {
-            ex.printStackTrace();
+            System.out.println(printSqlException(ex));
         }
         return map;
     }
@@ -149,7 +148,7 @@ public class Database{
             result.close();
         } catch (
                 SQLException ex) {
-            ex.printStackTrace();
+            System.out.println(printSqlException(ex));
         }
         return map;
     }
@@ -165,7 +164,7 @@ public class Database{
                     result.next();
                     orderIDs[i] = result.getString(1);
                 }
-                
+
             statement.close();
             result.close();
         } catch (SQLException ex) {
@@ -194,7 +193,7 @@ public class Database{
             result.close();
         } catch (
                 SQLException ex) {
-            ex.printStackTrace();
+            System.out.println(printSqlException(ex));
         }
         return productData;
 
@@ -219,7 +218,7 @@ public class Database{
             result.close();
         } catch (
                 SQLException ex) {
-            ex.printStackTrace();
+            System.out.println(printSqlException(ex));
         }
         return productNaam;
 
@@ -240,7 +239,7 @@ public class Database{
             statement.close();
             result2.close();
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            System.out.println(printSqlException(ex));
         }
         return productIDs;
     }
@@ -261,7 +260,7 @@ public class Database{
                 result3.close();
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            System.out.println(printSqlException(ex));
         }
         return productLocatie;
     }
@@ -281,7 +280,7 @@ public class Database{
             result.close();
         } catch (
                 SQLException ex) {
-            ex.printStackTrace();
+            System.out.println(printSqlException(ex));
         }
         return customerID;
     }
@@ -302,7 +301,7 @@ public class Database{
                 statement.close();
                 result3.close();
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            System.out.println(printSqlException(ex));
         }
             return customerDetails;
     }
@@ -316,7 +315,7 @@ public class Database{
             
             statement.close();
         }catch (SQLException ex){
-            ex.printStackTrace();
+            System.out.println(printSqlException(ex));
         }
     }
 }
