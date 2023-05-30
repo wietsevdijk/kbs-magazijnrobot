@@ -4,7 +4,7 @@
 
 #define Encoder_output_x 2  // encoder output X-axis
 #define Encoder_output_y 3  // encoder output Y-axis
-#define Encode_output_z A3  // encoder output Z-axis
+#define Encoder_output_z A3  // encoder output Z-axis
 
 // z-axis pins
 #define pwmZ 11
@@ -127,10 +127,14 @@ void DC_Motor_Encoder_y() {
 }
 
 void Read_z_encoder() {
-  z_axis = analogRead(Encode_output_z);
-  z_axis = map(z_axis, 285, 650, 20, 0);
-  //   Serial.print("Z-Axis: ");
-  //   Serial.println(z_axis);
+  Serial.print("Z-Axis: ");
+  Serial.println(getCurrentDistance());
+}
+
+float getCurrentDistance() {
+  float distanceVoltageZ = analogRead(Encoder_output_z) * (5.0 / 1023.0);
+  float distanceZ = (13 * (1 / distanceVoltageZ)) * 0.975;
+  return distanceZ;
 }
 
 void sendStartingPoint() {
@@ -138,23 +142,19 @@ void sendStartingPoint() {
     sendXStart = true;
     message = "StrtX";
     requestEvent();
-    Serial.println(message);
   } else if (Count_pulses_x <= 5 && sendXStart) {
     sendXStart = false;
     message = "StrtN";
     requestEvent();
-    Serial.println(message);
   }
   if (Count_pulses_y > 250 && !sendYStart) {
     sendYStart = true;
     message = "StrtY";
     requestEvent();
-    Serial.println(message);
   } else if (Count_pulses_y <= 250 && sendYStart) {
     sendYStart = false;
     message = "StrtN";
     requestEvent();
-    Serial.println(message);
   }
 }
 
