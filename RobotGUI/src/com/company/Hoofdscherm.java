@@ -5,12 +5,20 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import com.fazecast.jSerialComm.*;
 
 public class Hoofdscherm extends JFrame {
     Database db = new Database();
+
+    ArrayList<Klant> klanten = db.retrieveAllCustomers();
+    ArrayList<Product> producten = db.retrieveAllProducts();
+    ArrayList<Order> orders = db.retrieveAllOrders(producten);
+
+
+
     Artikelscherm as = new Artikelscherm();
     RobotCommands rc = new RobotCommands();
     SerialPort sp = rc.getSp();

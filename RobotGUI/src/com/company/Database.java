@@ -42,8 +42,9 @@ public class Database{
 
     /*
     Haalt lijst op van alle klanten in de database
+    RETURN een ArrayList met Klant-objecten
     Gebruikt bij opstart van HMI
-     */
+    */
     public ArrayList<Klant> retrieveAllCustomers() {
         String retrieveQuery = //Haalt alle klantinformatie op
                 "SELECT klantID, klantVoornaam, klantAchternaam, klantAdres, klantPostcode, klantWoonplaats " +
@@ -83,6 +84,166 @@ public class Database{
         return klanten;
     }
 
+    /*
+    Haalt alle producten op uit de database
+    RETURN een ArrayList met Product-objecten
+    Gebruikt bij opstart van de HMI
+    */
+    public ArrayList<Product> retrieveAllProducts() {
+        String retrieveQuery = //Haalt alle producten op
+                "SELECT productID, productNaam, productPrijs, productGewicht " +
+                        "FROM producten";
+
+        //Maakt nieuwe arraylist aan die later wordt teruggegeven
+        ArrayList<Product> producten = new ArrayList<>();
+
+        //Voert query uit als prepared statement
+        try (PreparedStatement preparedStatement = con.prepareStatement(retrieveQuery)) {
+            ResultSet rs = preparedStatement.executeQuery();
+            while (rs.next()) { //Loop door alle resultaten
+
+                //Haal alle kolommen op en sla ze op
+                int productID = rs.getInt(1);
+                String naam = rs.getString(2);
+                float prijs = rs.getFloat(3);
+                int gewicht = rs.getInt(4);
+
+                //Voeg toe aan producten-array
+                producten.add(new Product(productID, naam, prijs, gewicht));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(printSqlException(ex));
+            if (con != null) { //Rollback als de transactie faalt.
+                try {
+                    System.err.print("Transaction is being rolled back");
+                    con.rollback();
+                } catch (SQLException excep) {
+                    System.out.println(printSqlException(excep));
+                }
+            }
+        }
+        return producten;
+    }
+
+    /*
+    Haalt alle orders op uit de database
+    RETURN een ArrayList met Order-objecten
+    Gebruikt bij opstart van de HMI
+    is afhankelijk van methode getOrderregels
+     */
+
+    public ArrayList<Order> retrieveAllOrders(ArrayList<Product> producten) {
+        String retrieveQuery = //Haalt alle orderinformatie op
+                "SELECT orderID, klantID, pickingCompleet " +
+                        "FROM orders";
+
+        //todo Orderlines meenemen in order, zie andere methode getOrderregel
+        //Maakt nieuwe arraylist aan die later wordt teruggegeven
+        ArrayList<Order> orders = new ArrayList<>();
+
+        //Voert query uit als prepared statement
+        try (PreparedStatement preparedStatement = con.prepareStatement(retrieveQuery)) {
+            ResultSet rs = preparedStatement.executeQuery();
+            while (rs.next()) { //Loop door alle resultaten
+
+                //Haal alle kolommen op en sla ze op
+                int orderID = rs.getInt(1);
+                int klantID = rs.getInt(2);
+                int pickingCompleet = rs.getInt(3);
+
+                ArrayList<Orderregel> orderRegels = getOrderregels(orderID, producten);
+
+                //Voeg toe aan producten-array
+                orders.add(new Order(orderID, klantID, pickingCompleet, orderRegels));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(printSqlException(ex));
+            if (con != null) { //Rollback als de transactie faalt.
+                try {
+                    System.err.print("Transaction is being rolled back");
+                    con.rollback();
+                } catch (SQLException excep) {
+                    System.out.println(printSqlException(excep));
+                }
+            }
+        }
+        return orders;
+    }
+
+    /*
+    Haalt alle Orderregels op horend bij meegegeven orderID
+    RETURN ArrayList met OrderLine-objecten
+    Gebruikt in methode retrieveAllOrders
+    is afhankelijk van methode getProductData
+     */
+    public ArrayList<Orderregel> getOrderregels (int orderID, ArrayList<Product> producten){
+        /*
+         NOTE: In deze functie verwijst "orderID" naar het meegegeven ID dat hoort bij de order waarvoor regels worden aangemaakt
+         & verwijst "orderRegelOrderID" naar de orderID die in de database is opgeslagen onder orderregels
+         (de 2de is verder niet belangrijk, omdat we de context van de order al weten bij het aanroepen van deze functie)
+          */
+
+        String retrieveQuery = //Haalt alle orderinformatie op
+                "SELECT orderRegelID, orderID, productID, productAantal " +
+                        "FROM orderregels " +
+                        "WHERE orderID = ?";
+
+        //Maakt nieuwe arraylist aan die later wordt teruggegeven
+        ArrayList<Orderregel> orderRegels = new ArrayList<>();
+
+        //Voert query uit als prepared statement
+        try (PreparedStatement preparedStatement = con.prepareStatement(retrieveQuery)) {
+            //Vul ? in: Haal alle orderregels op die bij meegegeven orderID horen
+            preparedStatement.setInt(1, orderID);
+            ResultSet rs = preparedStatement.executeQuery();
+            while (rs.next()) { //Loop door alle resultaten
+
+                //Haal alle kolommen op en sla ze op
+                int orderRegelID = rs.getInt(1);
+                int orderRegelOrderID = rs.getInt(2);
+                int productID = rs.getInt(3);
+                int aantal = rs.getInt(4);
+
+                //Zoekt bijbehorend Product-object bij opgehaalde productID
+                Product product = getProductData(productID, producten);
+
+                //Voeg toe aan producten-array
+                orderRegels.add(new Orderregel(orderRegelID, orderRegelOrderID, product, aantal));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(printSqlException(ex));
+            if (con != null) { //Rollback als de transactie faalt.
+                try {
+                    System.err.print("Transaction is being rolled back");
+                    con.rollback();
+                } catch (SQLException excep) {
+                    System.out.println(printSqlException(excep));
+                }
+            }
+        }
+        return orderRegels;
+    }
+
+    /*
+    Zoekt naar een specifiek product op productID uit de eerder opgehaalde Producten arraylist
+    RETURN Product-object
+    Gebruikt in methode getOrderregels
+     */
+    public Product getProductData (int productID, ArrayList<Product> producten){
+        for(Product product : producten){ //Loop door alle producten heen
+            if(product.getProductID() == productID) { //Check of productID van huidig product in loop overeenkomt met productID die we zoeken
+                return product;
+            }
+        }
+        return null;
+    }
+
+
+
+    //Oude methode, wordt uiteindelijk vervangen
     public String getOrderID(){
 
         String orderID = null;
@@ -153,6 +314,7 @@ public class Database{
         return map;
     }
 
+    //Oude methode, wordt uiteindelijk vervangen
     public String[] getAllOrders(){
         String[] orderIDs = new String[3];
 
