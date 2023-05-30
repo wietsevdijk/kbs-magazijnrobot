@@ -40,12 +40,25 @@ public class Database{
         return sb.toString();
     }
 
+    /* Onderstaande code moet worden toegevoegd in catch-blokken waar transacties gerollbackt moeten worden, dit staat hier tijdelijk omdat het bij SELECTs niet nodig is
+                if (con != null) { //Rollback als de transactie faalt.
+                try {
+                    System.err.print("Transaction is being rolled back");
+                    con.rollback();
+                } catch (SQLException excep) {
+                    System.out.println(printSqlException(excep));
+                }
+     */
+
+
+
     /*
     Haalt lijst op van alle klanten in de database
     RETURN een ArrayList met Klant-objecten
     Gebruikt bij opstart van HMI
     */
     public ArrayList<Klant> retrieveAllCustomers() {
+
         String retrieveQuery = //Haalt alle klantinformatie op
                 "SELECT klantID, klantVoornaam, klantAchternaam, klantAdres, klantPostcode, klantWoonplaats " +
                         "FROM klanten";
@@ -71,15 +84,8 @@ public class Database{
             }
 
         } catch (SQLException ex) {
+            //Print SQL exception
             System.out.println(printSqlException(ex));
-            if (con != null) { //Rollback als de transactie faalt.
-                try {
-                    System.err.print("Transaction is being rolled back");
-                    con.rollback();
-                } catch (SQLException excep) {
-                    System.out.println(printSqlException(excep));
-                }
-            }
         }
         return klanten;
     }
@@ -113,15 +119,8 @@ public class Database{
             }
 
         } catch (SQLException ex) {
+            //Print SQL exception
             System.out.println(printSqlException(ex));
-            if (con != null) { //Rollback als de transactie faalt.
-                try {
-                    System.err.print("Transaction is being rolled back");
-                    con.rollback();
-                } catch (SQLException excep) {
-                    System.out.println(printSqlException(excep));
-                }
-            }
         }
         return producten;
     }
@@ -138,7 +137,6 @@ public class Database{
                 "SELECT orderID, klantID, pickingCompleet " +
                         "FROM orders";
 
-        //todo Orderlines meenemen in order, zie andere methode getOrderregel
         //Maakt nieuwe arraylist aan die later wordt teruggegeven
         ArrayList<Order> orders = new ArrayList<>();
 
@@ -159,15 +157,8 @@ public class Database{
             }
 
         } catch (SQLException ex) {
+            //Print SQL exception
             System.out.println(printSqlException(ex));
-            if (con != null) { //Rollback als de transactie faalt.
-                try {
-                    System.err.print("Transaction is being rolled back");
-                    con.rollback();
-                } catch (SQLException excep) {
-                    System.out.println(printSqlException(excep));
-                }
-            }
         }
         return orders;
     }
@@ -214,15 +205,8 @@ public class Database{
             }
 
         } catch (SQLException ex) {
+            //Print SQL exception
             System.out.println(printSqlException(ex));
-            if (con != null) { //Rollback als de transactie faalt.
-                try {
-                    System.err.print("Transaction is being rolled back");
-                    con.rollback();
-                } catch (SQLException excep) {
-                    System.out.println(printSqlException(excep));
-                }
-            }
         }
         return orderRegels;
     }

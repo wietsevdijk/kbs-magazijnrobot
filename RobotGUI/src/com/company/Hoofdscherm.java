@@ -13,6 +13,7 @@ import com.fazecast.jSerialComm.*;
 public class Hoofdscherm extends JFrame {
     Database db = new Database();
 
+    //Opstart HMI: Haal eerst alle Klanten, Producten en Orders op
     ArrayList<Klant> klanten = db.retrieveAllCustomers();
     ArrayList<Product> producten = db.retrieveAllProducts();
     ArrayList<Order> orders = db.retrieveAllOrders(producten);
