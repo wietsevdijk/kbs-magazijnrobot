@@ -225,7 +225,48 @@ public class Database{
         return null;
     }
 
-    
+
+    /*
+    Haalt alle Magazijn-locaties op, zowel leeg als gevuld met een product
+    RETURN ArrayList met Magazijn-objecten
+    Wordt gebruikt bij opstart HMI
+    */
+    //todo DEZE METHODE IS NOG NIET AF
+    public ArrayList<Magazijn> getAllProductLocations(){
+        String retrieveQuery = //Haalt alle orderinformatie op
+                "SELECT locatie, productID " +
+                        "FROM magazijn";
+
+        //Maakt nieuwe arraylist aan die later wordt teruggegeven
+        ArrayList<Magazijn> locaties = new ArrayList<>();
+
+        //Voert query uit als prepared statement
+        try (PreparedStatement preparedStatement = con.prepareStatement(retrieveQuery)) {
+            //Vul ? in: Haal alle orderregels op die bij meegegeven orderID horen
+            preparedStatement.setInt(1, orderID);
+            ResultSet rs = preparedStatement.executeQuery();
+            while (rs.next()) { //Loop door alle resultaten
+
+                //Haal alle kolommen op en sla ze op
+                int orderRegelID = rs.getInt(1);
+                int orderRegelOrderID = rs.getInt(2);
+                int productID = rs.getInt(3);
+                int aantal = rs.getInt(4);
+
+                //Zoekt bijbehorend Product-object bij opgehaalde productID
+                Product product = getProductData(productID, producten);
+
+                //Voeg toe aan producten-array
+                orderRegels.add(new Orderregel(orderRegelID, orderRegelOrderID, product, aantal));
+            }
+
+        } catch (SQLException ex) {
+            //Print SQL exception
+            System.out.println(printSqlException(ex));
+        }
+        return locaties;
+
+    }
 
 
 
@@ -250,8 +291,8 @@ public class Database{
         return orderID;
     }
 
-
-    public Map<Integer, Object> getAllProductLocations(){
+    // OUDE METHODE voor ophalen productlocaties
+/*    public Map<Integer, Object> getAllProductLocations(){
         //Deze return een map met de locatie van het product en het productID van het product.
         Map<Integer, Object> map;
         map = new HashMap<Integer, Object>();
@@ -273,7 +314,7 @@ public class Database{
             System.out.println(printSqlException(ex));
         }
         return map;
-    }
+    }*/
 
     public Map<Integer, Object> getCurrentOrderProductLocations(){
         //Deze return een map met de locatie van het product en het productID van het product.
