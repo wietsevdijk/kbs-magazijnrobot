@@ -2,8 +2,8 @@
 #include <ezButton.h>  // Button library
 #include <SharpIR.h>   // measuring distance library
 
-#define Encoder_output_x 2  // encoder output X-axis
-#define Encoder_output_y 3  // encoder output Y-axis
+#define Encoder_output_x 2   // encoder output X-axis
+#define Encoder_output_y 3   // encoder output Y-axis
 #define Encoder_output_z A3  // encoder output Z-axis
 
 // z-axis pins
@@ -39,6 +39,9 @@ bool sendYStart = false;
 
 //If calibrating or not
 bool calibrating = false;
+
+//Modus
+bool manual = true;
 
 //To store the measurment data from z-axis
 String Data;
@@ -127,8 +130,8 @@ void DC_Motor_Encoder_y() {
 }
 
 void Read_z_encoder() {
-  Serial.print("Z-Axis: ");
-  Serial.println(getCurrentDistance());
+  // Serial.print("Z-Axis: ");
+  // Serial.println(getCurrentDistance());
 }
 
 float getCurrentDistance() {
@@ -166,8 +169,24 @@ void recieveCalibrating() {
   }
 }
 
-void slideOut() {
+void recieveMode() {
+  if (command.equals("MANUAL")) {
+    manual = true;
+  } else if (command.equals("AUTO")) {
+    manual = false;
+    Serial.println(manual);
+  }
+}
 
+void slideOut() {
+  if (getCurrentDistance() < 18) {
+    digitalWrite(directionZ, LOW);
+    digitalWrite(brakeZ, LOW);
+    analogWrite(pwmZ, 200);
+  } else {
+    digitalWrite(brakeZ, HIGH);  //ENGAGE BRAKES
+    analogWrite(pwmZ, 0);
+  }
 }
 
 void loop() {
@@ -187,18 +206,21 @@ void loop() {
   // Serial.println("Time taken ms): " + endTime);
 
   //receive event and turns motor on z-axis on or off
-  if (command.equals("VOOR") && getCurrentDistance() < 18) {  //STUUR NAAR VOREN
-    digitalWrite(directionZ, LOW);
-    digitalWrite(brakeZ, LOW);
-    analogWrite(pwmZ, 200);
-  } else if (command.equals("ACHTER") && getCurrentDistance() > 7) {  //STUUR NAAR ACHTER
-    digitalWrite(directionZ, HIGH);
-    digitalWrite(brakeZ, LOW);
-    analogWrite(pwmZ, 200);
-  } else {
-    digitalWrite(brakeZ, HIGH);  //ENGAGE BRAKES
-    analogWrite(pwmZ, 0);
+  if (manual) {
+    if (command.equals("VOOR") && getCurrentDistance() < 18) {  //STUUR NAAR VOREN
+      digitalWrite(directionZ, LOW);
+      digitalWrite(brakeZ, LOW);
+      analogWrite(pwmZ, 200);
+    } else if (command.equals("ACHTER") && getCurrentDistance() > 7) {  //STUUR NAAR ACHTER
+      digitalWrite(directionZ, HIGH);
+      digitalWrite(brakeZ, LOW);
+      analogWrite(pwmZ, 200);
+    } else {
+      digitalWrite(brakeZ, HIGH);  //ENGAGE BRAKES
+      analogWrite(pwmZ, 0);
+    }    
   }
+
 
   //count pulses read by the encoder
   DC_Motor_Encoder_x();
@@ -212,6 +234,14 @@ void loop() {
 
   //recieve calibrating
   recieveCalibrating();
+
+  //recieve mode
+  recieveMode();
+
+  //slide out
+  if (command.equals("UITSCHUIVEN")) {
+    slideOut();
+  }
 
   // //Get state of limit switch on X-axis and do something
   int stateX = limitSwitchX.getState();

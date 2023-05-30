@@ -160,12 +160,14 @@ void loop() {
     manual = true;
     digitalWrite(2, LOW);
     digitalWrite(4, HIGH);
+    sendCommand("MANUAL");
     delay(300);
   } else if (modeSwitch() && !noodstopTriggered && manual) {
     manual = false;
     goingHome = true;
     digitalWrite(2, HIGH);
     digitalWrite(4, LOW);
+    sendCommand("AUTO");
     delay(300);
   }
 
