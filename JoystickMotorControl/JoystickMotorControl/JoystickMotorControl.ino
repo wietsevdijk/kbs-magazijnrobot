@@ -395,11 +395,10 @@ void receivedFromSlave() {
     message = String(message + (char)Wire.read());
     // Serial.print(message);
   }
-  // Serial.print(message);
+  Serial.println(message);
 
   //   Writes the ("stuff here") on the serial monitor
   if (message.endsWith("yLimY")) {
-
     yLimit = true;
     y_axis = 0;
     if ((yValue > 800)) {
@@ -413,7 +412,6 @@ void receivedFromSlave() {
   }
 
   if (message.endsWith("xLimY")) {
-    Serial.println("kajshdfkjhadskjfhkjasdfkj");
     xLimit = true;
     x_axis = 0;
     if ((xValue > 800)) {

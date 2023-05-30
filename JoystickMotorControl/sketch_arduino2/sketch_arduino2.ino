@@ -30,6 +30,10 @@ long z_axis = 0;
 volatile int Count_pulses_x = 0;
 volatile int Count_pulses_y = 0;
 
+//To send limitswitch change once
+bool sendXLim = true;
+bool sendYLim = true;
+
 //To store the measurment data from z-axis
 String Data;
 
@@ -119,21 +123,21 @@ void DC_Motor_Encoder_y() {
 void Read_z_encoder() {
   z_axis = analogRead(Encode_output_z);
   z_axis = map(z_axis, 285, 650, 20, 0);
-//   Serial.print("Z-Axis: ");
-//   Serial.println(z_axis);
+  //   Serial.print("Z-Axis: ");
+  //   Serial.println(z_axis);
 }
 
 void sendStartingPoint() {
-  if(Count_pulses_x > 5) {
+  if (Count_pulses_x > 5) {
     message = "StrtX";
     requestEvent();
     Serial.println(message);
   }
-  if(Count_pulses_y > 100) {
+  if (Count_pulses_y > 100) {
     message = "StrtY";
     requestEvent();
     Serial.println(message);
-  } 
+  }
 }
 
 void loop() {
@@ -143,7 +147,7 @@ void loop() {
   unsigned long startTime = millis();
 
   // this returns the distance to the object you're measuring
-//  int dis = IR_prox.getDistance();  // read distance in cm
+  //  int dis = IR_prox.getDistance();  // read distance in cm
 
   // returns x-axis distance to the serial monitor
   // Serial.println("Mean distance: " + dis);
@@ -179,21 +183,27 @@ void loop() {
   // //Get state of limit switch on X-axis and do something
   int stateX = limitSwitchX.getState();
   if (stateX == HIGH) {
-    // Serial.println("The limit switch on X-Axis is: TOUCHED");
-    Count_pulses_x = 0;
-    message = "xLimY";
-    requestEvent();
+    if (sendXLim) {
+      // Serial.println("The limit switch on X-Axis is: TOUCHED");
+      sendXLim = false;
+      Count_pulses_x = 0;
+      message = "xLimY";
+      requestEvent();
+    }
   } else {
-    // Serial.println("The limit switch on X-Axis is: UNTOUCHED");
-    message = "xLimN";
-    requestEvent();
+    if (!sendXLim) {
+      // Serial.println("The limit switch on X-Axis is: UNTOUCHED");
+      sendXLim = true;
+      message = "xLimN";
+      requestEvent();      
+    }
   }
 
   //Read Z-axis
   Read_z_encoder();
 
   //Send starting point
-  sendStartingPoint();
+  // sendStartingPoint();
 
   //check limitswitchY
   limitSwitchY.loop();  // MUST call the loop() function first
@@ -201,13 +211,19 @@ void loop() {
   //Get state of limit switch on Y-axis and do something
   int stateY = limitSwitchY.getState();
   if (stateY == HIGH) {
-    // Serial.println("The limit switch on Y-Axis is: TOUCHED");
-    Count_pulses_y = 0;
-    message = "yLimY";
-    requestEvent();
+    if (sendYLim) {
+      // Serial.println("The limit switch on Y-Axis is: TOUCHED");
+      sendYLim = false;
+      Count_pulses_y = 0;
+      message = "yLimY";
+      requestEvent();
+    }
   } else {
-    // Serial.println("The limit switch on Y-Axis is: UNTOUCHED");
-    message = "yLimN";
-    requestEvent();
+    if (!sendYLim) {
+      // Serial.println("The limit switch on Y-Axis is: UNTOUCHED");
+      sendYLim = true;
+      message = "yLimN";
+      requestEvent();
+    }
   }
 }
