@@ -232,6 +232,8 @@ public class Database{
     Wordt gebruikt bij opstart HMI
     */
     //todo DEZE METHODE IS NOG NIET AF
+
+    /*
     public ArrayList<Magazijn> getAllProductLocations(){
         String retrieveQuery = //Haalt alle orderinformatie op
                 "SELECT locatie, productID " +
@@ -267,6 +269,7 @@ public class Database{
         return locaties;
 
     }
+     */
 
 
 

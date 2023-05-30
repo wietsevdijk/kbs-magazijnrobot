@@ -9,6 +9,8 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.sql.SQLException;
 
+//Werkt niet meer met nieuwe grid. nog verwerken naar nieuwe grid dus.
+
 public class Artikelscherm {
     RobotCommands rc = new RobotCommands();
     Database db = new Database();

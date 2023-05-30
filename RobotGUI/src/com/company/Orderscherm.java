@@ -42,7 +42,7 @@ public class Orderscherm extends JFrame {
         panelordergegevens.add(ordernummer);
 
         String[] product = db.getProductName(String.valueOf(order));
-        for(int i = 0; i < 3; i++) {
+        for(int i = 0; i < product.length; i++) {
             JLabel productnaam = new JLabel("Artikel " + (i+1) + ": " + product[i]);
             panelordergegevens.add(productnaam);
         }
@@ -62,7 +62,7 @@ public class Orderscherm extends JFrame {
         panelartikelgegevens.add(artikellocaties);
 
         String[] locatie = db.getProductLocatie(order);
-        for(int i = 0; i < 3; i++) {
+        for(int i = 0; i < locatie.length; i++) {
             JLabel artikellocatie = new JLabel("Artikel " + (i+1) + " -> Locatie:  " + locatie[i]);
             panelartikelgegevens.add(artikellocatie);
         }

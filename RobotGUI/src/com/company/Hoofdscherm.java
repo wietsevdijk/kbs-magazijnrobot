@@ -22,6 +22,7 @@ public class Hoofdscherm extends JFrame {
 
     Artikelscherm as = new Artikelscherm();
     RobotCommands rc = new RobotCommands();
+    DBLocationToHMILocation DBtoHMI = new DBLocationToHMILocation();
     SerialPort sp = rc.getSp();
     GridTekenPanel gridje;
 
@@ -36,8 +37,6 @@ public class Hoofdscherm extends JFrame {
 
     public Hoofdscherm() throws SQLException {
         addStartScherm("HMI Startscherm", 1440, 720);
-
-        //Serialcomm instellen
     }
 
     public void addStartScherm(String titel, int breedte, int hoogte) {
@@ -59,18 +58,17 @@ public class Hoofdscherm extends JFrame {
     }
 
     public void addGrid(){
-        //draw grid
+        //draw grid van 5x5
         gridje = new GridTekenPanel(5, 5);
         rechts.add(gridje);
     }
 
 
     public void addPanels() {
-
         //Bereidt het linker paneel voor
         links = new JPanel();
         links.setBorder(new LineBorder(Color.GRAY,2,false));
-        //zet tekstlabels onder elkaar
+        //zet tekstlabels in linker vak onder elkaar
         links.setLayout(new BoxLayout(links, BoxLayout.Y_AXIS));
 
         //gooit linker paneel erin
@@ -94,45 +92,55 @@ public class Hoofdscherm extends JFrame {
         add(rechts);
     }
 
+    //print laatst toegevoegde open order in midden scherm
     public void addHuidigeOrder(){
+        //haal orderID op
         int order = Integer.parseInt(db.getOrderID());
+
+        //haal producten op naar basis van eerder opgehaalde orderID
         String[] product = db.getProductName(String.valueOf(order));
 
         //labels aanmaken
         JLabel huidigeorder = new JLabel("Huidige order: " + order);
         huidigeorder.setHorizontalAlignment(JLabel.CENTER);
+
         //labels toevoegen
         midden.add(huidigeorder);
 
 
-        for(int i = 0; i < 3; i++) {
+        //Voegt productnamen toe
+        for(int i = 0; i < product.length; i++) {
             JLabel productnaam = new JLabel("Artikel " + (i+1) + ": " + product[i]);
             productnaam.setHorizontalAlignment(JLabel.CENTER);
             midden.add(productnaam);
         }
 
+        //Voegt product locaties toe
         String[] locatie = db.getProductLocatie(String.valueOf(order));
-        for(int i = 0; i < 3; i++) {
+        for(int i = 0; i < locatie.length; i++) {
             JLabel artikellocatie = new JLabel("Artikel " + (i+1) + " -> Locatie:  " + locatie[i]);
             artikellocatie.setHorizontalAlignment(JLabel.CENTER);
             midden.add(artikellocatie);
         }
+
+        //OUD: genereerd random coordinaten
+        //NIEUW: tekent coordinaten uit de laatste open order op de grid
         JButton genereerCoords = new JButton("Genereer coordinaten");
         JLabel coords = new JLabel();
         genereerCoords.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-       
+                //vertaal Database positie naar HMI positie
+                int []positie = DBtoHMI.positie();
+
+                //Zorgt dat we kunnen tekenen op de grid
                 gridje.setTSPLine(true);
-                gridje.setVak1(getRandomNumber(0,24) );
-                gridje.setVak2(getRandomNumber(0,24));
-                gridje.setVak3(getRandomNumber(0,24));
 
-                int vak1 = gridje.getVak1() + 1;
-                int vak2 = gridje.getVak2() + 1;
-                int vak3 = gridje.getVak3() + 1;
+                //Geef posities door aan grid
+                gridje.setVak1(positie[0]);
+                gridje.setVak2(positie[1]);
+                gridje.setVak3(positie[2]);
 
-                coords.setText("" + vak1 + ", " + vak2 + ", " + vak3);
 
                 midden.add(coords);
                 rechts.repaint();
@@ -142,12 +150,15 @@ public class Hoofdscherm extends JFrame {
 
         midden.add(genereerCoords);
 
+        //Doet nog niks. moet later een nieuwe order gaan inladen
         JButton nieuweOrder = new JButton("Nieuwe order inladen");
         midden.add(nieuweOrder);
 
+        //doet nog niks. moet later een command sturen naar robot op producten op te halen
         JButton orderOphalen = new JButton("Producten ophalen");
         midden.add(orderOphalen);
 
+        //Switch tussen automatisch en handmatig besuren. Werkt maar alleen in het HMI. Moet nog command doorsturen naar robot
         JButton toggleModus = new JButton("Automatisch/Handmatig");
         toggleModus.addActionListener(new ActionListener() {
             @Override
@@ -163,6 +174,7 @@ public class Hoofdscherm extends JFrame {
         });
         midden.add(toggleModus);
 
+        //Gooit de noodstop erop. Werkt maar alleen in HMI. Moet nog commando versturen naar robot
         JButton noodstop = new JButton("NOODSTOP!");
         noodstop.addActionListener(new ActionListener() {
             @Override
@@ -180,26 +192,28 @@ public class Hoofdscherm extends JFrame {
 
     }
 
+    //Laat een dialog box zien op basis van je gekozen waarde (Automatisch, Handmatig, Noodstop)
+    //in het handmatig dialogbox kan je de robot besturen met pijltjes toetsen
     public void addDialogBox() {
         if(noodstopknop) {
             JDialog d = new JDialog(Hoofdscherm.this, "NOODSTOP INGEDRUKT");
             JLabel noodstop = new JLabel("Je hebt de noodstop ingedrukt, alle proccessen worden stil gelegd!");
-            d.setModal(true);
+            d.setModal(false); //Zorgt ervoor dat we toesteming hebben om Focus te vragen
             d.setSize(450,100);
             d.add(noodstop);
             d.pack();
-            d.setLocationRelativeTo(getContentPane());
+            d.setLocationRelativeTo(getContentPane()); //opent de dialog box in het midden van het hoofdscherm
             d.setVisible(true);
         } else if (!automatisch && !noodstopknop){
             JDialog d = new JDialog(Hoofdscherm.this, "Handmatig");
             JLabel handmatiglabel = new JLabel("Robot staat nu op handmatige modus! Je kan nu de robot besturen met de pijltjes toetsen");
-            d.setModal(true);
+            d.setModal(false); //Zorgt ervoor dat we toesteming hebben om Focus te vragen
             d.setSize(250,100);
             d.add(handmatiglabel);
             d.pack();
             d.setLocationRelativeTo(getContentPane());
             d.setVisible(true);
-            d.requestFocus();
+            d.requestFocus(); //Vraag focus in dit scherm zodat we de robot kunnen besturen
 
             d.addKeyListener(new KeyListener() {
                 @Override
@@ -279,7 +293,7 @@ public class Hoofdscherm extends JFrame {
         } else if (automatisch && !noodstopknop){
             JDialog d = new JDialog(Hoofdscherm.this, "Automatisch");
             JLabel automatischlabel = new JLabel("Robot staat nu op automatische modus!");
-            d.setModal(true);
+            d.setModal(false);
             d.setSize(250,100);
             d.add(automatischlabel);
             d.pack();
@@ -289,7 +303,7 @@ public class Hoofdscherm extends JFrame {
     }
 
 
-
+    //haalt alle open orders op
     public void addOrderList() {
         JLabel openorders = new JLabel("Open orders: ");
         openorders.setLocation((this.getWidth()-openorders.getWidth())/2,50);
@@ -325,11 +339,6 @@ public class Hoofdscherm extends JFrame {
     public boolean isAutomatisch() {
         return automatisch;
     }
-
-    public int getRandomNumber(int min, int max) {
-        return (int) ((Math.random() * (max - min)) + min); //Nodig voor actionperformed
-    }
-
 }
 
 
