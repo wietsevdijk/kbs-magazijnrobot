@@ -138,20 +138,20 @@ float getCurrentDistance() {
 }
 
 void sendStartingPoint() {
-  if (Count_pulses_x > 5 && !sendXStart) {
+  if (Count_pulses_x > 6 && !sendXStart) {
     sendXStart = true;
     message = "StrtX";
     requestEvent();
-  } else if (Count_pulses_x <= 5 && sendXStart) {
+  } else if (Count_pulses_x <= 6 && sendXStart) {
     sendXStart = false;
     message = "StrtN";
     requestEvent();
   }
-  if (Count_pulses_y > 250 && !sendYStart) {
+  if (Count_pulses_y > 300 && !sendYStart) {
     sendYStart = true;
     message = "StrtY";
     requestEvent();
-  } else if (Count_pulses_y <= 250 && sendYStart) {
+  } else if (Count_pulses_y <= 300 && sendYStart) {
     sendYStart = false;
     message = "StrtN";
     requestEvent();
@@ -164,6 +164,10 @@ void recieveCalibrating() {
   } else if (sendXStart && sendYStart) {
     calibrating = false;
   }
+}
+
+void slideOut() {
+
 }
 
 void loop() {
@@ -183,11 +187,11 @@ void loop() {
   // Serial.println("Time taken ms): " + endTime);
 
   //receive event and turns motor on z-axis on or off
-  if (command.equals("VOOR")) {  //STUUR NAAR VOREN
+  if (command.equals("VOOR") && getCurrentDistance() < 18) {  //STUUR NAAR VOREN
     digitalWrite(directionZ, LOW);
     digitalWrite(brakeZ, LOW);
     analogWrite(pwmZ, 200);
-  } else if (command.equals("ACHTER")) {  //STUUR NAAR ACHTER
+  } else if (command.equals("ACHTER") && getCurrentDistance() > 7) {  //STUUR NAAR ACHTER
     digitalWrite(directionZ, HIGH);
     digitalWrite(brakeZ, LOW);
     analogWrite(pwmZ, 200);
