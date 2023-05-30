@@ -127,7 +127,8 @@ void loop() {
   response = String(response);
   Serial.print(response);
 
-
+  //Send calibrating
+  sendCalibrating();
 
 
   //COARDS PRINTEN
@@ -303,6 +304,12 @@ void goRight() {
   analogWrite(3, 200);     //Spins the motor on Channel A at full speed
 }
 
+void sendCalibrating() {
+  if(calibrating) {
+    sendCommand("CALIBRATING");
+  }
+}
+
 void goToStartingPoint() {
   receivedFromSlave();
   if(!xLimit && !calibrating) {
@@ -313,7 +320,7 @@ void goToStartingPoint() {
     analogWrite(3, 0);    
   }
 
-  if(!yLimit && !calibrating) {
+  if(!yLimit && !calibrating && xLimit) {
     goDown();
     isAtStart_y = false;
   } else if(yLimit && !calibrating) {
@@ -341,6 +348,10 @@ void goToStartingPoint() {
       goingHome = false;
     }
   }
+}
+
+void goToBox(int x, int y) {
+    
 }
 
 //turn on brakes for both X and Y

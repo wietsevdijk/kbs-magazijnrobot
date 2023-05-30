@@ -30,9 +30,15 @@ long z_axis = 0;
 volatile int Count_pulses_x = 0;
 volatile int Count_pulses_y = 0;
 
-//To send limitswitch change once
+//To send a change only once
 bool sendXLim = true;
 bool sendYLim = true;
+
+bool sendXStart = false;
+bool sendYStart = false;
+
+//If calibrating or not
+bool calibrating = false;
 
 //To store the measurment data from z-axis
 String Data;
@@ -128,15 +134,35 @@ void Read_z_encoder() {
 }
 
 void sendStartingPoint() {
-  if (Count_pulses_x > 5) {
+  if (Count_pulses_x > 5 && !sendXStart) {
+    sendXStart = true;
     message = "StrtX";
     requestEvent();
     Serial.println(message);
+  } else if (Count_pulses_x <= 5 && sendXStart) {
+    sendXStart = false;
+    message = "StrtN";
+    requestEvent();
+    Serial.println(message);
   }
-  if (Count_pulses_y > 100) {
+  if (Count_pulses_y > 250 && !sendYStart) {
+    sendYStart = true;
     message = "StrtY";
     requestEvent();
     Serial.println(message);
+  } else if (Count_pulses_y <= 250 && sendYStart) {
+    sendYStart = false;
+    message = "StrtN";
+    requestEvent();
+    Serial.println(message);
+  }
+}
+
+void recieveCalibrating() {
+  if (command.equals("CALIBRATING")) {
+    calibrating = true;
+  } else if (sendXStart && sendYStart) {
+    calibrating = false;
   }
 }
 
@@ -180,6 +206,9 @@ void loop() {
   //check limitswitchX
   limitSwitchX.loop();  // MUST call the loop() function first
 
+  //recieve calibrating
+  recieveCalibrating();
+
   // //Get state of limit switch on X-axis and do something
   int stateX = limitSwitchX.getState();
   if (stateX == HIGH) {
@@ -195,7 +224,7 @@ void loop() {
       // Serial.println("The limit switch on X-Axis is: UNTOUCHED");
       sendXLim = true;
       message = "xLimN";
-      requestEvent();      
+      requestEvent();
     }
   }
 
@@ -203,7 +232,9 @@ void loop() {
   Read_z_encoder();
 
   //Send starting point
-  // sendStartingPoint();
+  if (calibrating) {
+    sendStartingPoint();
+  }
 
   //check limitswitchY
   limitSwitchY.loop();  // MUST call the loop() function first
