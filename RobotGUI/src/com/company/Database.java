@@ -171,9 +171,9 @@ public class Database{
      */
     public ArrayList<Orderregel> getOrderregels (int orderID, ArrayList<Product> producten){
         /*
-         NOTE: In deze functie verwijst "orderID" naar het meegegeven ID dat hoort bij de order waarvoor regels worden aangemaakt
-         & verwijst "orderRegelOrderID" naar de orderID die in de database is opgeslagen onder orderregels
-         (de 2de is verder niet belangrijk, omdat we de context van de order al weten bij het aanroepen van deze functie)
+         NOTE: In deze functie verwijst "orderID" naar het meegegeven ID dat hoort bij de order waarvoor regels zijn aangemaakt
+         & verwijst "orderRegelOrderID" naar de orderID die in de database is opgeslagen onder de tabel orderregels
+         (de 2de is verder niet heel belangrijk, omdat we de context van de order al weten bij het aanroepen van deze functie)
           */
 
         String retrieveQuery = //Haalt alle orderinformatie op
@@ -224,6 +224,8 @@ public class Database{
         }
         return null;
     }
+
+    
 
 
 
