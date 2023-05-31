@@ -14,17 +14,17 @@ public class GridTekenPanel extends JPanel {
 
 
 
-    private ArrayList<Magazijnplek> plekkies;
+    private ArrayList<Magazijnplek> plekken;
 
     //Teken een door jouw gedefineerde grid
     public GridTekenPanel(int aantalX, int aantalY) {
         maxX = aantalX;
         maxY = aantalY;
 
-        plekkies = new ArrayList<>(aantalX * aantalY);
+        plekken = new ArrayList<>(aantalX * aantalY);
 
         setBackground(Color.black);
-        setPreferredSize(new Dimension(450, 450));
+        setPreferredSize(new Dimension(400, 400));
     }
 
     //Berekent afstand tussen 2 locaties in de grid
@@ -47,12 +47,12 @@ public class GridTekenPanel extends JPanel {
 
     //Bereken pixel locatie van array index naar pixel waarde
     public int berekenXpixel(int arrayIndex, int xsize) {
-        return plekkies.get(arrayIndex).getPositie().x + (xsize / 2);
+        return plekken.get(arrayIndex).getPositie().x + (xsize / 2);
     }
 
     //Bereken pixel locatie van array index naar pixel waarde
     public int berekenYpixel(int arrayIndex, int ysize) {
-        return plekkies.get(arrayIndex).getPositie().y + (ysize / 2);
+        return plekken.get(arrayIndex).getPositie().y + (ysize / 2);
     }
 
     @Override
@@ -83,8 +83,8 @@ public class GridTekenPanel extends JPanel {
                     g.setColor(Color.darkGray);
                 }
 
-                Magazijnplek plekkie = new Magazijnplek(x, y, new Point(xstart, ystart));
-                plekkies.add(plekkie);
+                Magazijnplek plek = new Magazijnplek(x, y, new Point(xstart, ystart));
+                plekken.add(plek);
 
                 g.fillRect(xstart, ystart, xsize, ysize);
             }
@@ -327,5 +327,7 @@ public class GridTekenPanel extends JPanel {
     public void setVak3(int vak3) {
         this.vak3 = vak3;
     }
+
+
 
 }

@@ -1,6 +1,4 @@
 package com.company;
-import java.io.PrintWriter;
-import java.io.Serial;
 import java.sql.*;
 import java.util.*;
 
@@ -345,16 +343,14 @@ public class Database{
     }
 
     //Oude methode, wordt uiteindelijk vervangen
-    public String[] getAllOrders(){
-        String[] orderIDs = new String[3];
-
+    public ArrayList<String> getAllOrders(){
+        ArrayList<String> orderIDs = new ArrayList<String>();
         try {
             Statement statement = con.createStatement();
             String query = "SELECT orderID FROM orders WHERE pickingCompleet = 0";
             ResultSet result = statement.executeQuery(query);
-                for (int i = 0; i < 3; i++) {
-                    result.next();
-                    orderIDs[i] = result.getString(1);
+                while (result.next()) {
+                    orderIDs.add(result.getString(1));
                 }
 
             statement.close();
@@ -436,16 +432,15 @@ public class Database{
         return productIDs;
     }
 
-    public String[] getProductLocatie(String orderID){
-        String[] productLocatie = new String[3];
+    public ArrayList<String> getProductLocatie(String orderID){
+        ArrayList<String> productLocatie = new ArrayList<String>();
         try {
                 
                 Statement statement = con.createStatement();
                 String query3 = "SELECT locatie FROM magazijn WHERE productID IN(SELECT productID FROM orderregels WHERE orderID = " + orderID + ")";
                 ResultSet result3 = statement.executeQuery(query3);
-                for (int i = 0; i < 3; i++) {
-                    result3.next();
-                    productLocatie[i] = result3.getString(1);
+                while(result3.next()){
+                    productLocatie.add(result3.getString(1));
                 }
                 
                 statement.close();

@@ -61,7 +61,7 @@ public class Orderscherm extends JFrame {
         JLabel artikellocaties = new JLabel("Artikel locaties: ");
         panelartikelgegevens.add(artikellocaties);
 
-        String[] locatie = db.getProductLocatie(order);
+        String[] locatie = db.getProductLocatie(order).toArray(new String[0]);
         for(int i = 0; i < locatie.length; i++) {
             JLabel artikellocatie = new JLabel("Artikel " + (i+1) + " -> Locatie:  " + locatie[i]);
             panelartikelgegevens.add(artikellocatie);
