@@ -13,8 +13,9 @@ public class DBLocationToHMILocation {
 
 
     //vertaalt database locatie naar HMI locatie. Nog verwerken met nieuwe database calls
+    //eventueel een map gebruiken ipv 24 if statements
     public int[] positie(){
-        String[] locatie = db.getProductLocatie(db.getOrderID());
+        String[] locatie = db.getProductLocatie(db.getOrderID()).toArray(new String[0]);
         int[] positie = new int[locatie.length];
         for(int i = 0; i < locatie.length; i++){
             if(Objects.equals(locatie[i], "A1")){

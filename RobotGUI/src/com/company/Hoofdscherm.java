@@ -30,13 +30,20 @@ public class Hoofdscherm extends JFrame {
     private JPanel links;
     private JPanel midden;
     private JPanel rechts;
+    private JScrollPane jScrollPaneMidden;
+    private JPanel currentorderpanel;
+    private JPanel buttonpanel;
     private boolean automatisch = true;
     private boolean noodstopknop = false;
+    JLabel artikellocatie1 = new JLabel();
+    JLabel artikellocatie2 = new JLabel();
+    JLabel artikellocatie3 = new JLabel();
+
 
 
 
     public Hoofdscherm() throws SQLException {
-        addStartScherm("HMI Startscherm", 1440, 720);
+        addStartScherm("HMI Startscherm", 1250, 450);
     }
 
     public void addStartScherm(String titel, int breedte, int hoogte) {
@@ -48,9 +55,9 @@ public class Hoofdscherm extends JFrame {
         setLayout(new GridLayout(1, 3)); //Zet de layout klaar voor 3 panels
 
         addPanels();
-        addGrid();
-        addHuidigeOrder();
         addOrderList();
+        addHuidigeOrder();
+        addGrid();
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
@@ -67,9 +74,9 @@ public class Hoofdscherm extends JFrame {
     public void addPanels() {
         //Bereidt het linker paneel voor
         links = new JPanel();
-        links.setBorder(new LineBorder(Color.GRAY,2,false));
         //zet tekstlabels in linker vak onder elkaar
-        links.setLayout(new BoxLayout(links, BoxLayout.Y_AXIS));
+        links.setLayout(new GridLayout(1,1));
+        links.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 
         //gooit linker paneel erin
         add(links);
@@ -77,9 +84,22 @@ public class Hoofdscherm extends JFrame {
 
         //Bereidt het midden paneel voor
         midden = new JPanel();
-        GridLayout layout = new GridLayout(14,1);
-        midden.setLayout(layout);
-        midden.setBorder(new LineBorder(Color.GRAY,2,false));
+        midden.setLayout(new GridLayout(2, 1));
+        midden.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+
+        //maakt scroll panel aan met huidige order locaties
+        currentorderpanel = new JPanel();
+        currentorderpanel.setLayout(new GridLayout(10,0));
+        jScrollPaneMidden = new JScrollPane(currentorderpanel);
+        jScrollPaneMidden.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        midden.add(jScrollPaneMidden);
+
+        //maakt buttonpanel aan
+        buttonpanel = new JPanel();
+        buttonpanel.setLayout(new GridLayout(6,1));
+
+        midden.add(buttonpanel);
+
 
 
         //Maakt de dropdowns en gooit het midden erin
@@ -94,44 +114,40 @@ public class Hoofdscherm extends JFrame {
 
     //print laatst toegevoegde open order in midden scherm
     public void addHuidigeOrder(){
-        //haal orderID op
-        int order = Integer.parseInt(db.getOrderID());
-
-        //haal producten op naar basis van eerder opgehaalde orderID
-        String[] product = db.getProductName(String.valueOf(order));
-
-        //labels aanmaken
-        JLabel huidigeorder = new JLabel("Huidige order: " + order);
-        huidigeorder.setHorizontalAlignment(JLabel.CENTER);
-
-        //labels toevoegen
-        midden.add(huidigeorder);
-
-
-        //Voegt productnamen toe
-        for(int i = 0; i < product.length; i++) {
-            JLabel productnaam = new JLabel("Artikel " + (i+1) + ": " + product[i]);
-            productnaam.setHorizontalAlignment(JLabel.CENTER);
-            midden.add(productnaam);
-        }
-
-        //Voegt product locaties toe
-        String[] locatie = db.getProductLocatie(String.valueOf(order));
-        for(int i = 0; i < locatie.length; i++) {
-            JLabel artikellocatie = new JLabel("Artikel " + (i+1) + " -> Locatie:  " + locatie[i]);
-            artikellocatie.setHorizontalAlignment(JLabel.CENTER);
-            midden.add(artikellocatie);
-        }
-
         //OUD: genereerd random coordinaten
         //NIEUW: tekent coordinaten uit de laatste open order op de grid
         JButton genereerCoords = new JButton("Genereer coordinaten");
-        JLabel coords = new JLabel();
         genereerCoords.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //vertaal Database positie naar HMI positie
                 int []positie = DBtoHMI.positie();
+                //Zorgt dat we kunnen tekenen op de grid
+                grid.setTSPLine(true);
+
+                //Geef posities door aan grid
+                grid.setVak1(getRandomNumber(0,24));
+                grid.setVak2(getRandomNumber(0,24));
+                grid.setVak3(getRandomNumber(0,24));
+
+                showLatestorder();
+                rechts.repaint();
+                rechts.revalidate();
+            }
+        });
+
+        buttonpanel.add(genereerCoords);
+
+        //Doet nog niks. moet later een nieuwe order gaan inladen
+        JButton nieuweOrder = new JButton("Nieuwe order inladen");
+        buttonpanel.add(nieuweOrder);
+
+        nieuweOrder.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showLatestorder();
+                //vertaal Database positie naar HMI positie
+                int []positie = DBtoHMI.positie( );
 
                 //Zorgt dat we kunnen tekenen op de grid
                 grid.setTSPLine(true);
@@ -141,40 +157,42 @@ public class Hoofdscherm extends JFrame {
                 grid.setVak2(positie[1]);
                 grid.setVak3(positie[2]);
 
-                System.out.println(positie[0]);
-
-
-                midden.add(coords);
+                midden.repaint();
+                midden.revalidate();
                 rechts.repaint();
                 rechts.revalidate();
             }
         });
 
-        midden.add(genereerCoords);
-
-        //Doet nog niks. moet later een nieuwe order gaan inladen
-        JButton nieuweOrder = new JButton("Nieuwe order inladen");
-        midden.add(nieuweOrder);
-
         //doet nog niks. moet later een command sturen naar robot op producten op te halen
         JButton orderOphalen = new JButton("Producten ophalen");
-        midden.add(orderOphalen);
+        buttonpanel.add(orderOphalen);
+
+        orderOphalen.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                db.shipOrder(db.getOrderID());
+            }
+        });
 
         //Switch tussen automatisch en handmatig besuren. Werkt maar alleen in het HMI. Moet nog command doorsturen naar robot
         JButton toggleModus = new JButton("Automatisch/Handmatig");
+        toggleModus.setBackground(Color.ORANGE);
         toggleModus.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(automatisch){
+                if(automatisch && !noodstopknop){
                     addDialogBox();
+                    toggleModus.setBackground(Color.GREEN);
                     automatisch = false;
-                } else if (!automatisch){
+                } else if (!automatisch && !noodstopknop){
+                    toggleModus.setBackground(Color.ORANGE);
                     addDialogBox();
                     automatisch = true;
                 }
             }
         });
-        midden.add(toggleModus);
+        buttonpanel.add(toggleModus);
 
         //Gooit de noodstop erop. Werkt maar alleen in HMI. Moet nog commando versturen naar robot
         JButton noodstop = new JButton("NOODSTOP!");
@@ -182,16 +200,19 @@ public class Hoofdscherm extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if(noodstopknop){
+                    noodstop.setBackground(null);
+                    toggleModus.setBackground(null);
                     noodstopknop = false;
                     addDialogBox();
                 } else if (!noodstopknop){
+                    toggleModus.setBackground(Color.RED);
+                    noodstop.setBackground(Color.RED);
                     noodstopknop = true;
                     addDialogBox();
                 }
             }
         });
-        midden.add(noodstop);
-
+        buttonpanel.add(noodstop);
     }
 
     //Laat een dialog box zien op basis van je gekozen waarde (Automatisch, Handmatig, Noodstop)
@@ -304,19 +325,72 @@ public class Hoofdscherm extends JFrame {
         }
     }
 
+    public void showLatestorder(){
+        //haal orderID op
+        int order = 0;
+        try {
+            order = Integer.parseInt(db.getOrderID());
+        }catch (Exception sqlException){
+            System.out.println("Geen open orders");
+        }
+        //haal producten op naar basis van eerder opgehaalde orderID
+        String[] product = db.getProductName(String.valueOf(order));
+
+        //labels aanmaken
+        JLabel huidigeorder = new JLabel("Huidige order: " + order);
+        huidigeorder.setHorizontalAlignment(JLabel.CENTER);
+        huidigeorder.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        jScrollPaneMidden.setColumnHeaderView(huidigeorder);
+
+        //Voegt product locaties toe
+        String[] locatie = db.getProductLocatie(String.valueOf(order)).toArray(new String[0]);
+        for(int i = 0; i < locatie.length; i++) {
+            if(i == 0) {
+                artikellocatie1.setText("Product " + (i + 1) + ": " + locatie[i]);
+            }
+
+            if(i == 1) {
+                artikellocatie2.setText("Product " + (i + 1) + ": " + locatie[i]);
+            }
+
+            if(i == 2) {
+                artikellocatie3.setText("Product " + (i + 1) + ": " + locatie[i]);
+            }
+        }
+        currentorderpanel.add(artikellocatie1);
+        currentorderpanel.add(artikellocatie2);
+        currentorderpanel.add(artikellocatie3);
+        currentorderpanel.repaint();
+        currentorderpanel.revalidate();
+    }
+
 
     //haalt alle open orders op
     public void addOrderList() {
-        JLabel openorders = new JLabel("Open orders: ");
-        openorders.setLocation((this.getWidth()-openorders.getWidth())/2,50);
-        links.add(openorders);
-        String[] orders = db.getAllOrders();
+        ArrayList<String> orderIDs = db.getAllOrders();
         String order= null;
-        for (int x = 0; x < orders.length; x++) {
-            JLabel orderNaam = new JLabel("Ordernummer: " + orders[x]); //print alle open orders
+
+        GridLayout layout = new GridLayout(20,1);
+        JPanel orderpanel = new JPanel();
+        orderpanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+
+        orderpanel.setLayout(layout);
+
+        JScrollPane jScrollPane1 = new JScrollPane(orderpanel);
+        jScrollPane1.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        JLabel openorders = new JLabel("Open orders: ");
+        openorders.setHorizontalAlignment(0);
+        openorders.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        jScrollPane1.setColumnHeaderView(openorders);
+        links.add(jScrollPane1);
+
+        for (String orderID : orderIDs) {
+            JLabel orderNaam = new JLabel("Ordernummer: " + orderID); //print alle open orders
             orderNaam.setForeground(Color.blue);
-            order = orders[x]; //krijg order nummer
+
+            order = orderID; //krijg order nummer
             orderNaam.setCursor(new Cursor(Cursor.HAND_CURSOR)); // maak order nummer label clickable
+            orderpanel.add(orderNaam);
             String finalOrder = order;
 
             orderNaam.addMouseListener(new MouseAdapter() { // voeg mouseclick listener toe aan ordernummer label
@@ -327,10 +401,10 @@ public class Hoofdscherm extends JFrame {
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
-
                 }
             });
-            links.add(orderNaam);
+            repaint();
+            revalidate();
         }
     }
 
