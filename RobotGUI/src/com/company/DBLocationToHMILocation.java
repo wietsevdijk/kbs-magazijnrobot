@@ -16,7 +16,7 @@ public class DBLocationToHMILocation {
     public int[] positie(){
         String[] locatie = db.getProductLocatie(db.getOrderID());
         int[] positie = new int[locatie.length];
-        for(int i = 1; i < locatie.length; i++){
+        for(int i = 0; i < locatie.length; i++){
             if(Objects.equals(locatie[i], "A1")){
                 positie[i] = 0;
             }

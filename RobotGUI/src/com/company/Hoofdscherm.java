@@ -24,7 +24,7 @@ public class Hoofdscherm extends JFrame {
     RobotCommands rc = new RobotCommands();
     DBLocationToHMILocation DBtoHMI = new DBLocationToHMILocation();
     SerialPort sp = rc.getSp();
-    GridTekenPanel gridje;
+    GridTekenPanel grid;
 
     private Color DarkGreen = new Color(0, 205, 0);
     private JPanel links;
@@ -59,8 +59,8 @@ public class Hoofdscherm extends JFrame {
 
     public void addGrid(){
         //draw grid van 5x5
-        gridje = new GridTekenPanel(5, 5);
-        rechts.add(gridje);
+        grid = new GridTekenPanel(5, 5);
+        rechts.add(grid);
     }
 
 
@@ -134,12 +134,14 @@ public class Hoofdscherm extends JFrame {
                 int []positie = DBtoHMI.positie();
 
                 //Zorgt dat we kunnen tekenen op de grid
-                gridje.setTSPLine(true);
+                grid.setTSPLine(true);
 
                 //Geef posities door aan grid
-                gridje.setVak1(positie[0]);
-                gridje.setVak2(positie[1]);
-                gridje.setVak3(positie[2]);
+                grid.setVak1(positie[0]);
+                grid.setVak2(positie[1]);
+                grid.setVak3(positie[2]);
+
+                System.out.println(positie[0]);
 
 
                 midden.add(coords);
@@ -339,6 +341,11 @@ public class Hoofdscherm extends JFrame {
     public boolean isAutomatisch() {
         return automatisch;
     }
+
+    public int getRandomNumber(int min, int max) {
+        return (int) ((Math.random() * (max - min)) + min); //Nodig voor actionperformed
+    }
+
 }
 
 
