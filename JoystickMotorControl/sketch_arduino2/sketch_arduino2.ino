@@ -23,9 +23,6 @@ byte x;
 //String to store received event command
 String command = "";
 
-//Axis
-long z_axis = 0;
-
 //Int to store pulses from encoder
 volatile int Count_pulses_x = 0;
 volatile int Count_pulses_y = 0;
@@ -129,15 +126,10 @@ void DC_Motor_Encoder_y() {
   }
 }
 
-void Read_z_encoder() {
-  // Serial.print("Z-Axis: ");
-  // Serial.println(getCurrentDistance());
-}
-
-float getCurrentDistance() {
-  float distanceVoltageZ = analogRead(Encoder_output_z) * (5.0 / 1023.0);
-  float distanceZ = (13 * (1 / distanceVoltageZ)) * 0.975;
-  return distanceZ;
+float Read_z_encoder() {
+  float z_value = analogRead(Encoder_output_z) * (5.0 / 1023.0);
+  float z_axis = (13 * (1 / z_value)) * 0.975;
+  return z_axis;
 }
 
 void sendStartingPoint() {
@@ -179,12 +171,12 @@ void recieveMode() {
 }
 
 void slideOut() {
-  if (getCurrentDistance() < 18) {
+  if (Read_z_encoder() < 18) {
     digitalWrite(directionZ, LOW);
     digitalWrite(brakeZ, LOW);
     analogWrite(pwmZ, 200);
   } else {
-    digitalWrite(brakeZ, HIGH);  //ENGAGE BRAKES
+    digitalWrite(brakeZ, HIGH);
     analogWrite(pwmZ, 0);
   }
 }
@@ -207,11 +199,11 @@ void loop() {
 
   //receive event and turns motor on z-axis on or off
   if (manual) {
-    if (command.equals("VOOR") && getCurrentDistance() < 18) {  //STUUR NAAR VOREN
+    if (command.equals("VOOR") && Read_z_encoder() < 18) {  //STUUR NAAR VOREN
       digitalWrite(directionZ, LOW);
       digitalWrite(brakeZ, LOW);
       analogWrite(pwmZ, 200);
-    } else if (command.equals("ACHTER") && getCurrentDistance() > 7) {  //STUUR NAAR ACHTER
+    } else if (command.equals("ACHTER") && Read_z_encoder() > 7) {  //STUUR NAAR ACHTER
       digitalWrite(directionZ, HIGH);
       digitalWrite(brakeZ, LOW);
       analogWrite(pwmZ, 200);

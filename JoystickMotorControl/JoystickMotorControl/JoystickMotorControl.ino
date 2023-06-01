@@ -130,13 +130,6 @@ void loop() {
   //Send calibrating
   sendCalibrating();
 
-
-  //COARDS PRINTEN
-  //Serial.print("X-Axis: ");
-  //Serial.println(map(x_axis, 0, 450, 1, 500));
-  //Serial.print("Y-Axis: ");
-  //Serial.println(map(y_axis, 0, 500, 1, 500));
-
   //MODE CHECK
   if (!noodstopTriggered) {
     digitalWrite(manual ? 4 : 2, HIGH);
@@ -182,14 +175,6 @@ void loop() {
 
     Serial.println(zAxisMode);
   }
-
-
-  // if(joystickSwitch()){
-  //   Serial.println("SWITCH");
-  //   sendCommand("AAN");
-  // } else {
-  //   sendCommand("UIT");
-  // }
 
   // UITLEZEN JOYSTICK
   if (manual && !noodstopTriggered) {
