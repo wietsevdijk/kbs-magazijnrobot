@@ -5,3 +5,9 @@ Ga naar File -> Project Structure -> modules -> plus tekentje (onder module SDK)
 
 java database driver toevoegen:
 Ga naar File -> Project Structure -> Libraries -> plus tekentje -> selecteer mysql-connector-j-8.0.33.jar
+
+MySQL database installeren:
+Run het SQL script "nerdyrobot_DEFINITIEF.sql" om de database op te zetten. De code zoekt naar een database op localhost, dus run deze op dezelfde computer waar de HMI op wordt gestart
+
+Serial communicatie driver toevoegen:
+Ga naar File -> Project Structure -> Dependancies -> plus tekentje -> JARs or directories -> Selecter jSerialComm-2.9.3.jar
