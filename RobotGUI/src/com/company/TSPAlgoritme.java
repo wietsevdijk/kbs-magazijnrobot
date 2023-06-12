@@ -22,7 +22,7 @@ public class TSPAlgoritme {
     }
 
     public static void TSPOplossing(int aantalCoordinaten, int breedte, int hoogte) {
-        long starttijd = System.nanoTime();
+        double starttijd = System.nanoTime();
         new TSPAlgoritme();
 
         for (int i = 0; i < aantalCoordinaten; i++) {
@@ -56,7 +56,7 @@ public class TSPAlgoritme {
             huidige_x = dichtstbijzijndeCoordinaat.getX_as();
             huidige_y = dichtstbijzijndeCoordinaat.getY_as();
         }
-        long eindtijd = System.nanoTime();
+        double eindtijd = System.nanoTime();
         System.out.println("Output: " + volgorde);
         System.out.println("De totale afstand is: " + oplossing + " vakjes");
         System.out.println("Verstreken tijd: " + ((eindtijd - starttijd) / 1000000) + " ms");

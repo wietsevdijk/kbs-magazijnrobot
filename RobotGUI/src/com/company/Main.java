@@ -16,6 +16,6 @@ public class Main {
 //        Hoofdscherm hs = new Hoofdscherm();
 //        RobotCommands rc = new RobotCommands();
 
-        TSPAlgoritme.TSPOplossing(5, 10, 10);
+        TSPAlgoritme.TSPOplossing(10, 1000, 1000);
         }
     }
