@@ -9,6 +9,14 @@ public class Coordinaat {
         this.y_as = y_as;
     }
 
+    public int getX_as() {
+        return x_as;
+    }
+
+    public int getY_as() {
+        return y_as;
+    }
+
     public String toString() {
         return "(" + x_as + ", " + y_as + ")";
     }
