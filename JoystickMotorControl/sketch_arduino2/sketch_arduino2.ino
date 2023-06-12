@@ -2,9 +2,9 @@
 #include <ezButton.h>  // Button library
 #include <SharpIR.h>   // measuring distance library
 
-#define Encoder_output_x 2  // encoder output X-axis
-#define Encoder_output_y 5  // encoder output Y-axis
-#define Encode_output_z A3  // encoder output Z-axis
+#define Encoder_output_x 2   // encoder output X-axis
+#define Encoder_output_y 3   // encoder output Y-axis
+#define Encoder_output_z A3  // encoder output Z-axis
 
 // z-axis pins
 #define pwmZ 11
@@ -23,11 +23,22 @@ byte x;
 //String to store received event command
 String command = "";
 
-//Axis
-long z_axis = 0;
-
 //Int to store pulses from encoder
-int Count_pulses = 0;
+volatile int Count_pulses_x = 0;
+volatile int Count_pulses_y = 0;
+
+//To send a change only once
+bool sendXLim = true;
+bool sendYLim = true;
+
+bool sendXStart = false;
+bool sendYStart = false;
+
+//If calibrating or not
+bool calibrating = false;
+
+//Modus
+bool manual = true;
 
 //To store the measurment data from z-axis
 String Data;
@@ -52,7 +63,8 @@ void setup() {
   pinMode(A3, INPUT);  // sets the Encoder_output_z pin as the input
 
   //Interrupt function to read out encoders
-  attachInterrupt(digitalPinToInterrupt(Encoder_output_x), DC_Motor_Encoder, RISING);
+  // attachInterrupt(digitalPinToInterrupt(Encoder_output_x), DC_Motor_Encoder_x, RISING);
+  // attachInterrupt(digitalPinToInterrupt(Encoder_output_y), DC_Motor_Encoder_y, RISING);
 
   //Setup motor Channel B (Z-axis)
   TCCR2B = TCCR2B & B11111000 | B00000111;  // for PWM frequency for motors of 30.64 Hz
@@ -86,27 +98,89 @@ void requestEvent() {
 }
 
 //count encoder pulses to measure distance
-void DC_Motor_Encoder() {
+void DC_Motor_Encoder_x() {
   int b = digitalRead(Encoder_output_x);
   int i = b - (b % 100);
   if (command.equals("RIGHT") && b > 0) {
-    Count_pulses++;
-    Serial.println(Count_pulses);
+    Count_pulses_x++;
+    // Serial.println(Count_pulses_x);
   }
 
   if (command.equals("LEFT") && b > 0) {
-    Count_pulses--;
-    Serial.println(Count_pulses);
+    Count_pulses_x--;
+    // Serial.println(Count_pulses_x);
+  }
+}
+
+void DC_Motor_Encoder_y() {
+  int b = digitalRead(Encoder_output_y);
+  int i = b - (b % 100);
+  if (command.equals("UP") && b > 0) {
+    Count_pulses_y++;
+    // Serial.println(Count_pulses_y);
   }
 
+  if (command.equals("DOWN") && b > 0) {
+    Count_pulses_y--;
+    // Serial.println(Count_pulses_y);
+  }
 }
 
-void Read_z_encoder() {
-  z_axis = analogRead(Encode_output_z);
-  z_axis = map(z_axis, 285, 650, 20, 0);
-  //Serial.print("Z-Axis: ");
-  //Serial.println(z_axis);
+float Read_z_encoder() {
+  float z_value = analogRead(Encoder_output_z) * (5.0 / 1023.0);
+  float z_axis = (13 * (1 / z_value)) * 0.975;
+  return z_axis;
 }
+
+void sendStartingPoint() {
+  if (Count_pulses_x > 6 && !sendXStart) {
+    sendXStart = true;
+    message = "StrtX";
+    requestEvent();
+  } else if (Count_pulses_x <= 6 && sendXStart) {
+    sendXStart = false;
+    message = "StrtN";
+    requestEvent();
+  }
+  if (Count_pulses_y > 300 && !sendYStart) {
+    sendYStart = true;
+    message = "StrtY";
+    requestEvent();
+  } else if (Count_pulses_y <= 300 && sendYStart) {
+    sendYStart = false;
+    message = "StrtN";
+    requestEvent();
+  }
+}
+
+void recieveCalibrating() {
+  if (command.equals("CALIBRATING")) {
+    calibrating = true;
+  } else if (sendXStart && sendYStart) {
+    calibrating = false;
+  }
+}
+
+void recieveMode() {
+  if (command.equals("MANUAL")) {
+    manual = true;
+  } else if (command.equals("AUTO")) {
+    manual = false;
+    Serial.println(manual);
+  }
+}
+
+void slideOut() {
+  if (Read_z_encoder() < 18) {
+    digitalWrite(directionZ, LOW);
+    digitalWrite(brakeZ, LOW);
+    analogWrite(pwmZ, 200);
+  } else {
+    digitalWrite(brakeZ, HIGH);
+    analogWrite(pwmZ, 0);
+  }
+}
+
 void loop() {
   // put your main code here, to run repeatedly:
 
@@ -114,7 +188,7 @@ void loop() {
   unsigned long startTime = millis();
 
   // this returns the distance to the object you're measuring
-//  int dis = IR_prox.getDistance();  // read distance in cm
+  //  int dis = IR_prox.getDistance();  // read distance in cm
 
   // returns x-axis distance to the serial monitor
   // Serial.println("Mean distance: " + dis);
@@ -124,42 +198,69 @@ void loop() {
   // Serial.println("Time taken ms): " + endTime);
 
   //receive event and turns motor on z-axis on or off
-  if (command.equals("VOOR")) {  //STUUR NAAR VOREN
-    digitalWrite(directionZ, LOW);
-    digitalWrite(brakeZ, LOW);
-    analogWrite(pwmZ, 200);
-  } else if (command.equals("ACHTER")) {  //STUUR NAAR ACHTER
-    digitalWrite(directionZ, HIGH);
-    digitalWrite(brakeZ, LOW);
-    analogWrite(pwmZ, 200);
-  } else {
-    digitalWrite(brakeZ, HIGH);  //ENGAGE BRAKES
-    analogWrite(pwmZ, 0);
+  if (manual) {
+    if (command.equals("VOOR") && Read_z_encoder() < 18) {  //STUUR NAAR VOREN
+      digitalWrite(directionZ, LOW);
+      digitalWrite(brakeZ, LOW);
+      analogWrite(pwmZ, 200);
+    } else if (command.equals("ACHTER") && Read_z_encoder() > 7) {  //STUUR NAAR ACHTER
+      digitalWrite(directionZ, HIGH);
+      digitalWrite(brakeZ, LOW);
+      analogWrite(pwmZ, 200);
+    } else {
+      digitalWrite(brakeZ, HIGH);  //ENGAGE BRAKES
+      analogWrite(pwmZ, 0);
+    }    
   }
 
+
   //count pulses read by the encoder
-  //Serial.println("Pulses: " + Count_pulses);
+  DC_Motor_Encoder_x();
+  DC_Motor_Encoder_y();
+  // Serial.println(Count_pulses_x);
+  // Serial.println(Count_pulses_y);
 
 
   //check limitswitchX
   limitSwitchX.loop();  // MUST call the loop() function first
 
+  //recieve calibrating
+  recieveCalibrating();
+
+  //recieve mode
+  recieveMode();
+
+  //slide out
+  if (command.equals("UITSCHUIVEN")) {
+    slideOut();
+  }
+
   // //Get state of limit switch on X-axis and do something
   int stateX = limitSwitchX.getState();
   if (stateX == HIGH) {
-    //Serial.println("The limit switch on X-Axis is: TOUCHED");
-    message = "xLimY";
-    Count_pulses = 0;
-    requestEvent();
+    if (sendXLim) {
+      // Serial.println("The limit switch on X-Axis is: TOUCHED");
+      sendXLim = false;
+      Count_pulses_x = 0;
+      message = "xLimY";
+      requestEvent();
+    }
   } else {
-    //Serial.println("The limit switch on X-Axis is: UNTOUCHED");
-    message = "xLimN";
-    requestEvent();
+    if (!sendXLim) {
+      // Serial.println("The limit switch on X-Axis is: UNTOUCHED");
+      sendXLim = true;
+      message = "xLimN";
+      requestEvent();
+    }
   }
 
   //Read Z-axis
   Read_z_encoder();
 
+  //Send starting point
+  if (calibrating) {
+    sendStartingPoint();
+  }
 
   //check limitswitchY
   limitSwitchY.loop();  // MUST call the loop() function first
@@ -167,12 +268,19 @@ void loop() {
   //Get state of limit switch on Y-axis and do something
   int stateY = limitSwitchY.getState();
   if (stateY == HIGH) {
-    //Serial.println("The limit switch on Y-Axis is: TOUCHED");
-    message = "yLimY";
-    requestEvent();
+    if (sendYLim) {
+      // Serial.println("The limit switch on Y-Axis is: TOUCHED");
+      sendYLim = false;
+      Count_pulses_y = 0;
+      message = "yLimY";
+      requestEvent();
+    }
   } else {
-    //Serial.println("The limit switch on Y-Axis is: UNTOUCHED");
-    message = "yLimN";
-    requestEvent();
+    if (!sendYLim) {
+      // Serial.println("The limit switch on Y-Axis is: UNTOUCHED");
+      sendYLim = true;
+      message = "yLimN";
+      requestEvent();
+    }
   }
 }
