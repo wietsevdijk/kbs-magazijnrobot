@@ -15,8 +15,5 @@ public class Main {
         // write your code here
         Hoofdscherm hs = new Hoofdscherm();
         RobotCommands rc = new RobotCommands();
+        }
     }
-}
-
-
-
