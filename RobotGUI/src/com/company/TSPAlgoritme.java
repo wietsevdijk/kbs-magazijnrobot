@@ -4,17 +4,6 @@ import java.util.ArrayList;
 
 public class TSPAlgoritme {
 
-    public static void main(String[] args) {
-        TSPAlgoritme algoritme = new TSPAlgoritme();
-
-        for (int i = 0; i < 30; i++) {
-            Coordinaat coordinaat = new Coordinaat((int)(Math.random() * 50) + 1, (int)(Math.random() * 50) + 1);
-            TSPAlgoritme.setBegincoordinaat(coordinaat);
-        }
-        algoritme.geoptimaliseerdPad();
-    }
-
-
     private static ArrayList<Coordinaat> begincoordinaten;
 
     private static ArrayList<Coordinaat> volgorde;
@@ -32,12 +21,17 @@ public class TSPAlgoritme {
         }
     }
 
-    public void geoptimaliseerdPad() {
+    public static void TSPOplossing(int aantalCoordinaten, int breedte, int hoogte) {
         long starttijd = System.nanoTime();
-        double solution = 0;
+        new TSPAlgoritme();
+
+        for (int i = 0; i < aantalCoordinaten; i++) {
+            Coordinaat coordinaat = new Coordinaat((int)(Math.random() * breedte) + 1, (int)(Math.random() * hoogte) + 1);
+            TSPAlgoritme.setBegincoordinaat(coordinaat);
+        }
+        double oplossing = 0;
         int huidige_x = 1;
         int huidige_y = 1;
-        int aantalCoordinaten = begincoordinaten.size();
         System.out.println("Input: " + begincoordinaten);
         for(int i = 0; i < aantalCoordinaten; i++) {
             int index = 0;
@@ -56,7 +50,7 @@ public class TSPAlgoritme {
                 }
                 index++;
             }
-            solution+=kleinsteAfstand;
+            oplossing+=kleinsteAfstand;
             volgorde.add(dichtstbijzijndeCoordinaat);
             begincoordinaten.remove(dichtstbijzijndeIndex);
             huidige_x = dichtstbijzijndeCoordinaat.getX_as();
@@ -64,7 +58,7 @@ public class TSPAlgoritme {
         }
         long eindtijd = System.nanoTime();
         System.out.println("Output: " + volgorde);
-        System.out.println("De totale afstand is: " + solution + " vakjes");
+        System.out.println("De totale afstand is: " + oplossing + " vakjes");
         System.out.println("Verstreken tijd: " + ((eindtijd - starttijd) / 1000000) + " ms");
     }
 
