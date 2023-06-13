@@ -26,6 +26,7 @@ bool debug = true;
 unsigned long currentDebugTime;
 unsigned long previousDebugTime;
 
+//Encoder locations for all coordinates
 int x_position [6] = {0, 30, 730, 1431, 2145, 2841};
 int y_position [6] = {0, 2251, 1737, 1233, 715, 185};
 

@@ -298,7 +298,12 @@ void sendCalibrating() {
 }
 
 void goToStartingPoint() {
+  //bool calibrating is ONLY true when robot has found home, 
+  //but is aligning with starting coordinate (X1 Y5)
+  //Receive command from slave
   receivedFromSlave();
+
+  //Find X Home
   if(!xLimit && !calibrating) {
     goLeft();
     isAtStart_x = false;
@@ -307,6 +312,8 @@ void goToStartingPoint() {
     analogWrite(3, 0);    
   }
 
+  //Find Y Home
+  //NOTE: Check for X limit switch is needed for communication bug
   if(!yLimit && !calibrating && xLimit) {
     goDown();
     isAtStart_y = false;
@@ -315,10 +322,12 @@ void goToStartingPoint() {
     analogWrite(3, 0);    
   }
 
+  //Tell the robot to start finding the start point (X1 Y5)
   if(xLimit && yLimit) {
     calibrating = true;
   }
 
+  //Find starting point
   if(calibrating) {
     if(!isAtStart_x) {
       goRight();
