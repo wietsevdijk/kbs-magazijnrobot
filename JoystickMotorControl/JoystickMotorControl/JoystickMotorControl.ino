@@ -1,4 +1,5 @@
 #include <Wire.h>
+#include <string.h>
 
 #define VRX_PIN A2  // Arduino pin connected to VRX pin
 #define VRY_PIN A3  // Arduino pin connected to VRY pin
@@ -19,8 +20,6 @@ int currentMillis;
 int xValue = 0;  // To store value of the X axis from the joystick
 int yValue = 0;  // To store value of the Y axis from the joystick
 
-
-
 int zAxisMode = 0;
 
 int jSwitchLast;
@@ -36,6 +35,10 @@ bool goingHome = false;
 bool calibrating = false;
 bool isAtStart_x = false;
 bool isAtStart_y = false;
+
+bool foundCoord = false;
+
+int test = 0;
 
 long x_axis = 0;
 long y_axis = 0;
@@ -81,6 +84,13 @@ void setup() {
 
 
 void loop() {
+  if(test == 0){
+    sendToCoord("4.3");
+    test = 1;
+  }
+
+
+
   String HMIcommand = "";
   String response = "";
   // put your main code here, to run repeatedly:
@@ -231,7 +241,46 @@ void loop() {
   }
 }
 
-//Functions from here
+// ----- Functions from here -----
+
+
+//Send robot to coordinate
+//TODO: Change void to proper response for HMI
+void sendToCoord(String coordinate){
+  String response;
+  //Reset boolean
+  foundCoord = false;
+
+  //Send coordinate to slave
+  sendCommand("GOTO" + coordinate);
+
+  while(foundCoord == false){
+    //Start listening to slave Arduino for commands
+    response = receivedFromSlave();
+
+    //X AXIS CONTROL
+    if(response.endsWith("xMoveLeft")){
+      goLeft();
+    } else if(response.endsWith("xMoveRight")){
+      goRight();
+    } else {
+      brakeX;
+    }
+
+    //X AXIS CONTROL
+    if(response.endsWith("yMoveUp")){
+      goUp();
+    } else if(response.endsWith("yMoveDown")){
+      goDown();
+    } else {
+      brakeY;
+    }
+
+    if(response.endsWith("CoordFound")){
+      foundCoord = true;
+    }
+  }
+}
 
 //checks emergency button
 
@@ -275,6 +324,12 @@ void goDown() {
   analogWrite(11, 200);    //Spins the motor on Channel B at full speed
 }
 
+//stop Y axis movement
+void brakeY() {
+  digitalWrite(8, HIGH);
+  digitalWrite(11, 0);
+}
+
 //make robot go left
 void goLeft() {
   sendCommand("LEFT");
@@ -289,6 +344,12 @@ void goRight() {
   digitalWrite(12, HIGH);  //Establishes forward direction of Channel A
   digitalWrite(9, LOW);    //Disengage the Brake for Channel A
   analogWrite(3, 200);     //Spins the motor on Channel A at full speed
+}
+
+//stop X axis movement
+void brakeX() {
+  digitalWrite(9, HIGH);
+  digitalWrite(3, 0);
 }
 
 void sendCalibrating() {
@@ -390,7 +451,7 @@ void sendCommand(String cmd) {
   Wire.endTransmission();
 }
 
-void receivedFromSlave() {
+String receivedFromSlave() {
   //This is the part where the master request a data from the slave
   //Wire.requestFrom("address of slave", "amount of bytes to request", true or false to not cut or cut communication)
   Wire.requestFrom(9, 5);
@@ -439,4 +500,6 @@ void receivedFromSlave() {
   if (message.endsWith("StrtY")) {
     isAtStart_y = true;
   }
+
+  return message;
 }

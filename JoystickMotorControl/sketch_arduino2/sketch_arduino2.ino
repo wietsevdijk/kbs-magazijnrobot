@@ -22,7 +22,7 @@
 //SharpIR IR_prox(ir, model);
 
 //Value used for debug prints
-bool debug = true;
+bool debug = false;
 unsigned long currentDebugTime;
 unsigned long previousDebugTime;
 
@@ -321,4 +321,25 @@ void loop() {
       requestEvent();
     }
   }
+
+  //Coordinaat ontvangen vanaf Master
+  if(command.startsWith("GOTO")){
+    Serial.println(command);
+
+    //Remove "GOTO" from String, left with coordinate
+    command.remove(0, 4);
+    Serial.println(command);
+
+    //input is 4.3 (X4, Y3)
+    int X = command.substring(0, 1).toInt();
+    int Y = command.substring(2, 3).toInt();
+
+    Serial.print("X: ");
+    Serial.println(X);
+    Serial.print("Y: ");
+    Serial.println(Y);
+
+  }
+
+
 }
