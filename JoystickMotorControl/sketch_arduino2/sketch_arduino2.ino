@@ -26,8 +26,12 @@ bool debug = true;
 unsigned long currentDebugTime;
 unsigned long previousDebugTime;
 
-int x_position [6] = {0, 73, 792, 1491, 2205, 2931};
+int x_position [6] = {0, 30, 730, 1431, 2145, 2841};
 int y_position [6] = {0, 2251, 1737, 1233, 715, 185};
+
+//Coordinates to find when homing
+int findX = 1;
+int findY = 5;
 
 
 //byte for communication between arduino's
@@ -154,20 +158,20 @@ float Read_z_encoder() {
 }
 
 void sendStartingPoint() {
-  if (Count_pulses_x > 6 && !sendXStart) {
+  if (Count_pulses_x > x_position[findX] && !sendXStart) {
     sendXStart = true;
     message = "StrtX";
     requestEvent();
-  } else if (Count_pulses_x <= 6 && sendXStart) {
+  } else if (Count_pulses_x <= x_position[findX] && sendXStart) {
     sendXStart = false;
     message = "StrtN";
     requestEvent();
   }
-  if (Count_pulses_y > 300 && !sendYStart) {
+  if (Count_pulses_y > y_position[findY] && !sendYStart) {
     sendYStart = true;
     message = "StrtY";
     requestEvent();
-  } else if (Count_pulses_y <= 300 && sendYStart) {
+  } else if (Count_pulses_y <= y_position[findY] && sendYStart) {
     sendYStart = false;
     message = "StrtN";
     requestEvent();
