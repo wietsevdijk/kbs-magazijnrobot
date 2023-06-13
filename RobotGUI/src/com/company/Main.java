@@ -15,7 +15,8 @@ public class Main {
         // write your code here
 //        Hoofdscherm hs = new Hoofdscherm();
 //        RobotCommands rc = new RobotCommands();
+        TSPtestscherm test = new TSPtestscherm();
 
-        TSPAlgoritme.TSPOplossing(10, 1000, 1000);
+//        TSPAlgoritme.TSPOplossing(5, 10, 10);
         }
     }

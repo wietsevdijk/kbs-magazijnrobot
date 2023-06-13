@@ -213,6 +213,16 @@ public class Hoofdscherm extends JFrame {
             }
         });
         buttonpanel.add(noodstop);
+
+        //Voegt TSP test knop toe
+        JButton TSPtester = new JButton("TSP Tester");
+        buttonpanel.add(TSPtester);
+        TSPtester.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new TSPtestscherm();
+            }
+        });
     }
 
     //Laat een dialog box zien op basis van je gekozen waarde (Automatisch, Handmatig, Noodstop)
