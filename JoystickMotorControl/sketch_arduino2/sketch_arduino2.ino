@@ -4,6 +4,7 @@
 
 #define Encoder_output_x 2   // encoder output X-axis
 #define Encoder_output_y 3   // encoder output Y-axis
+
 #define Encoder_output_z A3  // encoder output Z-axis
 
 // z-axis pins
@@ -11,10 +12,26 @@
 #define directionZ 13
 #define brakeZ 8
 
+//X and Y direction measure pins
+#define directionX 5
+#define directionY 7
+
 // Distance measuring unit
 #define ir A0       //signal pin for distance measuring unit
 #define model 1080  // used 1080 because model GP2Y0A21YK0F is used
 //SharpIR IR_prox(ir, model);
+
+//Value used for debug prints
+bool debug = true;
+unsigned long currentDebugTime;
+unsigned long previousDebugTime;
+
+int x_position [6] = {0, 30, 730, 1431, 2145, 2841};
+int y_position [6] = {0, 2251, 1737, 1233, 715, 185};
+
+//Coordinates to find when homing
+int findX = 1;
+int findY = 5;
 
 
 //byte for communication between arduino's
@@ -26,6 +43,10 @@ String command = "";
 //Int to store pulses from encoder
 volatile int Count_pulses_x = 0;
 volatile int Count_pulses_y = 0;
+volatile int distanceZ;
+
+int dirX;
+int dirY;
 
 //To send a change only once
 bool sendXLim = true;
@@ -58,13 +79,13 @@ void setup() {
   Wire.onRequest(requestEvent);
 
   //Set encoders as input
-  pinMode(Encoder_output_x, INPUT);  // sets the Encoder_output_x pin as the input
-  //pinMode(Encoder_output_y, INPUT);  // sets the Encoder_output_y pin as the input
+  pinMode(Encoder_output_x, INPUT_PULLUP);  // sets the Encoder_output_x pin as the input
+  pinMode(Encoder_output_y, INPUT_PULLUP);  // sets the Encoder_output_y pin as the input
   pinMode(A3, INPUT);  // sets the Encoder_output_z pin as the input
 
   //Interrupt function to read out encoders
-  // attachInterrupt(digitalPinToInterrupt(Encoder_output_x), DC_Motor_Encoder_x, RISING);
-  // attachInterrupt(digitalPinToInterrupt(Encoder_output_y), DC_Motor_Encoder_y, RISING);
+  attachInterrupt(digitalPinToInterrupt(Encoder_output_x), readEncoderX, RISING);
+  attachInterrupt(digitalPinToInterrupt(Encoder_output_y), readEncoderY, RISING);
 
   //Setup motor Channel B (Z-axis)
   TCCR2B = TCCR2B & B11111000 | B00000111;  // for PWM frequency for motors of 30.64 Hz
@@ -73,9 +94,21 @@ void setup() {
   pinMode(brakeZ, OUTPUT);  //Initiates Brake Channel A pin
   pinMode(directionZ, OUTPUT);
 
+  //These pins are bridged Direction pins from the Master Arduino
+  //Use these to measure the direction the motors are going when reading encoder
+  //X: LOW = Left, HIGH = Right
+  //Y: LOW = UP, HIGH = Down
+  pinMode(directionX, INPUT);
+  pinMode(directionY, INPUT);
+
   //Set debounce time for limit switches on x-axis and y-axis
   limitSwitchX.setDebounceTime(50);  // set debounce time of limitswitch to 50 milliseconds
   limitSwitchY.setDebounceTime(50);  // set debounce time of limitswitch to 50 milliseconds
+
+  //Debug print
+  if(debug){
+    Serial.println("----- DEBUG MODE ENABLED -----");
+  }
 }
 
 //receive command for master arduino
@@ -97,34 +130,26 @@ void requestEvent() {
   Wire.write(message.c_str());
 }
 
-//count encoder pulses to measure distance
-void DC_Motor_Encoder_x() {
-  int b = digitalRead(Encoder_output_x);
-  int i = b - (b % 100);
-  if (command.equals("RIGHT") && b > 0) {
+void readEncoderX() {
+  dirX = digitalRead(directionX);
+  if(dirX == HIGH){
     Count_pulses_x++;
-    // Serial.println(Count_pulses_x);
-  }
-
-  if (command.equals("LEFT") && b > 0) {
+  } else {
     Count_pulses_x--;
-    // Serial.println(Count_pulses_x);
   }
+
 }
 
-void DC_Motor_Encoder_y() {
-  int b = digitalRead(Encoder_output_y);
-  int i = b - (b % 100);
-  if (command.equals("UP") && b > 0) {
+void readEncoderY() {
+  dirY = digitalRead(directionY);
+  if(dirY == LOW){
     Count_pulses_y++;
-    // Serial.println(Count_pulses_y);
+  } else {
+    Count_pulses_y--;
   }
 
-  if (command.equals("DOWN") && b > 0) {
-    Count_pulses_y--;
-    // Serial.println(Count_pulses_y);
-  }
 }
+
 
 float Read_z_encoder() {
   float z_value = analogRead(Encoder_output_z) * (5.0 / 1023.0);
@@ -133,20 +158,20 @@ float Read_z_encoder() {
 }
 
 void sendStartingPoint() {
-  if (Count_pulses_x > 6 && !sendXStart) {
+  if (Count_pulses_x > x_position[findX] && !sendXStart) {
     sendXStart = true;
     message = "StrtX";
     requestEvent();
-  } else if (Count_pulses_x <= 6 && sendXStart) {
+  } else if (Count_pulses_x <= x_position[findX] && sendXStart) {
     sendXStart = false;
     message = "StrtN";
     requestEvent();
   }
-  if (Count_pulses_y > 300 && !sendYStart) {
+  if (Count_pulses_y > y_position[findY] && !sendYStart) {
     sendYStart = true;
     message = "StrtY";
     requestEvent();
-  } else if (Count_pulses_y <= 300 && sendYStart) {
+  } else if (Count_pulses_y <= y_position[findY] && sendYStart) {
     sendYStart = false;
     message = "StrtN";
     requestEvent();
@@ -182,28 +207,50 @@ void slideOut() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  //DEBUG
+  if(debug){
+    //print elke 500ms debug print
+    currentDebugTime = millis();
+    if(currentDebugTime - previousDebugTime > 500){
+      previousDebugTime = currentDebugTime;
 
-  // takes the time before the loop on the library begins
-  unsigned long startTime = millis();
+      Serial.print("X: ");
+      Serial.println(Count_pulses_x);
+      Serial.print("Y: ");
+      Serial.println(Count_pulses_y);
+      Serial.print("Z: ");
+      Serial.println(distanceZ);
 
-  // this returns the distance to the object you're measuring
-  //  int dis = IR_prox.getDistance();  // read distance in cm
+      //X: LOW = Left, HIGH = Right
+      //Y: LOW = UP, HIGH = Down
+      // dirX = digitalRead(directionX);
+      // dirY = digitalRead(directionY);
 
-  // returns x-axis distance to the serial monitor
-  // Serial.println("Mean distance: " + dis);
+      // if(dirX == HIGH){
+      //   Serial.println("RIGHT");
+      // } else{
+      //   Serial.println("LEFT");
+      // }
 
-  // the following gives you the time taken to get the measurement
-  unsigned long endTime = millis() - startTime;
-  // Serial.println("Time taken ms): " + endTime);
+      // if(dirY == HIGH){
+      //   Serial.println("DOWN");
+      // } else{
+      //   Serial.println("UP");
+      // }
+
+    }
+  }
+
+  //Read Z-axis
+  distanceZ = Read_z_encoder();
 
   //receive event and turns motor on z-axis on or off
   if (manual) {
-    if (command.equals("VOOR") && Read_z_encoder() < 18) {  //STUUR NAAR VOREN
+    if (command.equals("VOOR") && distanceZ < 18) {  //STUUR NAAR VOREN
       digitalWrite(directionZ, LOW);
       digitalWrite(brakeZ, LOW);
       analogWrite(pwmZ, 200);
-    } else if (command.equals("ACHTER") && Read_z_encoder() > 7) {  //STUUR NAAR ACHTER
+    } else if (command.equals("ACHTER") && distanceZ > 6) {  //STUUR NAAR ACHTER
       digitalWrite(directionZ, HIGH);
       digitalWrite(brakeZ, LOW);
       analogWrite(pwmZ, 200);
@@ -212,14 +259,6 @@ void loop() {
       analogWrite(pwmZ, 0);
     }    
   }
-
-
-  //count pulses read by the encoder
-  DC_Motor_Encoder_x();
-  DC_Motor_Encoder_y();
-  // Serial.println(Count_pulses_x);
-  // Serial.println(Count_pulses_y);
-
 
   //check limitswitchX
   limitSwitchX.loop();  // MUST call the loop() function first
@@ -254,8 +293,6 @@ void loop() {
     }
   }
 
-  //Read Z-axis
-  Read_z_encoder();
 
   //Send starting point
   if (calibrating) {
