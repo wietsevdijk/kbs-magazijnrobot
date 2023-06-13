@@ -36,6 +36,7 @@ String command = "";
 //Int to store pulses from encoder
 volatile int Count_pulses_x = 0;
 volatile int Count_pulses_y = 0;
+volatile int distanceZ;
 
 int dirX;
 int dirY;
@@ -139,7 +140,7 @@ void readEncoderY() {
   } else {
     Count_pulses_y--;
   }
-  
+
 }
 
 
@@ -234,13 +235,15 @@ void loop() {
   if(debug){
     //print elke 500ms debug print
     currentDebugTime = millis();
-    if(currentDebugTime - previousDebugTime > 200){
+    if(currentDebugTime - previousDebugTime > 500){
       previousDebugTime = currentDebugTime;
 
       Serial.print("X: ");
       Serial.println(Count_pulses_x);
       Serial.print("Y: ");
       Serial.println(Count_pulses_y);
+      Serial.print("Z: ");
+      Serial.println(distanceZ);
 
       //X: LOW = Left, HIGH = Right
       //Y: LOW = UP, HIGH = Down
@@ -275,13 +278,16 @@ void loop() {
   unsigned long endTime = millis() - startTime;
   // Serial.println("Time taken ms): " + endTime);
 
+  //Read Z-axis
+  distanceZ = Read_z_encoder();
+
   //receive event and turns motor on z-axis on or off
   if (manual) {
-    if (command.equals("VOOR") && Read_z_encoder() < 18) {  //STUUR NAAR VOREN
+    if (command.equals("VOOR") && distanceZ < 18) {  //STUUR NAAR VOREN
       digitalWrite(directionZ, LOW);
       digitalWrite(brakeZ, LOW);
       analogWrite(pwmZ, 200);
-    } else if (command.equals("ACHTER") && Read_z_encoder() > 7) {  //STUUR NAAR ACHTER
+    } else if (command.equals("ACHTER") && distanceZ > 6) {  //STUUR NAAR ACHTER
       digitalWrite(directionZ, HIGH);
       digitalWrite(brakeZ, LOW);
       analogWrite(pwmZ, 200);
@@ -332,8 +338,6 @@ void loop() {
     }
   }
 
-  //Read Z-axis
-  Read_z_encoder();
 
   //Send starting point
   if (calibrating) {
