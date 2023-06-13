@@ -4,6 +4,7 @@
 
 #define Encoder_output_x 2   // encoder output X-axis
 #define Encoder_output_y 3   // encoder output Y-axis
+
 #define Encoder_output_z A3  // encoder output Z-axis
 
 // z-axis pins
@@ -11,10 +12,19 @@
 #define directionZ 13
 #define brakeZ 8
 
+//X and Y direction measure pins
+#define directionX 5
+#define directionY 7
+
 // Distance measuring unit
 #define ir A0       //signal pin for distance measuring unit
 #define model 1080  // used 1080 because model GP2Y0A21YK0F is used
 //SharpIR IR_prox(ir, model);
+
+//Value used for debug prints
+bool debug = true;
+unsigned long currentDebugTime;
+unsigned long previousDebugTime;
 
 
 //byte for communication between arduino's
@@ -26,6 +36,9 @@ String command = "";
 //Int to store pulses from encoder
 volatile int Count_pulses_x = 0;
 volatile int Count_pulses_y = 0;
+
+int dirX;
+int dirY;
 
 //To send a change only once
 bool sendXLim = true;
@@ -58,13 +71,13 @@ void setup() {
   Wire.onRequest(requestEvent);
 
   //Set encoders as input
-  pinMode(Encoder_output_x, INPUT);  // sets the Encoder_output_x pin as the input
-  //pinMode(Encoder_output_y, INPUT);  // sets the Encoder_output_y pin as the input
+  pinMode(Encoder_output_x, INPUT_PULLUP);  // sets the Encoder_output_x pin as the input
+  pinMode(Encoder_output_y, INPUT_PULLUP);  // sets the Encoder_output_y pin as the input
   pinMode(A3, INPUT);  // sets the Encoder_output_z pin as the input
 
   //Interrupt function to read out encoders
-  // attachInterrupt(digitalPinToInterrupt(Encoder_output_x), DC_Motor_Encoder_x, RISING);
-  // attachInterrupt(digitalPinToInterrupt(Encoder_output_y), DC_Motor_Encoder_y, RISING);
+  attachInterrupt(digitalPinToInterrupt(Encoder_output_x), readEncoderX, RISING);
+  attachInterrupt(digitalPinToInterrupt(Encoder_output_y), readEncoderY, RISING);
 
   //Setup motor Channel B (Z-axis)
   TCCR2B = TCCR2B & B11111000 | B00000111;  // for PWM frequency for motors of 30.64 Hz
@@ -73,9 +86,21 @@ void setup() {
   pinMode(brakeZ, OUTPUT);  //Initiates Brake Channel A pin
   pinMode(directionZ, OUTPUT);
 
+  //These pins are bridged Direction pins from the Master Arduino
+  //Use these to measure the direction the motors are going when reading encoder
+  //X: LOW = Left, HIGH = Right
+  //Y: LOW = UP, HIGH = Down
+  pinMode(directionX, INPUT);
+  pinMode(directionY, INPUT);
+
   //Set debounce time for limit switches on x-axis and y-axis
   limitSwitchX.setDebounceTime(50);  // set debounce time of limitswitch to 50 milliseconds
   limitSwitchY.setDebounceTime(50);  // set debounce time of limitswitch to 50 milliseconds
+
+  //Debug print
+  if(debug){
+    Serial.println("----- DEBUG MODE ENABLED -----");
+  }
 }
 
 //receive command for master arduino
@@ -97,6 +122,28 @@ void requestEvent() {
   Wire.write(message.c_str());
 }
 
+void readEncoderX() {
+  dirX = digitalRead(directionX);
+  if(dirX == HIGH){
+    Count_pulses_x++;
+  } else {
+    Count_pulses_x--;
+  }
+
+}
+
+void readEncoderY() {
+  dirY = digitalRead(directionY);
+  if(dirY == LOW){
+    Count_pulses_y++;
+  } else {
+    Count_pulses_y--;
+  }
+  
+}
+
+
+//DEPRECATED
 //count encoder pulses to measure distance
 void DC_Motor_Encoder_x() {
   int b = digitalRead(Encoder_output_x);
@@ -112,6 +159,7 @@ void DC_Motor_Encoder_x() {
   }
 }
 
+//DEPRECATED
 void DC_Motor_Encoder_y() {
   int b = digitalRead(Encoder_output_y);
   int i = b - (b % 100);
@@ -182,7 +230,37 @@ void slideOut() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  //DEBUG
+  if(debug){
+    //print elke 500ms debug print
+    currentDebugTime = millis();
+    if(currentDebugTime - previousDebugTime > 200){
+      previousDebugTime = currentDebugTime;
+
+      Serial.print("X: ");
+      Serial.println(Count_pulses_x);
+      Serial.print("Y: ");
+      Serial.println(Count_pulses_y);
+
+      //X: LOW = Left, HIGH = Right
+      //Y: LOW = UP, HIGH = Down
+      // dirX = digitalRead(directionX);
+      // dirY = digitalRead(directionY);
+
+      // if(dirX == HIGH){
+      //   Serial.println("RIGHT");
+      // } else{
+      //   Serial.println("LEFT");
+      // }
+
+      // if(dirY == HIGH){
+      //   Serial.println("DOWN");
+      // } else{
+      //   Serial.println("UP");
+      // }
+
+    }
+  }
 
   // takes the time before the loop on the library begins
   unsigned long startTime = millis();
@@ -214,9 +292,9 @@ void loop() {
   }
 
 
-  //count pulses read by the encoder
-  DC_Motor_Encoder_x();
-  DC_Motor_Encoder_y();
+  //count pulses read by the encoder - DEPRECATED
+  //DC_Motor_Encoder_x();
+  //DC_Motor_Encoder_y();
   // Serial.println(Count_pulses_x);
   // Serial.println(Count_pulses_y);
 
