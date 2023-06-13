@@ -26,6 +26,9 @@ bool debug = true;
 unsigned long currentDebugTime;
 unsigned long previousDebugTime;
 
+int x_position [6] = {0, 73, 792, 1491, 2205, 2931};
+int y_position [6] = {0, 2251, 1737, 1233, 715, 185};
+
 
 //byte for communication between arduino's
 byte x;
@@ -144,37 +147,6 @@ void readEncoderY() {
 }
 
 
-//DEPRECATED
-//count encoder pulses to measure distance
-void DC_Motor_Encoder_x() {
-  int b = digitalRead(Encoder_output_x);
-  int i = b - (b % 100);
-  if (command.equals("RIGHT") && b > 0) {
-    Count_pulses_x++;
-    // Serial.println(Count_pulses_x);
-  }
-
-  if (command.equals("LEFT") && b > 0) {
-    Count_pulses_x--;
-    // Serial.println(Count_pulses_x);
-  }
-}
-
-//DEPRECATED
-void DC_Motor_Encoder_y() {
-  int b = digitalRead(Encoder_output_y);
-  int i = b - (b % 100);
-  if (command.equals("UP") && b > 0) {
-    Count_pulses_y++;
-    // Serial.println(Count_pulses_y);
-  }
-
-  if (command.equals("DOWN") && b > 0) {
-    Count_pulses_y--;
-    // Serial.println(Count_pulses_y);
-  }
-}
-
 float Read_z_encoder() {
   float z_value = analogRead(Encoder_output_z) * (5.0 / 1023.0);
   float z_axis = (13 * (1 / z_value)) * 0.975;
@@ -265,19 +237,6 @@ void loop() {
     }
   }
 
-  // takes the time before the loop on the library begins
-  unsigned long startTime = millis();
-
-  // this returns the distance to the object you're measuring
-  //  int dis = IR_prox.getDistance();  // read distance in cm
-
-  // returns x-axis distance to the serial monitor
-  // Serial.println("Mean distance: " + dis);
-
-  // the following gives you the time taken to get the measurement
-  unsigned long endTime = millis() - startTime;
-  // Serial.println("Time taken ms): " + endTime);
-
   //Read Z-axis
   distanceZ = Read_z_encoder();
 
@@ -296,14 +255,6 @@ void loop() {
       analogWrite(pwmZ, 0);
     }    
   }
-
-
-  //count pulses read by the encoder - DEPRECATED
-  //DC_Motor_Encoder_x();
-  //DC_Motor_Encoder_y();
-  // Serial.println(Count_pulses_x);
-  // Serial.println(Count_pulses_y);
-
 
   //check limitswitchX
   limitSwitchX.loop();  // MUST call the loop() function first
