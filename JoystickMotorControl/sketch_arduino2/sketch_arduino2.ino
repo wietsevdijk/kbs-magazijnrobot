@@ -22,9 +22,10 @@
 //SharpIR IR_prox(ir, model);
 
 //Value used for debug prints
-bool debug = false;
+bool debug = true;
 unsigned long currentDebugTime;
 unsigned long previousDebugTime;
+String isCalibrating;
 
 //Encoder locations for all coordinates
 int x_position [6] = {0, 30, 730, 1431, 2145, 2841};
@@ -58,6 +59,8 @@ bool sendYStart = false;
 
 //If calibrating or not
 bool calibrating = false;
+bool calibratedX = false;
+bool calibratedY = false;
 
 //Modus
 bool manual = true;
@@ -159,24 +162,26 @@ float Read_z_encoder() {
 }
 
 void sendStartingPoint() {
-  if (Count_pulses_x > x_position[findX] && !sendXStart) {
-    sendXStart = true;
-    message = "StrtX";
-    requestEvent();
-  } else if (Count_pulses_x <= x_position[findX] && sendXStart) {
-    sendXStart = false;
-    message = "StrtN";
-    requestEvent();
-  }
-  if (Count_pulses_y > y_position[findY] && !sendYStart) {
-    sendYStart = true;
-    message = "StrtY";
-    requestEvent();
-  } else if (Count_pulses_y <= y_position[findY] && sendYStart) {
-    sendYStart = false;
-    message = "StrtN";
-    requestEvent();
-  }
+    //Serial.println("FINDING START POINT");
+    if (Count_pulses_x > x_position[findX] && !sendXStart) {
+      sendXStart = true;
+      message = "StrtX";
+      requestEvent();
+    } else if (Count_pulses_x <= x_position[findX] && sendXStart) {
+      sendXStart = false;
+      message = "StrtN";
+      requestEvent();
+    }
+    if (Count_pulses_y > y_position[findY] && !sendYStart) {
+      sendYStart = true;
+      message = "StrtY";
+      requestEvent();
+    } else if (Count_pulses_y <= y_position[findY] && sendYStart) {
+      sendYStart = false;
+      message = "StrtN";
+      requestEvent();
+    }
+
 }
 
 void recieveCalibrating() {
@@ -184,6 +189,7 @@ void recieveCalibrating() {
     calibrating = true;
   } else if (sendXStart && sendYStart) {
     calibrating = false;
+    //Serial.println("CALIBRATING COMPLETE");
   }
 }
 
@@ -205,6 +211,33 @@ void slideOut() {
     digitalWrite(brakeZ, HIGH);
     analogWrite(pwmZ, 0);
   }
+
+}
+
+//functions to send X and Y movement commands to master
+void moveLeft() {
+  message = "xMoveL";
+  requestEvent();
+}
+
+void moveRight() {
+  message = "xMoveR";
+  requestEvent();
+}
+
+void moveUp(){
+  message = "yMoveU";
+  requestEvent();
+}
+
+void moveDown(){
+  message = "yMoveD";
+  requestEvent();
+}
+
+void stopMoving(){
+  message = "dontMv";
+  requestEvent();
 }
 
 void loop() {
@@ -221,6 +254,9 @@ void loop() {
       Serial.println(Count_pulses_y);
       Serial.print("Z: ");
       Serial.println(distanceZ);
+
+      isCalibrating = calibrating ? "YES CALIBRATING" : "NO CALIBRATING";
+      Serial.println(isCalibrating);
 
       //X: LOW = Left, HIGH = Right
       //Y: LOW = UP, HIGH = Down
@@ -324,20 +360,30 @@ void loop() {
 
   //Coordinaat ontvangen vanaf Master
   if(command.startsWith("GOTO")){
+    message = "";
     Serial.println(command);
 
     //Remove "GOTO" from String, left with coordinate
     command.remove(0, 4);
     Serial.println(command);
 
-    //input is 4.3 (X4, Y3)
+    //voorbeeld: input is 4.3 (X4, Y3)
+    //Haal coordinaten op uit String
     int X = command.substring(0, 1).toInt();
     int Y = command.substring(2, 3).toInt();
 
-    Serial.print("X: ");
-    Serial.println(X);
-    Serial.print("Y: ");
-    Serial.println(Y);
+    if (Count_pulses_x > x_position[X]) {
+      moveRight();
+    } else if (Count_pulses_x <= x_position[X]) {
+      moveLeft();
+    }
+
+    if (Count_pulses_y > y_position[Y]) {
+      moveUp();
+    } else if (Count_pulses_y <= y_position[Y]) {
+      moveDown();
+    }
+
 
   }
 

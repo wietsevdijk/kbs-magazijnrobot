@@ -13,6 +13,9 @@
 #define GeelLED 4
 #define RoodLED 5
 
+unsigned long currentDebugTime;
+unsigned long previousDebugTime;
+
 
 int currentMillis;
 
@@ -35,6 +38,7 @@ bool goingHome = false;
 bool calibrating = false;
 bool isAtStart_x = false;
 bool isAtStart_y = false;
+bool homingComplete = false;
 
 bool foundCoord = false;
 
@@ -84,12 +88,13 @@ void setup() {
 
 
 void loop() {
-  if(test == 0){
+
+  //Test sending coord to Slave
+  if(test = 0 && homingComplete && manual){
+    Serial.println("SENDING COORD");
     sendToCoord("4.3");
     test = 1;
   }
-
-
 
   String HMIcommand = "";
   String response = "";
@@ -234,7 +239,7 @@ void loop() {
   }
 
   //Startprocedure
-  if (!manual && !noodstopTriggered) {
+  if (!manual && !noodstopTriggered && !homingComplete) {
     if (goingHome) {
       goToStartingPoint();
     }
@@ -247,6 +252,7 @@ void loop() {
 //Send robot to coordinate
 //TODO: Change void to proper response for HMI
 void sendToCoord(String coordinate){
+  Serial.println("STARTING COORD COMMAND");
   String response;
   //Reset boolean
   foundCoord = false;
@@ -256,27 +262,28 @@ void sendToCoord(String coordinate){
 
   while(foundCoord == false){
     //Start listening to slave Arduino for commands
-    response = receivedFromSlave();
+    response = receiveMotorCommandFromSlave();
+    //Serial.println();
 
     //X AXIS CONTROL
-    if(response.endsWith("xMoveLeft")){
+    if(response.endsWith("xMoveL")){
       goLeft();
-    } else if(response.endsWith("xMoveRight")){
+    } else if(response.endsWith("xMoveR")){
       goRight();
     } else {
-      brakeX;
+      brakeX();
     }
 
     //X AXIS CONTROL
-    if(response.endsWith("yMoveUp")){
+    if(response.endsWith("yMoveU")){
       goUp();
-    } else if(response.endsWith("yMoveDown")){
+    } else if(response.endsWith("yMoveD")){
       goDown();
-    } else {
-      brakeY;
+    } else{
+      brakeY();
     }
 
-    if(response.endsWith("CoordFound")){
+    if(response.endsWith("CoordF")){
       foundCoord = true;
     }
   }
@@ -403,6 +410,7 @@ void goToStartingPoint() {
     if(isAtStart_x && isAtStart_y) {
       calibrating = false;
       goingHome = false;
+      homingComplete = true;
     }
   }
 }
@@ -451,7 +459,7 @@ void sendCommand(String cmd) {
   Wire.endTransmission();
 }
 
-String receivedFromSlave() {
+void receivedFromSlave() {
   //This is the part where the master request a data from the slave
   //Wire.requestFrom("address of slave", "amount of bytes to request", true or false to not cut or cut communication)
   Wire.requestFrom(9, 5);
@@ -500,6 +508,21 @@ String receivedFromSlave() {
   if (message.endsWith("StrtY")) {
     isAtStart_y = true;
   }
+}
+
+String receiveMotorCommandFromSlave() {
+    //This is the part where the master request a data from the slave
+  //Wire.requestFrom("address of slave", "amount of bytes to request", true or false to not cut or cut communication)
+  Wire.requestFrom(9, 6);
+  String message;
+
+  //Returns the number of bytes available for retrieval with read().
+  //This should be called on a master device after a call to requestFrom() or on a slave inside the onReceive() handler.
+  while (Wire.available()) {
+    message = String(message + (char)Wire.read());
+    // Serial.print(message);
+  }
+  Serial.println(message);
 
   return message;
 }
