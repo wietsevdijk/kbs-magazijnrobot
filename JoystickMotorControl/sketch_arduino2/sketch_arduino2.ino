@@ -243,6 +243,19 @@ void stopMoving(){
   requestEvent();
 }
 
+//Signal to the Master that the robot has arrived at coordinates
+void sendArrived() {
+  message = "CoordF";
+  requestEvent();
+}
+
+//Clear the request message & request a new event
+void clearRequestMessage() {
+  message = "";
+  requestEvent();
+}
+
+
 void loop() {
   //DEBUG
   if(debug){
@@ -365,7 +378,11 @@ void loop() {
 
   //Coordinaat ontvangen vanaf Master
   if(command.startsWith("GOTO")){
+    //Reset values
+    foundXPos = false;
+    foundYPos = false;
     message = "";
+
     Serial.println("-----");
     Serial.println(command);
 
@@ -396,54 +413,56 @@ void loop() {
     goToY(Y);
 
     if(foundXPos && foundYPos){
-      
+      sendArrived();
     }
 
   }
 
 }
 
+//Send robot to X coordinate
 void goToX(int X){
   
     while(!foundXPos){
 
-      if (Count_pulses_x > x_position[X]) {
+      if (Count_pulses_x > (x_position[X] + 5)) {
         moveLeft();
-      } else if (Count_pulses_x <= x_position[X]) {
+      } else if (Count_pulses_x <= (x_position[X]) - 5) {
         moveRight();
       }
 
-      if ((x_position[X] -5) <= Count_pulses_x  && Count_pulses_x < (x_position[X] + 5)) {
+      if ((x_position[X] -1) < Count_pulses_x  && Count_pulses_x <= (x_position[X] + 1)) {
         stopMoving();
         foundXPos = true;
         Serial.println("----- FOUND X -----");
         Serial.println(x_position[X]);
         Serial.println(Count_pulses_x);
         Serial.println("-----");
-        delay(20);
+        delay(20); //ik weet het, delays zijn slecht, sorry ~Wietse
       }
     }
 
 }
 
+//Send robot to Y coordinate
 void goToY(int Y){
   
     while(!foundYPos){
 
-      if (Count_pulses_y > y_position[Y]) {
+      if (Count_pulses_y > (y_position[Y] + 5)) {
         moveDown();
-      } else if (Count_pulses_y <= y_position[Y]) {
+      } else if (Count_pulses_y <= (y_position[Y] - 5)) {
         moveUp();
       }
 
-      if ((y_position[Y] -5) <= Count_pulses_y  && Count_pulses_y < (y_position[Y] + 5)) {
+      if ((y_position[Y] -1) < Count_pulses_y  && Count_pulses_y <= (y_position[Y] + 1)) {
         stopMoving();
         foundYPos = true;
         Serial.println("----- FOUND Y -----");
         Serial.println(y_position[Y]);
         Serial.println(Count_pulses_y);
         Serial.println("-----");
-        delay(20);
+        delay(20); //ik weet het, delays zijn slecht, sorry ~Wietse
       }
     }
 

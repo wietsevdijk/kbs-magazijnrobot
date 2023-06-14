@@ -263,6 +263,9 @@ void sendToCoord(String coordinate){
   //Send coordinate to slave
   sendCommand("GOTO" + coordinate);
 
+  //lees commando maar doe er niks mee, cleart buffer
+  receiveMotorCommandFromSlave();
+
   while(foundCoord == false){
     //Start listening to slave Arduino for commands
     response = receiveMotorCommandFromSlave();
@@ -287,7 +290,9 @@ void sendToCoord(String coordinate){
     }
 
     if(response.endsWith("CoordF")){
+      Serial.println(" !!!!!! ROBOT HAS ARRIVED AT " + coordinate);
       foundCoord = true;
+      //return true;
     }
   }
 }
@@ -416,8 +421,15 @@ void goToStartingPoint() {
       homingComplete = true;
 
       //TEST
-      Serial.println("SENDING COORD");
-      sendToCoord("2.4");
+      Serial.println("SENDING COORDS");
+      sendToCoord("5.1");
+      sendToCoord("4.1");
+      sendToCoord("3.1");
+      sendToCoord("2.1");
+      sendToCoord("1.1");
+
+      
+    
     }
   }
 }
