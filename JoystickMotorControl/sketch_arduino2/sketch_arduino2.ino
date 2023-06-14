@@ -425,11 +425,11 @@ void goToX(int X){
   
     while(!foundXPos){
 
-      if (Count_pulses_x > (x_position[X] + 5)) {
-        moveLeft();
-      } else if (Count_pulses_x <= (x_position[X]) - 5) {
+      if (Count_pulses_x <= (x_position[X])) {
         moveRight();
-      }
+      } else if (Count_pulses_x > (x_position[X])) {
+        moveLeft();
+      } 
 
       if ((x_position[X] -1) < Count_pulses_x  && Count_pulses_x <= (x_position[X] + 1)) {
         stopMoving();
@@ -438,7 +438,7 @@ void goToX(int X){
         Serial.println(x_position[X]);
         Serial.println(Count_pulses_x);
         Serial.println("-----");
-        delay(20); //ik weet het, delays zijn slecht, sorry ~Wietse
+        delay(5); //ik weet het, delays zijn slecht, sorry ~Wietse
       }
     }
 
@@ -449,11 +449,12 @@ void goToY(int Y){
   
     while(!foundYPos){
 
-      if (Count_pulses_y > (y_position[Y] + 5)) {
-        moveDown();
-      } else if (Count_pulses_y <= (y_position[Y] - 5)) {
+
+      if (Count_pulses_y <= (y_position[Y])) {
         moveUp();
-      }
+      } else if (Count_pulses_y > (y_position[Y])) {
+        moveDown();
+      } 
 
       if ((y_position[Y] -1) < Count_pulses_y  && Count_pulses_y <= (y_position[Y] + 1)) {
         stopMoving();
@@ -462,7 +463,7 @@ void goToY(int Y){
         Serial.println(y_position[Y]);
         Serial.println(Count_pulses_y);
         Serial.println("-----");
-        delay(20); //ik weet het, delays zijn slecht, sorry ~Wietse
+        delay(5); //ik weet het, delays zijn slecht, sorry ~Wietse
       }
     }
 

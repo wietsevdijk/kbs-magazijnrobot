@@ -272,22 +272,22 @@ void sendToCoord(String coordinate){
     //Serial.println();
 
     //X AXIS CONTROL
-    if(response.endsWith("xMoveL")){
-      goLeft();
-    } else if(response.endsWith("xMoveR")){
-      goRight();
-    } else if(response.endsWith("dontMv")) {
-      brakeX();
-    }
+    // if(response.endsWith("xMoveL")){
+    //   goLeft();
+    // } else if(response.endsWith("xMoveR")){
+    //   goRight();
+    // } else if(response.endsWith("dontMv")) {
+    //   brakeX();
+    // }
 
-    //X AXIS CONTROL
-    if(response.endsWith("yMoveU")){
-      goUp();
-    } else if(response.endsWith("yMoveD")){
-      goDown();
-    } else if(response.endsWith("dontMv")){
-      brakeY();
-    }
+    // //X AXIS CONTROL
+    // if(response.endsWith("yMoveU")){
+    //   goUp();
+    // } else if(response.endsWith("yMoveD")){
+    //   goDown();
+    // } else if(response.endsWith("dontMv")){
+    //   brakeY();
+    // }
 
     if(response.endsWith("CoordF")){
       Serial.println(" !!!!!! ROBOT HAS ARRIVED AT " + coordinate);
@@ -421,12 +421,12 @@ void goToStartingPoint() {
       homingComplete = true;
 
       //TEST
-      Serial.println("SENDING COORDS");
-      sendToCoord("5.1");
-      sendToCoord("4.1");
-      sendToCoord("3.1");
-      sendToCoord("2.1");
-      sendToCoord("1.1");
+      // Serial.println("SENDING COORDS");
+      // sendToCoord("5.1");
+      // sendToCoord("4.1");
+      // sendToCoord("3.1");
+      // sendToCoord("2.1");
+      // sendToCoord("1.1");
 
       
     
