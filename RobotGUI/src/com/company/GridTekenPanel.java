@@ -17,14 +17,13 @@ public class GridTekenPanel extends JPanel {
     private ArrayList<Magazijnplek> plekken;
 
     //Teken een door jouw gedefineerde grid
-    public GridTekenPanel(int aantalX, int aantalY) {
+    public GridTekenPanel(int aantalX, int aantalY, int breedte, int hoogte) {
         maxX = aantalX;
         maxY = aantalY;
 
         plekken = new ArrayList<>(aantalX * aantalY);
 
-        setBackground(Color.black);
-        setPreferredSize(new Dimension(400, 400));
+        setPreferredSize(new Dimension(breedte, hoogte));
     }
 
     //Berekent afstand tussen 2 locaties in de grid

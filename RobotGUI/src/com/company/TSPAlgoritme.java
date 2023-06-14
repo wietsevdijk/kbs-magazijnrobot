@@ -4,18 +4,16 @@ import java.util.ArrayList;
 
 public class TSPAlgoritme {
 
-    private static ArrayList<Coordinaat> begincoordinaten;
+    private static ArrayList<Coordinaat> begincoordinaten = new ArrayList<>();
 
-    private static ArrayList<Coordinaat> volgorde;
+    private static ArrayList<Coordinaat> volgorde = new ArrayList<>();
 
     public TSPAlgoritme() {
         if(begincoordinaten == null) {
-            begincoordinaten = new ArrayList<>();
         } else {
             begincoordinaten.clear();
         }
         if(volgorde == null) {
-            volgorde = new ArrayList<>();
         } else {
             volgorde.clear();
         }
@@ -68,5 +66,9 @@ public class TSPAlgoritme {
 
     public static ArrayList<Coordinaat> getBegincoordinaten() {
         return begincoordinaten;
+    }
+
+    public static ArrayList<Coordinaat> getVolgorde() {
+        return volgorde;
     }
 }

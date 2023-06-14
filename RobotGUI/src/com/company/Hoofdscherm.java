@@ -66,7 +66,7 @@ public class Hoofdscherm extends JFrame {
 
     public void addGrid(){
         //draw grid van 5x5
-        grid = new GridTekenPanel(5, 5);
+        grid = new GridTekenPanel(5, 5, 400, 400);
         rechts.add(grid);
     }
 
