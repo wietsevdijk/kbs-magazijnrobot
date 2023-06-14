@@ -28,6 +28,8 @@ int zAxisMode = 0;
 int jSwitchLast;
 int jSwitchCurrent;
 
+String testmessage;
+
 String message;                  //The message received from the slave
 bool noodstopTriggered = false;  //boolean for emergency stop button
 bool manual = true;              // boolean for manual/automatic mode button
@@ -88,13 +90,14 @@ void setup() {
 
 
 void loop() {
-
+  testmessage = receivedFromSlave();
+  
   //Test sending coord to Slave
-  if(test = 0 && homingComplete && manual){
-    Serial.println("SENDING COORD");
-    sendToCoord("4.3");
-    test = 1;
-  }
+  // if(test = 0 && testmessage.endsWith("CALIB")){
+  //   Serial.println("SENDING COORD");
+  //   sendToCoord("4.3");
+  //   test = 1;
+  // }
 
   String HMIcommand = "";
   String response = "";
@@ -270,7 +273,7 @@ void sendToCoord(String coordinate){
       goLeft();
     } else if(response.endsWith("xMoveR")){
       goRight();
-    } else {
+    } else if(response.endsWith("dontMv")) {
       brakeX();
     }
 
@@ -279,7 +282,7 @@ void sendToCoord(String coordinate){
       goUp();
     } else if(response.endsWith("yMoveD")){
       goDown();
-    } else{
+    } else if(response.endsWith("dontMv")){
       brakeY();
     }
 
@@ -411,6 +414,10 @@ void goToStartingPoint() {
       calibrating = false;
       goingHome = false;
       homingComplete = true;
+
+      //TEST
+      Serial.println("SENDING COORD");
+      sendToCoord("2.4");
     }
   }
 }
@@ -459,7 +466,7 @@ void sendCommand(String cmd) {
   Wire.endTransmission();
 }
 
-void receivedFromSlave() {
+String receivedFromSlave() {
   //This is the part where the master request a data from the slave
   //Wire.requestFrom("address of slave", "amount of bytes to request", true or false to not cut or cut communication)
   Wire.requestFrom(9, 5);
@@ -508,6 +515,8 @@ void receivedFromSlave() {
   if (message.endsWith("StrtY")) {
     isAtStart_y = true;
   }
+
+  return message;
 }
 
 String receiveMotorCommandFromSlave() {

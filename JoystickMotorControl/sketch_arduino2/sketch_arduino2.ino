@@ -57,10 +57,12 @@ bool sendYLim = true;
 bool sendXStart = false;
 bool sendYStart = false;
 
+bool foundXPos = false;
+bool foundYPos = false;
+
 //If calibrating or not
 bool calibrating = false;
-bool calibratedX = false;
-bool calibratedY = false;
+bool calibratingComplete = false;
 
 //Modus
 bool manual = true;
@@ -189,7 +191,8 @@ void recieveCalibrating() {
     calibrating = true;
   } else if (sendXStart && sendYStart) {
     calibrating = false;
-    //Serial.println("CALIBRATING COMPLETE");
+    //KALIBRATIE COMPLEET
+    calibratingComplete = true;
   }
 }
 
@@ -301,7 +304,9 @@ void loop() {
   limitSwitchX.loop();  // MUST call the loop() function first
 
   //recieve calibrating
-  recieveCalibrating();
+  if (!calibratingComplete){
+    recieveCalibrating();
+  }
 
   //recieve mode
   recieveMode();
@@ -361,6 +366,7 @@ void loop() {
   //Coordinaat ontvangen vanaf Master
   if(command.startsWith("GOTO")){
     message = "";
+    Serial.println("-----");
     Serial.println(command);
 
     //Remove "GOTO" from String, left with coordinate
@@ -372,20 +378,73 @@ void loop() {
     int X = command.substring(0, 1).toInt();
     int Y = command.substring(2, 3).toInt();
 
-    if (Count_pulses_x > x_position[X]) {
-      moveRight();
-    } else if (Count_pulses_x <= x_position[X]) {
-      moveLeft();
-    }
+    Serial.println("-----");
 
-    if (Count_pulses_y > y_position[Y]) {
-      moveUp();
-    } else if (Count_pulses_y <= y_position[Y]) {
-      moveDown();
-    }
+    Serial.print("X: ");
+    Serial.print(X);
+    Serial.print(" - ");
+    Serial.println(x_position[X]);
 
+    Serial.print("Y: ");
+    Serial.print(Y);
+    Serial.print(" - ");
+    Serial.println(y_position[Y]);
+
+    Serial.println("-----");
+
+    goToX(X);
+    goToY(Y);
+
+    if(foundXPos && foundYPos){
+      
+    }
 
   }
 
+}
+
+void goToX(int X){
+  
+    while(!foundXPos){
+
+      if (Count_pulses_x > x_position[X]) {
+        moveLeft();
+      } else if (Count_pulses_x <= x_position[X]) {
+        moveRight();
+      }
+
+      if ((x_position[X] -5) <= Count_pulses_x  && Count_pulses_x < (x_position[X] + 5)) {
+        stopMoving();
+        foundXPos = true;
+        Serial.println("----- FOUND X -----");
+        Serial.println(x_position[X]);
+        Serial.println(Count_pulses_x);
+        Serial.println("-----");
+        delay(20);
+      }
+    }
+
+}
+
+void goToY(int Y){
+  
+    while(!foundYPos){
+
+      if (Count_pulses_y > y_position[Y]) {
+        moveDown();
+      } else if (Count_pulses_y <= y_position[Y]) {
+        moveUp();
+      }
+
+      if ((y_position[Y] -5) <= Count_pulses_y  && Count_pulses_y < (y_position[Y] + 5)) {
+        stopMoving();
+        foundYPos = true;
+        Serial.println("----- FOUND Y -----");
+        Serial.println(y_position[Y]);
+        Serial.println(Count_pulses_y);
+        Serial.println("-----");
+        delay(20);
+      }
+    }
 
 }
