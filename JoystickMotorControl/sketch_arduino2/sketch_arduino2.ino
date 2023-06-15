@@ -25,9 +25,12 @@
 bool debug = true;
 unsigned long currentDebugTime;
 unsigned long previousDebugTime;
+String isCalibrating;
 
 //Encoder locations for all coordinates
-int x_position [6] = {0, 30, 730, 1431, 2145, 2841};
+int x_position_old [6] = {0, 30, 730, 1431, 2145, 2841}; //oude posities voordat brake code was gefixt, niet gebruiken
+
+int x_position [6] = {0, 80, 770, 1470, 2170, 2870};
 int y_position [6] = {0, 2251, 1737, 1233, 715, 185};
 
 //Coordinates to find when homing
@@ -56,8 +59,12 @@ bool sendYLim = true;
 bool sendXStart = false;
 bool sendYStart = false;
 
+bool foundXPos = false;
+bool foundYPos = false;
+
 //If calibrating or not
 bool calibrating = false;
+bool calibratingComplete = false;
 
 //Modus
 bool manual = true;
@@ -159,24 +166,26 @@ float Read_z_encoder() {
 }
 
 void sendStartingPoint() {
-  if (Count_pulses_x > x_position[findX] && !sendXStart) {
-    sendXStart = true;
-    message = "StrtX";
-    requestEvent();
-  } else if (Count_pulses_x <= x_position[findX] && sendXStart) {
-    sendXStart = false;
-    message = "StrtN";
-    requestEvent();
-  }
-  if (Count_pulses_y > y_position[findY] && !sendYStart) {
-    sendYStart = true;
-    message = "StrtY";
-    requestEvent();
-  } else if (Count_pulses_y <= y_position[findY] && sendYStart) {
-    sendYStart = false;
-    message = "StrtN";
-    requestEvent();
-  }
+    //Serial.println("FINDING START POINT");
+    if (Count_pulses_x > x_position[findX] && !sendXStart) {
+      sendXStart = true;
+      message = "StrtX";
+      requestEvent();
+    } else if (Count_pulses_x <= x_position[findX] && sendXStart) {
+      sendXStart = false;
+      message = "StrtN";
+      requestEvent();
+    }
+    if (Count_pulses_y > y_position[findY] && !sendYStart) {
+      sendYStart = true;
+      message = "StrtY";
+      requestEvent();
+    } else if (Count_pulses_y <= y_position[findY] && sendYStart) {
+      sendYStart = false;
+      message = "StrtN";
+      requestEvent();
+    }
+
 }
 
 void recieveCalibrating() {
@@ -184,6 +193,8 @@ void recieveCalibrating() {
     calibrating = true;
   } else if (sendXStart && sendYStart) {
     calibrating = false;
+    //KALIBRATIE COMPLEET
+    calibratingComplete = true;
   }
 }
 
@@ -205,7 +216,47 @@ void slideOut() {
     digitalWrite(brakeZ, HIGH);
     analogWrite(pwmZ, 0);
   }
+
 }
+
+//functions to send X and Y movement commands to master
+void moveLeft() {
+  message = "xMoveL";
+  requestEvent();
+}
+
+void moveRight() {
+  message = "xMoveR";
+  requestEvent();
+}
+
+void moveUp(){
+  message = "yMoveU";
+  requestEvent();
+}
+
+void moveDown(){
+  message = "yMoveD";
+  requestEvent();
+}
+
+void stopMoving(){
+  message = "dontMv";
+  requestEvent();
+}
+
+//Signal to the Master that the robot has arrived at coordinates
+void sendArrived() {
+  message = "CoordF";
+  requestEvent();
+}
+
+//Clear the request message & request a new event
+void clearRequestMessage() {
+  message = "";
+  requestEvent();
+}
+
 
 void loop() {
   //DEBUG
@@ -221,6 +272,9 @@ void loop() {
       Serial.println(Count_pulses_y);
       Serial.print("Z: ");
       Serial.println(distanceZ);
+
+      isCalibrating = calibrating ? "IS CALIBRATING" : "NOT CALIBRATING";
+      Serial.println(isCalibrating);
 
       //X: LOW = Left, HIGH = Right
       //Y: LOW = UP, HIGH = Down
@@ -265,7 +319,9 @@ void loop() {
   limitSwitchX.loop();  // MUST call the loop() function first
 
   //recieve calibrating
-  recieveCalibrating();
+  if (!calibratingComplete){
+    recieveCalibrating();
+  }
 
   //recieve mode
   recieveMode();
@@ -321,4 +377,116 @@ void loop() {
       requestEvent();
     }
   }
+
+  //Coordinaat ontvangen vanaf Master
+  if(command.startsWith("GOTO")){
+    //Reset values
+    foundXPos = false;
+    foundYPos = false;
+    message = "";
+
+    Serial.println("-----");
+    Serial.println(command);
+
+    //Remove "GOTO" from String, left with coordinate
+    command.remove(0, 4);
+    Serial.println(command);
+
+    //voorbeeld: input is 4.3 (X4, Y3)
+    //Haal coordinaten op uit String
+    int X = command.substring(0, 1).toInt();
+    int Y = command.substring(2, 3).toInt();
+
+    Serial.println("-----");
+
+    Serial.print("X target: ");
+    Serial.print(X);
+    Serial.print(" - ");
+    Serial.println(x_position[X]);
+
+    Serial.print("Y target: ");
+    Serial.print(Y);
+    Serial.print(" - ");
+    Serial.println(y_position[Y]);
+
+    Serial.println("-----");
+
+    goToX(X);
+    goToY(Y);
+
+    if(foundXPos && foundYPos){
+      sendArrived();
+    }
+
+  }
+
+}
+
+//Send robot to X coordinate
+void goToX(int X){
+
+  //first check if robot is already at correct point on axis to prevent unnecessary movement
+    if ((x_position[X] -30) < Count_pulses_x  && Count_pulses_x <= (x_position[X] + 30)){
+      stopMoving();
+      foundXPos = true;
+      Serial.println("----- ALREADY AT X -----");
+    }
+
+    //if robot is not already at correct point, start moving until it is found
+    while(!foundXPos){
+
+      if (Count_pulses_x < (x_position[X])) {
+        moveRight();
+      } else if (Count_pulses_x >= (x_position[X])) {
+        moveLeft();
+      } 
+
+      if ((x_position[X] -1) < Count_pulses_x  && Count_pulses_x <= (x_position[X] + 1)) {
+        stopMoving();
+        foundXPos = true;
+        Serial.println("----- FOUND X -----");
+        Serial.print("TARGET:");
+        Serial.println(x_position[X]);
+        Serial.print("CURRENT POS:");
+        Serial.println(Count_pulses_x);
+        Serial.println("-----");
+        delay(10); //ik weet het, delays zijn slecht, sorry ~Wietse
+      }
+    }
+
+}
+
+//Send robot to Y coordinate
+void goToY(int Y){
+  
+  //first check if robot is already at correct point on axis to prevent unnecessary movement
+  if ((y_position[Y] -30) < Count_pulses_y  && Count_pulses_y <= (y_position[Y] + 30)){
+    stopMoving();
+    foundYPos = true;
+    Serial.println("----- ALREADY AT Y -----");
+  }
+
+
+    //if robot is not already at correct point, start moving until it is found
+    while(!foundYPos){
+
+      if (Count_pulses_y < (y_position[Y])) {
+        moveUp();
+      } else if (Count_pulses_y >= (y_position[Y])) {
+        moveDown();
+      } 
+
+      if ((y_position[Y] -1) < Count_pulses_y  && Count_pulses_y <= (y_position[Y] + 1)) {
+        stopMoving();
+        foundYPos = true;
+        Serial.println("----- FOUND Y -----");
+        Serial.print("TARGET:");
+        Serial.println(y_position[Y]);
+        Serial.print("CURRENT POS:");
+        Serial.println(Count_pulses_y);
+        Serial.println("-----");
+        delay(10); //ik weet het, delays zijn slecht, sorry ~Wietse
+      }
+    }
+
 }

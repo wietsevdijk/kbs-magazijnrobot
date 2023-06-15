@@ -1,4 +1,5 @@
 #include <Wire.h>
+#include <string.h>
 
 #define VRX_PIN A2  // Arduino pin connected to VRX pin
 #define VRY_PIN A3  // Arduino pin connected to VRY pin
@@ -12,6 +13,9 @@
 #define GeelLED 4
 #define RoodLED 5
 
+unsigned long currentDebugTime;
+unsigned long previousDebugTime;
+
 
 int currentMillis;
 
@@ -19,12 +23,14 @@ int currentMillis;
 int xValue = 0;  // To store value of the X axis from the joystick
 int yValue = 0;  // To store value of the Y axis from the joystick
 
-
-
 int zAxisMode = 0;
 
 int jSwitchLast;
 int jSwitchCurrent;
+
+String HMIcommand;
+String response;
+
 
 String message;                  //The message received from the slave
 bool noodstopTriggered = false;  //boolean for emergency stop button
@@ -36,6 +42,10 @@ bool goingHome = false;
 bool calibrating = false;
 bool isAtStart_x = false;
 bool isAtStart_y = false;
+bool homingComplete = false;
+
+bool foundCoord = false;
+
 
 long x_axis = 0;
 long y_axis = 0;
@@ -81,8 +91,9 @@ void setup() {
 
 
 void loop() {
-  String HMIcommand = "";
-  String response = "";
+
+  HMIcommand = "";
+  response = "";
   // put your main code here, to run repeatedly:
   if (Serial.available()) {
     // read serial data
@@ -181,7 +192,7 @@ void loop() {
     xValue = analogRead(VRY_PIN);
     yValue = analogRead(VRX_PIN);
 
-    if (zAxisMode == 1) {
+    if (zAxisMode == 1) { //Joystick stuurt Z-as aan
       digitalWrite(9, HIGH);
       digitalWrite(8, HIGH);
       if (yValue < 100) {
@@ -194,14 +205,14 @@ void loop() {
         sendCommand("");
       }
 
-    } else {
+    } else { //Joystick stuurt X- en Y-as aan
       sendCommand("");
       if (xValue < 100) {
         goRight();  //execute function to make robot go right
       } else if (xValue > 800 && !xLimit) {
         goLeft();  // execute function to make robot go left
       } else {
-        digitalWrite(9, HIGH);  //Disengage the Brake for Channel A
+        digitalWrite(9, HIGH);  //Engage the Brake for Channel A
       }
 
       if (yValue < 100) {
@@ -210,7 +221,7 @@ void loop() {
       } else if (yValue > 800 && !yLimit) {
         goDown();  // execute function to make robot go down
       } else {
-        digitalWrite(8, HIGH);  //Disengage the Brake for Channel A
+        digitalWrite(8, HIGH);  //Engage the Brake for Channel A
       }
     }
     receivedFromSlave();
@@ -224,14 +235,60 @@ void loop() {
   }
 
   //Startprocedure
-  if (!manual && !noodstopTriggered) {
+  if (!manual && !noodstopTriggered && !homingComplete) {
     if (goingHome) {
       goToStartingPoint();
     }
   }
 }
 
-//Functions from here
+// ----- Functions from here -----
+
+
+//Send robot to coordinate
+//TODO: Change void to proper response for HMI
+void sendToCoord(String coordinate){
+  Serial.println("STARTING COORD COMMAND");
+  String response;
+  //Reset boolean
+  foundCoord = false;
+
+  //Send coordinate to slave
+  sendCommand("GOTO" + coordinate);
+
+  //lees commando maar doe er niks mee, cleart buffer
+  receiveMotorCommandFromSlave();
+
+  while(foundCoord == false){
+    //Start listening to slave Arduino for commands
+    response = receiveMotorCommandFromSlave();
+    //Serial.println();
+
+    //X AXIS CONTROL
+    if(response.endsWith("xMoveL")){
+      goLeft();
+    } else if(response.endsWith("xMoveR")){
+      goRight();
+    } else if(response.endsWith("dontMv")) {
+      brakeX();
+    }
+
+    //X AXIS CONTROL
+    if(response.endsWith("yMoveU")){
+      goUp();
+    } else if(response.endsWith("yMoveD")){
+      goDown();
+    } else if(response.endsWith("dontMv")){
+      brakeY();
+    }
+
+    if(response.endsWith("CoordF")){
+      Serial.println(" !!!!!! ROBOT HAS ARRIVED AT " + coordinate);
+      foundCoord = true;
+      delay(3500); //TODO: HAAL UITINDELIJK WEG!!!
+    }
+  }
+}
 
 //checks emergency button
 
@@ -275,6 +332,11 @@ void goDown() {
   analogWrite(11, 200);    //Spins the motor on Channel B at full speed
 }
 
+//stop Y axis movement
+void brakeY() {
+  digitalWrite(8, HIGH);
+}
+
 //make robot go left
 void goLeft() {
   sendCommand("LEFT");
@@ -289,6 +351,11 @@ void goRight() {
   digitalWrite(12, HIGH);  //Establishes forward direction of Channel A
   digitalWrite(9, LOW);    //Disengage the Brake for Channel A
   analogWrite(3, 200);     //Spins the motor on Channel A at full speed
+}
+
+//stop X axis movement
+void brakeX() {
+  digitalWrite(9, HIGH);
 }
 
 void sendCalibrating() {
@@ -342,6 +409,14 @@ void goToStartingPoint() {
     if(isAtStart_x && isAtStart_y) {
       calibrating = false;
       goingHome = false;
+      homingComplete = true;
+
+      //TEST, stuurt naar middelste punt magazijn
+      Serial.println("SENDING TEST COORDS");
+      sendToCoord("3.3");
+
+      // ---    
+
     }
   }
 }
@@ -390,7 +465,7 @@ void sendCommand(String cmd) {
   Wire.endTransmission();
 }
 
-void receivedFromSlave() {
+String receivedFromSlave() {
   //This is the part where the master request a data from the slave
   //Wire.requestFrom("address of slave", "amount of bytes to request", true or false to not cut or cut communication)
   Wire.requestFrom(9, 5);
@@ -439,4 +514,23 @@ void receivedFromSlave() {
   if (message.endsWith("StrtY")) {
     isAtStart_y = true;
   }
+
+  return message;
+}
+
+String receiveMotorCommandFromSlave() {
+    //This is the part where the master request a data from the slave
+  //Wire.requestFrom("address of slave", "amount of bytes to request", true or false to not cut or cut communication)
+  Wire.requestFrom(9, 6);
+  String message;
+
+  //Returns the number of bytes available for retrieval with read().
+  //This should be called on a master device after a call to requestFrom() or on a slave inside the onReceive() handler.
+  while (Wire.available()) {
+    message = String(message + (char)Wire.read());
+    // Serial.print(message);
+  }
+  Serial.println(message);
+
+  return message;
 }
