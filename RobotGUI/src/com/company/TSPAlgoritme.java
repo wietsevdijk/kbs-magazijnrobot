@@ -10,11 +10,13 @@ public class TSPAlgoritme {
     private double afstand;
     private double verstrekenTijd;
     private ArrayList<Coordinaat> begincoordinaten;
+    private ArrayList<Coordinaat> overigecoordinaten;
     private ArrayList<Coordinaat> volgorde;
     boolean random;
 
     public TSPAlgoritme(int breedte, int hoogte, int aantalCoordinaten) {
         begincoordinaten = new ArrayList<>();
+        overigecoordinaten = new ArrayList<>();
         volgorde = new ArrayList<>();
         this.aantalCoordinaten = aantalCoordinaten;
         this.breedte = breedte;
@@ -22,11 +24,14 @@ public class TSPAlgoritme {
         afstand = 0;
         verstrekenTijd = 0;
         random = true;
-        TSPOplossing();
+        volgorde = TSPOplossing();
     }
 
-    public TSPAlgoritme(int breedte, int hoogte, ArrayList coordinaten) {
-        begincoordinaten = coordinaten;
+    public TSPAlgoritme(int breedte, int hoogte, ArrayList<Coordinaat> coordinaten) {
+        begincoordinaten = new ArrayList<>();
+        begincoordinaten.addAll(coordinaten);
+        overigecoordinaten = new ArrayList<>();
+        overigecoordinaten.addAll(coordinaten);
         volgorde = new ArrayList<>();
         aantalCoordinaten = coordinaten.size();
         this.breedte = breedte;
@@ -34,31 +39,31 @@ public class TSPAlgoritme {
         afstand = 0;
         verstrekenTijd = 0;
         random = false;
-        TSPOplossing();
+        volgorde = TSPOplossing();
     }
 
-    public void TSPOplossing() {
+    public ArrayList<Coordinaat> TSPOplossing() {
         double starttijd = System.nanoTime();
+        ArrayList<Coordinaat> juisteVolgorde;
         if(random) {
             voegRandomCoordinatenToe();
         }
-        System.out.println("Input: " + begincoordinaten);
-        zetInJuisteVolgorde();
+        juisteVolgorde = zetInJuisteVolgorde();
         double eindtijd = System.nanoTime();
         verstrekenTijd = (eindtijd - starttijd) / 1000000;
-        System.out.println("Output: " + volgorde);
-        System.out.println("De totale afstand is: " + afstand + " vakjes");
-        System.out.println("Verstreken tijd: " + verstrekenTijd + " ms");
+        return juisteVolgorde;
     }
 
     public void voegRandomCoordinatenToe() {
         for (int i = 0; i < aantalCoordinaten; i++) {
             Coordinaat coordinaat = new Coordinaat((int)(Math.random() * breedte) + 1, (int)(Math.random() * hoogte) + 1);
             begincoordinaten.add(coordinaat);
+            overigecoordinaten.add(coordinaat);
         }
     }
 
-    public void zetInJuisteVolgorde() {
+    public ArrayList<Coordinaat> zetInJuisteVolgorde() {
+        ArrayList<Coordinaat> juisteVolgorde = new ArrayList<>();
         int huidige_x = 1;
         int huidige_y = 1;
         for(int i = 0; i < aantalCoordinaten; i++) {
@@ -66,7 +71,7 @@ public class TSPAlgoritme {
             int dichtstbijzijndeIndex = 0;
             double kleinsteAfstand = -1;
             Coordinaat dichtstbijzijndeCoordinaat = new Coordinaat(1, 1);
-            for(Coordinaat coordinaat: begincoordinaten) {
+            for(Coordinaat coordinaat: overigecoordinaten) {
                 int x_as = coordinaat.getX_as();
                 int y_as = coordinaat.getY_as();
                 double afstand = Math.sqrt(Math.pow((huidige_x - x_as), 2) + Math.pow((huidige_y - y_as), 2));
@@ -78,26 +83,22 @@ public class TSPAlgoritme {
                 index++;
             }
             afstand+=kleinsteAfstand;
-            volgorde.add(dichtstbijzijndeCoordinaat);
-            begincoordinaten.remove(dichtstbijzijndeIndex);
+            juisteVolgorde.add(dichtstbijzijndeCoordinaat);
+            overigecoordinaten.remove(dichtstbijzijndeIndex);
             huidige_x = dichtstbijzijndeCoordinaat.getX_as();
             huidige_y = dichtstbijzijndeCoordinaat.getY_as();
         }
-    }
-
-    public ArrayList<Coordinaat> getBegincoordinaten() {
-        return begincoordinaten;
+        return juisteVolgorde;
     }
 
     public ArrayList<Coordinaat> getVolgorde() {
         return volgorde;
     }
 
-    public double getAfstand() {
-        return afstand;
-    }
-
-    public double getVerstrekenTijd() {
-        return verstrekenTijd;
+    public String toString() {
+        return  "Input: " + begincoordinaten + "\n" +
+                "Output: " + volgorde + "\n" +
+                "De totale afstand is: " + afstand + " vakjes" + "\n" +
+                "Verstreken tijd: " + verstrekenTijd + " ms";
     }
 }
