@@ -33,15 +33,14 @@ public class TSPAlgoritme {
         this.hoogte = hoogte;
         afstand = 0;
         verstrekenTijd = 0;
-        TSPOplossing();
         random = false;
+        TSPOplossing();
     }
 
     public void TSPOplossing() {
         double starttijd = System.nanoTime();
         if(random) {
             voegRandomCoordinatenToe();
-            System.out.println("| fdlswjhf");
         }
         System.out.println("Input: " + begincoordinaten);
         zetInJuisteVolgorde();
