@@ -101,4 +101,20 @@ public class TSPAlgoritme {
                 "De totale afstand is: " + afstand + " vakjes" + "\n" +
                 "Verstreken tijd: " + verstrekenTijd + " ms";
     }
+
+    public String toStringBegincoordinaten() {
+        return "Input: " + begincoordinaten;
+    }
+
+    public String toStringVolgorde() {
+        return "Output: " + volgorde;
+    }
+
+    public String toStringAfstand() {
+        return "De totale afstand is: " + afstand + " vakjes";
+    }
+
+    public String toStringTijd() {
+        return "Verstreken tijd: " + verstrekenTijd + " ms";
+    }
 }

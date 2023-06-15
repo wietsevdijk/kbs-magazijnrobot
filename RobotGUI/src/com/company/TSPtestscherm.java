@@ -17,17 +17,19 @@ public class TSPtestscherm extends JFrame implements ActionListener {
     private static JTextField hoogteMagazijnField;
     private static int hoogteMagazijn;
     private static JButton goKnop;
-    private static JLabel coordinaatText;
-    private static ArrayList<Coordinaat> volgorde = new ArrayList<>();
+    private static JLabel inputText;
+    private static JLabel outputText;
+    private static JLabel afstandText;
+    private static JLabel tijdText;
     private SpringLayout springLayout;
     public TSPtestscherm() {
         setTitle("TSP Testscherm");
-        setSize(700, 700);
+        setSize(650, 900);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
 
         panel = new JPanel();
-        panel.setPreferredSize(new Dimension(700, 100));
+        panel.setPreferredSize(new Dimension(650, 100));
         panel.setLayout(new SpringLayout());
 
         gridPanel = new JPanel();
@@ -39,47 +41,62 @@ public class TSPtestscherm extends JFrame implements ActionListener {
 
         JLabel aantalCoordinatenJL = new JLabel("Aantal Coördinaten: ");
         panel.add(aantalCoordinatenJL);
-        springLayout.putConstraint(SpringLayout.NORTH, aantalCoordinatenJL, 5, SpringLayout.NORTH, this);
-        springLayout.putConstraint(SpringLayout.WEST, aantalCoordinatenJL, 0, SpringLayout.WEST, this);
+        springLayout.putConstraint(SpringLayout.NORTH, aantalCoordinatenJL, 10, SpringLayout.NORTH, this);
+        springLayout.putConstraint(SpringLayout.WEST, aantalCoordinatenJL, 10, SpringLayout.WEST, this);
 
         aantalCoordinatenField = new JTextField(6);
         panel.add(aantalCoordinatenField);
         aantalCoordinatenField.addActionListener(this);
-        springLayout.putConstraint(SpringLayout.NORTH, aantalCoordinatenField, 5, SpringLayout.NORTH, this);
-        springLayout.putConstraint(SpringLayout.WEST, aantalCoordinatenField, 115, SpringLayout.WEST, this);
+        springLayout.putConstraint(SpringLayout.NORTH, aantalCoordinatenField, 10, SpringLayout.NORTH, this);
+        springLayout.putConstraint(SpringLayout.WEST, aantalCoordinatenField, 125, SpringLayout.WEST, this);
 
         JLabel breedteMagazijnJL = new JLabel("Breedte Magazijn: ");
         panel.add(breedteMagazijnJL);
-        springLayout.putConstraint(SpringLayout.NORTH, breedteMagazijnJL, 5, SpringLayout.NORTH, this);
-        springLayout.putConstraint(SpringLayout.WEST, breedteMagazijnJL, 190, SpringLayout.WEST, this);
+        springLayout.putConstraint(SpringLayout.NORTH, breedteMagazijnJL, 10, SpringLayout.NORTH, this);
+        springLayout.putConstraint(SpringLayout.WEST, breedteMagazijnJL, 200, SpringLayout.WEST, this);
 
         breedteMagazijnField = new JTextField(6);
         panel.add(breedteMagazijnField);
         breedteMagazijnField.addActionListener(this);
-        springLayout.putConstraint(SpringLayout.NORTH, breedteMagazijnField, 5, SpringLayout.NORTH, this);
-        springLayout.putConstraint(SpringLayout.WEST, breedteMagazijnField, 300, SpringLayout.WEST, this);
+        springLayout.putConstraint(SpringLayout.NORTH, breedteMagazijnField, 10, SpringLayout.NORTH, this);
+        springLayout.putConstraint(SpringLayout.WEST, breedteMagazijnField, 310, SpringLayout.WEST, this);
 
         JLabel hoogteMagazijnJL = new JLabel("Hoogte Magazijn: ");
         panel.add(hoogteMagazijnJL);
-        springLayout.putConstraint(SpringLayout.NORTH, hoogteMagazijnJL, 5, SpringLayout.NORTH, this);
-        springLayout.putConstraint(SpringLayout.WEST, hoogteMagazijnJL, 380, SpringLayout.WEST, this);
+        springLayout.putConstraint(SpringLayout.NORTH, hoogteMagazijnJL, 10, SpringLayout.NORTH, this);
+        springLayout.putConstraint(SpringLayout.WEST, hoogteMagazijnJL, 390, SpringLayout.WEST, this);
 
         hoogteMagazijnField = new JTextField(6);
         panel.add(hoogteMagazijnField);
         hoogteMagazijnField.addActionListener(this);
-        springLayout.putConstraint(SpringLayout.NORTH, hoogteMagazijnField, 5, SpringLayout.NORTH, this);
-        springLayout.putConstraint(SpringLayout.WEST, hoogteMagazijnField, 485, SpringLayout.WEST, this);
+        springLayout.putConstraint(SpringLayout.NORTH, hoogteMagazijnField, 10, SpringLayout.NORTH, this);
+        springLayout.putConstraint(SpringLayout.WEST, hoogteMagazijnField, 495, SpringLayout.WEST, this);
 
         goKnop = new JButton("GO");
         panel.add(goKnop);
         goKnop.addActionListener(this);
-        springLayout.putConstraint(SpringLayout.NORTH, goKnop, 0, SpringLayout.NORTH, this);
-        springLayout.putConstraint(SpringLayout.WEST, goKnop, 550, SpringLayout.WEST, this);
+        springLayout.putConstraint(SpringLayout.NORTH, goKnop, 5, SpringLayout.NORTH, this);
+        springLayout.putConstraint(SpringLayout.WEST, goKnop, 570, SpringLayout.WEST, this);
 
-        coordinaatText = new JLabel();
-        panel.add(coordinaatText);
-        springLayout.putConstraint(SpringLayout.NORTH, coordinaatText, 30, SpringLayout.NORTH, this);
-        springLayout.putConstraint(SpringLayout.WEST, coordinaatText, 0, SpringLayout.WEST, this);
+        inputText = new JLabel();
+        panel.add(inputText);
+        springLayout.putConstraint(SpringLayout.NORTH, inputText, 45, SpringLayout.NORTH, this);
+        springLayout.putConstraint(SpringLayout.WEST, inputText, 10, SpringLayout.WEST, this);
+
+        outputText = new JLabel();
+        panel.add(outputText);
+        springLayout.putConstraint(SpringLayout.NORTH, outputText, 75, SpringLayout.NORTH, this);
+        springLayout.putConstraint(SpringLayout.WEST, outputText, 10, SpringLayout.WEST, this);
+
+        afstandText = new JLabel();
+        panel.add(afstandText);
+        springLayout.putConstraint(SpringLayout.NORTH, afstandText, 105, SpringLayout.NORTH, this);
+        springLayout.putConstraint(SpringLayout.WEST, afstandText, 10, SpringLayout.WEST, this);
+
+        tijdText = new JLabel();
+        panel.add(tijdText);
+        springLayout.putConstraint(SpringLayout.NORTH, tijdText, 135, SpringLayout.NORTH, this);
+        springLayout.putConstraint(SpringLayout.WEST, tijdText, 10, SpringLayout.WEST, this);
 
 
 
@@ -94,17 +111,17 @@ public class TSPtestscherm extends JFrame implements ActionListener {
                 TSPAlgoritme algoritme = new TSPAlgoritme(breedteMagazijn, hoogteMagazijn, aantalCoordinaten);
                 gridPanel = new GridTekenPanel(breedteMagazijn, hoogteMagazijn, 600, 600);
                 panel.add(gridPanel);
-                springLayout.putConstraint(SpringLayout.NORTH, gridPanel, 50, SpringLayout.NORTH, panel);
-                springLayout.putConstraint(SpringLayout.WEST, gridPanel, 5, SpringLayout.WEST, panel);
+                springLayout.putConstraint(SpringLayout.NORTH, gridPanel, 165, SpringLayout.NORTH, panel);
+                springLayout.putConstraint(SpringLayout.WEST, gridPanel, 15, SpringLayout.WEST, panel);
 
-
-
-                volgorde = algoritme.getVolgorde();
-                String coordinaatTexten = "";
-                for(Coordinaat coordinaat: volgorde) {
-                    coordinaatTexten+=coordinaat.toString();
-                }
-                coordinaatText.setText(coordinaatTexten);
+                String input = algoritme.toStringBegincoordinaten();
+                inputText.setText(input);
+                String output = algoritme.toStringVolgorde();
+                outputText.setText(output);
+                String afstand = algoritme.toStringAfstand();
+                afstandText.setText(afstand);
+                String tijd = algoritme.toStringTijd();
+                tijdText.setText(tijd);
                 panel.revalidate();
                 panel.repaint();
             }
