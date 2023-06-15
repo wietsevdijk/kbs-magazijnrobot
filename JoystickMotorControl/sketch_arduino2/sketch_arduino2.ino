@@ -28,7 +28,9 @@ unsigned long previousDebugTime;
 String isCalibrating;
 
 //Encoder locations for all coordinates
-int x_position [6] = {0, 30, 730, 1431, 2145, 2841};
+int x_position_old [6] = {0, 30, 730, 1431, 2145, 2841}; //oude posities voordat brake code was gefixt, niet gebruiken
+
+int x_position [6] = {0, 80, 770, 1470, 2170, 2870};
 int y_position [6] = {0, 2251, 1737, 1233, 715, 185};
 
 //Coordinates to find when homing
@@ -271,7 +273,7 @@ void loop() {
       Serial.print("Z: ");
       Serial.println(distanceZ);
 
-      isCalibrating = calibrating ? "YES CALIBRATING" : "NO CALIBRATING";
+      isCalibrating = calibrating ? "IS CALIBRATING" : "NOT CALIBRATING";
       Serial.println(isCalibrating);
 
       //X: LOW = Left, HIGH = Right
@@ -422,12 +424,20 @@ void loop() {
 
 //Send robot to X coordinate
 void goToX(int X){
-  
+
+  //first check if robot is already at correct point on axis to prevent unnecessary movement
+    if ((x_position[X] -30) < Count_pulses_x  && Count_pulses_x <= (x_position[X] + 30)){
+      stopMoving();
+      foundXPos = true;
+      Serial.println("----- ALREADY AT X -----");
+    }
+
+    //if robot is not already at correct point, start moving until it is found
     while(!foundXPos){
 
-      if (Count_pulses_x <= (x_position[X])) {
+      if (Count_pulses_x < (x_position[X])) {
         moveRight();
-      } else if (Count_pulses_x > (x_position[X])) {
+      } else if (Count_pulses_x >= (x_position[X])) {
         moveLeft();
       } 
 
@@ -449,12 +459,20 @@ void goToX(int X){
 //Send robot to Y coordinate
 void goToY(int Y){
   
+  //first check if robot is already at correct point on axis to prevent unnecessary movement
+  if ((y_position[Y] -30) < Count_pulses_y  && Count_pulses_y <= (y_position[Y] + 30)){
+    stopMoving();
+    foundYPos = true;
+    Serial.println("----- ALREADY AT Y -----");
+  }
+
+
+    //if robot is not already at correct point, start moving until it is found
     while(!foundYPos){
 
-
-      if (Count_pulses_y <= (y_position[Y])) {
+      if (Count_pulses_y < (y_position[Y])) {
         moveUp();
-      } else if (Count_pulses_y > (y_position[Y])) {
+      } else if (Count_pulses_y >= (y_position[Y])) {
         moveDown();
       } 
 

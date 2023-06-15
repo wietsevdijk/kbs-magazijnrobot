@@ -284,7 +284,7 @@ void sendToCoord(String coordinate){
     if(response.endsWith("CoordF")){
       Serial.println(" !!!!!! ROBOT HAS ARRIVED AT " + coordinate);
       foundCoord = true;
-      //return true;
+      delay(3500); //TODO: HAAL UITINDELIJK WEG!!!
     }
   }
 }
@@ -411,12 +411,19 @@ void goToStartingPoint() {
       homingComplete = true;
 
       //TEST
-      Serial.println("SENDING COORDS");
-      sendToCoord("5.1");
-      // sendToCoord("4.1");
-      // sendToCoord("3.1");
-      // sendToCoord("2.1");
+      Serial.println("SENDING TEST COORDS");
       sendToCoord("1.1");
+      sendToCoord("2.1");
+      sendToCoord("3.1");
+      sendToCoord("4.1");
+      sendToCoord("5.1");
+      sendToCoord("4.1");
+      sendToCoord("3.1");
+      sendToCoord("2.1");
+      sendToCoord("1.1");
+
+      
+      
     
     }
   }
