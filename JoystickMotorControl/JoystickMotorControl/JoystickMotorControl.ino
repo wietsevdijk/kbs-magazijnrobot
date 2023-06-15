@@ -28,6 +28,9 @@ int zAxisMode = 0;
 int jSwitchLast;
 int jSwitchCurrent;
 
+String HMIcommand;
+String response;
+
 
 String message;                  //The message received from the slave
 bool noodstopTriggered = false;  //boolean for emergency stop button
@@ -43,7 +46,6 @@ bool homingComplete = false;
 
 bool foundCoord = false;
 
-int test = 0;
 
 long x_axis = 0;
 long y_axis = 0;
@@ -90,9 +92,8 @@ void setup() {
 
 void loop() {
 
-
-  String HMIcommand = "";
-  String response = "";
+  HMIcommand = "";
+  response = "";
   // put your main code here, to run repeatedly:
   if (Serial.available()) {
     // read serial data
