@@ -91,7 +91,8 @@ public class TSPtestscherm extends JFrame implements ActionListener {
                 aantalCoordinaten = Integer.parseInt(aantalCoordinatenField.getText());
                 breedteMagazijn = Integer.parseInt(breedteMagazijnField.getText());
                 hoogteMagazijn = Integer.parseInt(hoogteMagazijnField.getText());
-                TSPAlgoritme.TSPOplossing(aantalCoordinaten, breedteMagazijn, hoogteMagazijn);
+                TSPAlgoritme algoritme = new TSPAlgoritme();
+                algoritme.TSPOplossing(aantalCoordinaten, breedteMagazijn, hoogteMagazijn);
                 gridPanel = new GridTekenPanel(breedteMagazijn, hoogteMagazijn, 600, 600);
                 panel.add(gridPanel);
                 springLayout.putConstraint(SpringLayout.NORTH, gridPanel, 50, SpringLayout.NORTH, panel);
@@ -99,7 +100,7 @@ public class TSPtestscherm extends JFrame implements ActionListener {
 
 
 
-                volgorde = TSPAlgoritme.getVolgorde();
+                volgorde = algoritme.getVolgorde();
                 String coordinaatTexten = "";
                 for(Coordinaat coordinaat: volgorde) {
                     coordinaatTexten+=coordinaat.toString();

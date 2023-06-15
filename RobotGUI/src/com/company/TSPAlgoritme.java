@@ -4,28 +4,20 @@ import java.util.ArrayList;
 
 public class TSPAlgoritme {
 
-    private static ArrayList<Coordinaat> begincoordinaten = new ArrayList<>();
+    private ArrayList<Coordinaat> begincoordinaten;
 
-    private static ArrayList<Coordinaat> volgorde = new ArrayList<>();
+    private ArrayList<Coordinaat> volgorde;
 
     public TSPAlgoritme() {
-        if(begincoordinaten == null) {
-        } else {
-            begincoordinaten.clear();
-        }
-        if(volgorde == null) {
-        } else {
-            volgorde.clear();
-        }
+        begincoordinaten = new ArrayList<>();
+        volgorde = new ArrayList<>();
     }
 
-    public static void TSPOplossing(int aantalCoordinaten, int breedte, int hoogte) {
+    public void TSPOplossing(int aantalCoordinaten, int breedte, int hoogte) {
         double starttijd = System.nanoTime();
-        new TSPAlgoritme();
-
         for (int i = 0; i < aantalCoordinaten; i++) {
             Coordinaat coordinaat = new Coordinaat((int)(Math.random() * breedte) + 1, (int)(Math.random() * hoogte) + 1);
-            TSPAlgoritme.setBegincoordinaat(coordinaat);
+            begincoordinaten.add(coordinaat);
         }
         double oplossing = 0;
         int huidige_x = 1;
@@ -60,15 +52,7 @@ public class TSPAlgoritme {
         System.out.println("Verstreken tijd: " + ((eindtijd - starttijd) / 1000000) + " ms");
     }
 
-    public static void setBegincoordinaat(Coordinaat coordinaat) {
-        begincoordinaten.add(coordinaat);
-    }
-
-    public static ArrayList<Coordinaat> getBegincoordinaten() {
-        return begincoordinaten;
-    }
-
-    public static ArrayList<Coordinaat> getVolgorde() {
+    public ArrayList<Coordinaat> getVolgorde() {
         return volgorde;
     }
 }
