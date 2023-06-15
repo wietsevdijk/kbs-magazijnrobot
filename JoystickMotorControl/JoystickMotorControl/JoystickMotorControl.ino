@@ -285,7 +285,6 @@ void sendToCoord(String coordinate){
     if(response.endsWith("CoordF")){
       Serial.println(" !!!!!! ROBOT HAS ARRIVED AT " + coordinate);
       foundCoord = true;
-      delay(3500); //TODO: HAAL UITINDELIJK WEG!!!
     }
   }
 }
