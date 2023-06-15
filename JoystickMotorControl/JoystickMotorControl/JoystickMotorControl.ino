@@ -28,7 +28,6 @@ int zAxisMode = 0;
 int jSwitchLast;
 int jSwitchCurrent;
 
-String testmessage;
 
 String message;                  //The message received from the slave
 bool noodstopTriggered = false;  //boolean for emergency stop button
@@ -90,14 +89,7 @@ void setup() {
 
 
 void loop() {
-  testmessage = receivedFromSlave();
-  
-  //Test sending coord to Slave
-  // if(test = 0 && testmessage.endsWith("CALIB")){
-  //   Serial.println("SENDING COORD");
-  //   sendToCoord("4.3");
-  //   test = 1;
-  // }
+
 
   String HMIcommand = "";
   String response = "";
@@ -199,7 +191,7 @@ void loop() {
     xValue = analogRead(VRY_PIN);
     yValue = analogRead(VRX_PIN);
 
-    if (zAxisMode == 1) {
+    if (zAxisMode == 1) { //Joystick stuurt Z-as aan
       digitalWrite(9, HIGH);
       digitalWrite(8, HIGH);
       if (yValue < 100) {
@@ -212,14 +204,14 @@ void loop() {
         sendCommand("");
       }
 
-    } else {
+    } else { //Joystick stuurt X- en Y-as aan
       sendCommand("");
       if (xValue < 100) {
         goRight();  //execute function to make robot go right
       } else if (xValue > 800 && !xLimit) {
         goLeft();  // execute function to make robot go left
       } else {
-        digitalWrite(9, HIGH);  //Disengage the Brake for Channel A
+        digitalWrite(9, HIGH);  //Engage the Brake for Channel A
       }
 
       if (yValue < 100) {
@@ -228,7 +220,7 @@ void loop() {
       } else if (yValue > 800 && !yLimit) {
         goDown();  // execute function to make robot go down
       } else {
-        digitalWrite(8, HIGH);  //Disengage the Brake for Channel A
+        digitalWrite(8, HIGH);  //Engage the Brake for Channel A
       }
     }
     receivedFromSlave();
@@ -272,22 +264,22 @@ void sendToCoord(String coordinate){
     //Serial.println();
 
     //X AXIS CONTROL
-    // if(response.endsWith("xMoveL")){
-    //   goLeft();
-    // } else if(response.endsWith("xMoveR")){
-    //   goRight();
-    // } else if(response.endsWith("dontMv")) {
-    //   brakeX();
-    // }
+    if(response.endsWith("xMoveL")){
+      goLeft();
+    } else if(response.endsWith("xMoveR")){
+      goRight();
+    } else if(response.endsWith("dontMv")) {
+      brakeX();
+    }
 
-    // //X AXIS CONTROL
-    // if(response.endsWith("yMoveU")){
-    //   goUp();
-    // } else if(response.endsWith("yMoveD")){
-    //   goDown();
-    // } else if(response.endsWith("dontMv")){
-    //   brakeY();
-    // }
+    //X AXIS CONTROL
+    if(response.endsWith("yMoveU")){
+      goUp();
+    } else if(response.endsWith("yMoveD")){
+      goDown();
+    } else if(response.endsWith("dontMv")){
+      brakeY();
+    }
 
     if(response.endsWith("CoordF")){
       Serial.println(" !!!!!! ROBOT HAS ARRIVED AT " + coordinate);
@@ -342,7 +334,6 @@ void goDown() {
 //stop Y axis movement
 void brakeY() {
   digitalWrite(8, HIGH);
-  digitalWrite(11, 0);
 }
 
 //make robot go left
@@ -364,7 +355,6 @@ void goRight() {
 //stop X axis movement
 void brakeX() {
   digitalWrite(9, HIGH);
-  digitalWrite(3, 0);
 }
 
 void sendCalibrating() {
@@ -421,14 +411,12 @@ void goToStartingPoint() {
       homingComplete = true;
 
       //TEST
-      // Serial.println("SENDING COORDS");
-      // sendToCoord("5.1");
+      Serial.println("SENDING COORDS");
+      sendToCoord("5.1");
       // sendToCoord("4.1");
       // sendToCoord("3.1");
       // sendToCoord("2.1");
-      // sendToCoord("1.1");
-
-      
+      sendToCoord("1.1");
     
     }
   }

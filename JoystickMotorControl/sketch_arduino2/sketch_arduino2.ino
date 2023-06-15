@@ -397,12 +397,12 @@ void loop() {
 
     Serial.println("-----");
 
-    Serial.print("X: ");
+    Serial.print("X target: ");
     Serial.print(X);
     Serial.print(" - ");
     Serial.println(x_position[X]);
 
-    Serial.print("Y: ");
+    Serial.print("Y target: ");
     Serial.print(Y);
     Serial.print(" - ");
     Serial.println(y_position[Y]);
@@ -435,10 +435,12 @@ void goToX(int X){
         stopMoving();
         foundXPos = true;
         Serial.println("----- FOUND X -----");
+        Serial.print("TARGET:");
         Serial.println(x_position[X]);
+        Serial.print("CURRENT POS:");
         Serial.println(Count_pulses_x);
         Serial.println("-----");
-        delay(5); //ik weet het, delays zijn slecht, sorry ~Wietse
+        delay(10); //ik weet het, delays zijn slecht, sorry ~Wietse
       }
     }
 
@@ -460,10 +462,12 @@ void goToY(int Y){
         stopMoving();
         foundYPos = true;
         Serial.println("----- FOUND Y -----");
+        Serial.print("TARGET:");
         Serial.println(y_position[Y]);
+        Serial.print("CURRENT POS:");
         Serial.println(Count_pulses_y);
         Serial.println("-----");
-        delay(5); //ik weet het, delays zijn slecht, sorry ~Wietse
+        delay(10); //ik weet het, delays zijn slecht, sorry ~Wietse
       }
     }
 
