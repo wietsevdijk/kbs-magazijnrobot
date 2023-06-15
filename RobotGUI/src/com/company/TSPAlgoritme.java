@@ -21,8 +21,8 @@ public class TSPAlgoritme {
         this.hoogte = hoogte;
         afstand = 0;
         verstrekenTijd = 0;
-        TSPOplossing();
         random = true;
+        TSPOplossing();
     }
 
     public TSPAlgoritme(int breedte, int hoogte, ArrayList coordinaten) {
@@ -41,6 +41,7 @@ public class TSPAlgoritme {
         double starttijd = System.nanoTime();
         if(random) {
             voegRandomCoordinatenToe();
+            System.out.println("| fdlswjhf");
         }
         System.out.println("Input: " + begincoordinaten);
         zetInJuisteVolgorde();
