@@ -11,8 +11,9 @@ public class TSPAlgoritme {
     private double verstrekenTijd;
     private ArrayList<Coordinaat> begincoordinaten;
     private ArrayList<Coordinaat> volgorde;
+    boolean random;
 
-    public TSPAlgoritme(int aantalCoordinaten, int breedte, int hoogte) {
+    public TSPAlgoritme(int breedte, int hoogte, int aantalCoordinaten) {
         begincoordinaten = new ArrayList<>();
         volgorde = new ArrayList<>();
         this.aantalCoordinaten = aantalCoordinaten;
@@ -21,11 +22,26 @@ public class TSPAlgoritme {
         afstand = 0;
         verstrekenTijd = 0;
         TSPOplossing();
+        random = true;
+    }
+
+    public TSPAlgoritme(int breedte, int hoogte, ArrayList coordinaten) {
+        begincoordinaten = coordinaten;
+        volgorde = new ArrayList<>();
+        aantalCoordinaten = coordinaten.size();
+        this.breedte = breedte;
+        this.hoogte = hoogte;
+        afstand = 0;
+        verstrekenTijd = 0;
+        TSPOplossing();
+        random = false;
     }
 
     public void TSPOplossing() {
         double starttijd = System.nanoTime();
-        voegRandomCoordinatenToe();
+        if(random) {
+            voegRandomCoordinatenToe();
+        }
         System.out.println("Input: " + begincoordinaten);
         zetInJuisteVolgorde();
         double eindtijd = System.nanoTime();

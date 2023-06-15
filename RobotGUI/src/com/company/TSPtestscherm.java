@@ -91,7 +91,7 @@ public class TSPtestscherm extends JFrame implements ActionListener {
                 aantalCoordinaten = Integer.parseInt(aantalCoordinatenField.getText());
                 breedteMagazijn = Integer.parseInt(breedteMagazijnField.getText());
                 hoogteMagazijn = Integer.parseInt(hoogteMagazijnField.getText());
-                TSPAlgoritme algoritme = new TSPAlgoritme(aantalCoordinaten, breedteMagazijn, hoogteMagazijn);
+                TSPAlgoritme algoritme = new TSPAlgoritme(breedteMagazijn, hoogteMagazijn, aantalCoordinaten);
                 gridPanel = new GridTekenPanel(breedteMagazijn, hoogteMagazijn, 600, 600);
                 panel.add(gridPanel);
                 springLayout.putConstraint(SpringLayout.NORTH, gridPanel, 50, SpringLayout.NORTH, panel);
