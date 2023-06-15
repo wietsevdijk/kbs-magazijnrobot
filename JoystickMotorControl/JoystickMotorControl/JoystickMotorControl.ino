@@ -410,21 +410,12 @@ void goToStartingPoint() {
       goingHome = false;
       homingComplete = true;
 
-      //TEST
+      //TEST, stuurt naar middelste punt magazijn
       Serial.println("SENDING TEST COORDS");
-      sendToCoord("1.1");
-      sendToCoord("2.1");
-      sendToCoord("3.1");
-      sendToCoord("4.1");
-      sendToCoord("5.1");
-      sendToCoord("4.1");
-      sendToCoord("3.1");
-      sendToCoord("2.1");
-      sendToCoord("1.1");
+      sendToCoord("3.3");
 
-      
-      
-    
+      // ---    
+
     }
   }
 }
