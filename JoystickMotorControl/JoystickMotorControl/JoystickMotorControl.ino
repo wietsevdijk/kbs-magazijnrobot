@@ -410,9 +410,13 @@ void goToStartingPoint() {
       goingHome = false;
       homingComplete = true;
 
-      //TEST, stuurt naar middelste punt magazijn
+      //TEST COORDS - Dit is voor nu hardcoded, 
+      // dit moet volledig worden weggehaald wanneer coordinaat ontvangen
+      // vanaf Java compleet is
       Serial.println("SENDING TEST COORDS");
+      sendToCoord("2.4");
       sendToCoord("3.3");
+      sendToCoord("4.2");
 
       // ---    
 

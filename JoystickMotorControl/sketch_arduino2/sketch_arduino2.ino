@@ -33,6 +33,9 @@ int x_position_old [6] = {0, 30, 730, 1431, 2145, 2841}; //oude posities voordat
 int x_position [6] = {0, 80, 770, 1470, 2170, 2870};
 int y_position [6] = {0, 2251, 1737, 1233, 715, 185};
 
+//TEST
+int testPakketNummer = 1;
+
 //Coordinates to find when homing
 int findX = 1;
 int findY = 5;
@@ -48,6 +51,8 @@ String command = "";
 volatile int Count_pulses_x = 0;
 volatile int Count_pulses_y = 0;
 volatile int distanceZ;
+
+int pickUpTarget;
 
 int dirX;
 int dirY;
@@ -207,16 +212,43 @@ void recieveMode() {
   }
 }
 
-void slideOut() {
-  if (Read_z_encoder() < 18) {
+//NOTE: Bij de slide functies moet Read_z_encoder() opnieuw worden aangeroepen
+//i.p.v. distanceZ gebruiken, omdat deze tijdens het zoeken van een coordinaat niet
+//globaal wordt aangeroepen
+void slideOut(int pakketNummer) {
+  int slideOutTarget = 18; //standaardwaarde, schuift arm helemaal uit
+
+  //voor nummers 2 en 3, schuif minder ver uit:
+  if(pakketNummer == 2){slideOutTarget = 14;} 
+  if(pakketNummer == 3){slideOutTarget = 10;} 
+
+  while (Read_z_encoder() < slideOutTarget) {
     digitalWrite(directionZ, LOW);
     digitalWrite(brakeZ, LOW);
     analogWrite(pwmZ, 200);
-  } else {
-    digitalWrite(brakeZ, HIGH);
-    analogWrite(pwmZ, 0);
   }
+    digitalWrite(brakeZ, HIGH);
+}
 
+void slideIn() {
+  while (Read_z_encoder() >= 6) {
+    digitalWrite(directionZ, HIGH);
+    digitalWrite(brakeZ, LOW);
+    analogWrite(pwmZ, 200);
+  }
+    digitalWrite(brakeZ, HIGH);
+}
+
+void pickUp() {
+  //Bepaal hoever robot moet bewegen
+  pickUpTarget = (Count_pulses_y + 100);
+
+  while(Count_pulses_y < pickUpTarget){
+    moveUp();
+  } 
+
+  stopMoving();
+  
 }
 
 //functions to send X and Y movement commands to master
@@ -326,11 +358,6 @@ void loop() {
   //recieve mode
   recieveMode();
 
-  //slide out
-  if (command.equals("UITSCHUIVEN")) {
-    slideOut();
-  }
-
   // //Get state of limit switch on X-axis and do something
   int stateX = limitSwitchX.getState();
   if (stateX == HIGH) {
@@ -415,7 +442,13 @@ void loop() {
     goToY(Y);
 
     if(foundXPos && foundYPos){
+      slideOut(testPakketNummer);
+      delay(500); //TODO: HAAL WEG
+      pickUp();
+      delay(500); //TODO: HAAL WEG
+      slideIn();
       sendArrived();
+      testPakketNummer++;
     }
 
   }
