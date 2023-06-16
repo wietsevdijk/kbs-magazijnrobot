@@ -13,9 +13,13 @@
 #define GeelLED 4
 #define RoodLED 5
 
+//Als debug aanstaat, werkt communicatie met de HMI niet
+//De HMI leest de Serial output van de robot, wat niet werkt
+//als er constant debug prints in de Serial monitor worden gegooid
+// Dus alleen debug aanzetten als het echt nodig is
+bool debug = false;
 unsigned long currentDebugTime;
 unsigned long previousDebugTime;
-
 
 int currentMillis;
 
@@ -27,6 +31,13 @@ int zAxisMode = 0;
 
 int jSwitchLast;
 int jSwitchCurrent;
+
+enum CommandMode { //Commandmodussen voor switch-case
+  coordinaten,
+  eindPunt
+};
+
+CommandMode currentCommandMode;
 
 String HMIcommand;
 String response;
@@ -94,11 +105,36 @@ void loop() {
 
   HMIcommand = "";
   response = "";
-  // put your main code here, to run repeatedly:
+   //Read commands coming from HMI
   if (Serial.available()) {
     // read serial data
     HMIcommand = String(Serial.readString());
     // lcd.print(HMIcommand);
+  }
+
+  if(HMIcommand.length() > 0){ //Check of er een commando binnen is gekomen
+
+    if (HMIcommand == "COORDS") {
+      currentCommandMode = coordinaten;
+      sendToHMI("Command mode enabled");
+    } else if(HMIcommand == "END"){
+      currentCommandMode = eindPunt;
+      sendToHMI("End mode enabled");
+    } else {
+    //Als het commando niet 1 van de commandomodussen is, dan:
+    //Handel ingekomen commando af op basis van huidige commandomodus
+    switch (currentCommandMode)
+      {
+      case coordinaten:
+        sendToCoord(HMIcommand);
+        sendToHMI("Going to coord " + HMIcommand);
+        break;
+      
+      default:
+        break;
+      }
+
+    }
   }
 
   if (HMIcommand == "UP") {
@@ -135,7 +171,9 @@ void loop() {
     response = "naar achteren";
   }
 
-  response = String(response);
+
+
+  // !!! NIET AANRAKEN !!! Gebruikt voor terugcommuniceren naar Java
   Serial.print(response);
 
   //Send calibrating
@@ -180,11 +218,11 @@ void loop() {
   jSwitchCurrent = joystickSwitch();
   if (jSwitchLast == 1 & jSwitchCurrent == 0) {
 
-    Serial.println("Toggled-Z");
+    if(debug){Serial.println("Toggled-Z");}
 
     zAxisMode = !zAxisMode;
 
-    Serial.println(zAxisMode);
+    if(debug){Serial.println(zAxisMode);}
   }
 
   // UITLEZEN JOYSTICK
@@ -196,10 +234,10 @@ void loop() {
       digitalWrite(9, HIGH);
       digitalWrite(8, HIGH);
       if (yValue < 100) {
-        Serial.println("vooruit");
+        if(debug){Serial.println("vooruit");}
         sendCommand("VOOR");
       } else if (yValue > 800) {
-        Serial.println("achteruit");
+        if(debug){Serial.println("achteruit");}
         sendCommand("ACHTER");
       } else {
         sendCommand("");
@@ -244,11 +282,17 @@ void loop() {
 
 // ----- Functions from here -----
 
+//Send message back to HMI
+void sendToHMI(String input) {
+  //Add start and end character to input
+  input = ("-" + input + ";");
+  response = input;
+}
 
 //Send robot to coordinate
 //TODO: Change void to proper response for HMI
 void sendToCoord(String coordinate){
-  Serial.println("STARTING COORD COMMAND");
+  if(debug){Serial.println("STARTING COORD COMMAND");}
   String response;
   //Reset boolean
   foundCoord = false;
@@ -262,7 +306,7 @@ void sendToCoord(String coordinate){
   while(foundCoord == false){
     //Start listening to slave Arduino for commands
     response = receiveMotorCommandFromSlave();
-    //Serial.println();
+    
 
     //X AXIS CONTROL
     if(response.endsWith("xMoveL")){
@@ -283,7 +327,7 @@ void sendToCoord(String coordinate){
     }
 
     if(response.endsWith("CoordF")){
-      Serial.println(" !!!!!! ROBOT HAS ARRIVED AT " + coordinate);
+      if(debug){Serial.println(" !!!!!! ROBOT HAS ARRIVED AT " + coordinate);}
       foundCoord = true;
     }
   }
@@ -413,10 +457,10 @@ void goToStartingPoint() {
       //TEST COORDS - Dit is voor nu hardcoded, 
       // dit moet volledig worden weggehaald wanneer coordinaat ontvangen
       // vanaf Java compleet is
-      Serial.println("SENDING TEST COORDS");
-      sendToCoord("5.5");
-      sendToCoord("3.3");
-      sendToCoord("1.1");
+      // if(debug){Serial.println("SENDING TEST COORDS");}
+      // sendToCoord("5.5");
+      // sendToCoord("3.3");
+      // sendToCoord("1.1");
 
       // ---    
 
@@ -478,9 +522,8 @@ String receivedFromSlave() {
   //This should be called on a master device after a call to requestFrom() or on a slave inside the onReceive() handler.
   while (Wire.available()) {
     message = String(message + (char)Wire.read());
-    // Serial.print(message);
   }
-  Serial.println(message);
+  if(debug){Serial.println(message);}
 
   //   Writes the ("stuff here") on the serial monitor
   if (message.endsWith("yLimY")) {
@@ -531,9 +574,8 @@ String receiveMotorCommandFromSlave() {
   //This should be called on a master device after a call to requestFrom() or on a slave inside the onReceive() handler.
   while (Wire.available()) {
     message = String(message + (char)Wire.read());
-    // Serial.print(message);
   }
-  Serial.println(message);
+  if(debug){Serial.println(message);}
 
   return message;
 }

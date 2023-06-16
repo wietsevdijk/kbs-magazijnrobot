@@ -20,7 +20,7 @@ public class RobotCommands implements SerialPortDataListener {
     private int arduinoDelay = 50;
 
     public RobotCommands(){
-        sp = SerialPort.getCommPort("COM6"); // selecteer je gebruikte COM port
+        sp = SerialPort.getCommPort("COM4"); // selecteer je gebruikte COM port
         sp.setComPortParameters(9600, 8, 1, 0); //Set Serial baudrate
         sp.setComPortTimeouts(SerialPort.TIMEOUT_NONBLOCKING, 0, 0); //timeouts uitzetten
 
@@ -49,7 +49,7 @@ public class RobotCommands implements SerialPortDataListener {
                     //System.out.println(message);
                     //op dit punt moet er iets gebeuren met de message
                     setMessage(parseReceivedMessage(localMessage)); //stel message in voor object
-                    System.out.println(message);
+                    System.out.println("ARDUINO RESPONSE: \"" + message + "\"");
                     localMessage = "";
                     //System.out.println("MESSAGE MODE DISABLED");
                     buildUpMessage = false;

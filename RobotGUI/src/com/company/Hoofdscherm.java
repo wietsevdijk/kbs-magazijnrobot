@@ -177,13 +177,14 @@ public class Hoofdscherm extends JFrame {
                 try {
                     rc.sendCommandMode(sp, "COORDS");
 
-                    if(rc.getMessage().equals("modustrue")){
-                        System.out.println("modus is aan");
+                    if(rc.getMessage().equals("Command mode enabled")){
+                        System.out.println("modus is goed");
+                        rc.sendCommandMode(sp, "3.3");
                         //rc.setMessage("");
                     }
 
-                    if(rc.getMessage().equals("modusfalse")){;
-                        System.out.println("modus is uit");
+                    if(rc.getMessage().equals("in Case Coordinaten")){;
+                        System.out.println("toppie");
                         //rc.setMessage("");
                     }
 
