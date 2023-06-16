@@ -41,6 +41,10 @@ int testPakketNummer = 1;
 int findX = 1;
 int findY = 5;
 
+//Location for the end point
+int endX = 4700;
+int endY = 160;
+
 
 //byte for communication between arduino's
 byte x;
@@ -51,7 +55,7 @@ String command = "";
 //Int to store pulses from encoder
 volatile int Count_pulses_x = 0;
 volatile int Count_pulses_y = 0;
-volatile int distanceZ;
+volatile float distanceZ;
 
 int dirX;
 int dirY;
@@ -230,11 +234,15 @@ void slideOut(int pakketNummer) {
 }
 
 void slideIn() {
-  while (Read_z_encoder() >= 6) {
+  while (Read_z_encoder() >= 6.6) {
     digitalWrite(directionZ, HIGH);
     digitalWrite(brakeZ, LOW);
     analogWrite(pwmZ, 200);
+    Serial.print("Z: ");
+    Serial.println(Read_z_encoder());
   }
+    Serial.print("ENDED AT: ");
+    Serial.println(Read_z_encoder());
     digitalWrite(brakeZ, HIGH);
 }
 
@@ -249,6 +257,19 @@ void pickUp() {
 }
 
 void moveToEnd() {
+
+  while(Count_pulses_x < endX){
+    moveRight();
+  } 
+  stopMoving();
+
+  while(Count_pulses_y > endY){
+    moveDown();
+  } 
+  stopMoving();
+
+
+Serial.println("----- ARRIVED AT END -----");
 
 }
 
@@ -338,7 +359,7 @@ void loop() {
       digitalWrite(directionZ, LOW);
       digitalWrite(brakeZ, LOW);
       analogWrite(pwmZ, 200);
-    } else if (command.equals("ACHTER") && distanceZ > 6) {  //STUUR NAAR ACHTER
+    } else if (command.equals("ACHTER") && distanceZ > 6.7) {  //STUUR NAAR ACHTER
       digitalWrite(directionZ, HIGH);
       digitalWrite(brakeZ, LOW);
       analogWrite(pwmZ, 200);
@@ -450,6 +471,10 @@ void loop() {
       slideIn();
       sendArrived();
       testPakketNummer++;
+    }
+
+    if(testPakketNummer == 4){
+      moveToEnd();
     }
 
   }
