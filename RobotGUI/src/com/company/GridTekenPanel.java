@@ -112,8 +112,8 @@ public class GridTekenPanel extends JPanel {
             int maxXpixel = (xsize * maxX) - 10;
             int maxYpixel = (ysize * maxY) + 1;
             for(Coordinaat coordinaat: coordinaten) {
-                int x_positie = (((maxXpixel / maxX) * coordinaat.getX_as()) + (coordinaat.getX_as() * 2)) - 70;
-                int y_positie = (maxYpixel - ((maxYpixel / maxY) * coordinaat.getY_as())) + 60;
+                int x_positie = ((maxXpixel / maxX) * coordinaat.getX_as()) - (xsize / 2);
+                int y_positie = maxYpixel - (((maxYpixel / maxY) * coordinaat.getY_as()) - (ysize / 2));
                 g.drawString(".", x_positie, y_positie);
             }
         }
