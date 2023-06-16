@@ -175,16 +175,22 @@ public class Hoofdscherm extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    rc.sendCommandMode(sp);
+                    rc.sendCommandMode(sp, "COORDS");
+
                     if(rc.getMessage().equals("modustrue")){
                         System.out.println("modus is aan");
-                        rc.setMessage("");
+                        //rc.setMessage("");
                     }
 
-                    if(rc.getMessage().equals("modusfalse")){
+                    if(rc.getMessage().equals("modusfalse")){;
                         System.out.println("modus is uit");
-                        rc.setMessage("");
+                        //rc.setMessage("");
                     }
+
+                    if(rc.getMessage().equals("")){
+                        System.out.println("Geen reactie van Arduino");
+                    }
+
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }

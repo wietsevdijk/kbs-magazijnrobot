@@ -14,8 +14,10 @@ import java.util.Scanner;
 public class RobotCommands implements SerialPortDataListener {
     SerialPort sp;
     private String message = "";
+    private String localMessage = "";
     private boolean buildUpMessage;
     private String receivedData;
+    private int arduinoDelay = 50;
 
     public RobotCommands(){
         sp = SerialPort.getCommPort("COM6"); // selecteer je gebruikte COM port
@@ -33,22 +35,23 @@ public class RobotCommands implements SerialPortDataListener {
                 receivedData = new String(event.getReceivedData());
 
                 if(receivedData.startsWith("-")){ //Check of bericht starting prefix heeft
+                    message = ""; // Clear eerst globaal message attribuut
                     buildUpMessage = true; //Zo ja, sta bericht opbouwen toe
-                    System.out.println("MESSAGE MODE ENABLED");
+                    //System.out.println("MESSAGE MODE ENABLED");
                 }
 
-                if(buildUpMessage = true) {
-                    System.out.println("RECEIVED DATA");
-                    message += receivedData;
+                if(buildUpMessage) {
+                    //System.out.println("RECEIVED DATA");
+                    localMessage += receivedData;
                 }
 
                 if(receivedData.endsWith(";")){
-                    System.out.println(message);
+                    //System.out.println(message);
                     //op dit punt moet er iets gebeuren met de message
-                    setMessage(parseReceivedMessage(message)); //stel message in voor object
+                    setMessage(parseReceivedMessage(localMessage)); //stel message in voor object
                     System.out.println(message);
-                    message = "";
-                    System.out.println("MESSAGE MODE DISABLED");
+                    localMessage = "";
+                    //System.out.println("MESSAGE MODE DISABLED");
                     buildUpMessage = false;
                 }
             }
@@ -67,7 +70,7 @@ public class RobotCommands implements SerialPortDataListener {
 
     }
 
-    
+
 
     public SerialPort openSP() {
         sp.openPort();
@@ -83,15 +86,18 @@ public class RobotCommands implements SerialPortDataListener {
             byte[] bytes;
             bytes = location.getBytes(StandardCharsets.UTF_8); //Zet string om naar bytes en stuurt naar arduino
             sp.getOutputStream().write(bytes);
-            System.out.println("Send location: " + location);
+            System.out.println("Sent location: " + location);
 
     }
 
-    public void sendCommandMode(SerialPort sp) throws IOException {
+    public void sendCommandMode(SerialPort sp, String mode) throws IOException {
         getSp().openPort();
             byte[] bytes;
-            bytes = "COORDS".getBytes(StandardCharsets.UTF_8); //Zet string om naar bytes en stuurt naar arduino
+            bytes = mode.getBytes(StandardCharsets.UTF_8); //Zet string om naar bytes en stuurt naar arduino
             sp.getOutputStream().write(bytes);
+
+        //wachten voor reactie
+        sleepWithDelay();
     }
 
     public void moveRobotUp(SerialPort sp) throws IOException {
@@ -146,10 +152,33 @@ public class RobotCommands implements SerialPortDataListener {
     }
 
     public String getMessage() {
+
         return message;
     }
 
     public void setMessage(String message) {
         this.message = message;
     }
+
+    //Functie om te wachten voor een bepaalde tijd,
+    //nodig omdat de Arduino een delay heeft voordat hij een reactie teruggeeft
+    //Het wachten zorgt ervoor dat het "message" attribuut altijd up-to-date is
+    private void sleepWithDelay() {
+        try {
+            Thread.sleep(arduinoDelay);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } //Afhandelen van de Exception in de methode zelf zorgt ervoor dat hij makkelijker overal aan te roepen is
+    }
+
+    //Wachten met handmatig meegegeven delay
+    private void sleepWithDelay(int delayInMs) {
+        try {
+            Thread.sleep(delayInMs);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } //Afhandelen van de Exception in de methode zelf zorgt ervoor dat hij makkelijker overal aan te roepen is
+    }
+
+
 }

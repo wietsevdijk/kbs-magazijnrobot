@@ -15,7 +15,7 @@ void setup() {
   lcd.clear();
   pinMode(LED, OUTPUT);
   Serial.begin(9600);
-  Serial.setTimeout(100);
+  Serial.setTimeout(10);
 
   while (!Serial) {
     ;  // wait for serial port to connect.
@@ -23,11 +23,12 @@ void setup() {
 
   lcd.setCursor(0, 0);
   lcd.print("Init done");
-  delay(1000);
+  //delay(1000);
   lcd.clear();
 }
 
 void sendToHMI(String input) {
+  //Add start and end character to input
   input = ("-" + input + ";");
   response = input;
 }
@@ -44,15 +45,17 @@ void loop() {
 
   if (HMIcommand == "COORDS") {
 
-      if(coordMode == false){
-      sendToHMI("modustrue");
-      coordMode = true;
-      }
+      // if(coordMode == false){
+      // sendToHMI("modustrue");
+      // coordMode = true;
+      // }
 
-      if(coordMode == true){
-        sendToHMI("modusfalse");
-        coordMode = false;
-      }
+      // if(coordMode == true){
+      //   sendToHMI("modusfalse");
+      //   coordMode = false;
+      // }
+
+      sendToHMI("modustrue");
 
     }
 
@@ -69,5 +72,6 @@ void loop() {
   }
 
   lcd.print(HMIcommand);
+  //Send response to HMI
   Serial.print(response);
 }
