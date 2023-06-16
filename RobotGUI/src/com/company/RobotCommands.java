@@ -22,39 +22,6 @@ public class RobotCommands implements SerialPortDataListener {
         sp.setComPortParameters(9600, 8, 1, 0); //Set Serial baudrate
         sp.setComPortTimeouts(SerialPort.TIMEOUT_NONBLOCKING, 0, 0); //timeouts uitzetten
 
-        /*
-        sp.addDataListener(new SerialPortDataListener() {
-            @Override
-            public int getListeningEvents() {
-                return SerialPort.LISTENING_EVENT_DATA_AVAILABLE;
-            }
-
-            @Override
-            public void serialEvent(SerialPortEvent event) {
-                if (event.getEventType() != SerialPort.LISTENING_EVENT_DATA_AVAILABLE)
-                    return;
-                byte[] newData = new byte[sp.bytesAvailable()];
-                int numRead = sp.readBytes(newData, newData.length);
-                System.out.println("Read " + numRead + " bytes.");
-            }
-        });
-         */
-
-        /*
-        sp.addDataListener(new SerialPortDataListener() {
-            @Override
-            public int getListeningEvents() {
-                return SerialPort.LISTENING_EVENT_DATA_WRITTEN;
-            }
-
-            @Override
-            public void serialEvent(SerialPortEvent event) {
-                if (event.getEventType() == SerialPort.LISTENING_EVENT_DATA_WRITTEN)
-                    System.out.println("All bytes were successfully transmitted!");
-            }
-        });
-         */
-
         sp.addDataListener(new SerialPortDataListener() {
             @Override
             public int getListeningEvents() {
@@ -100,12 +67,7 @@ public class RobotCommands implements SerialPortDataListener {
 
     }
 
-
-
-
-    public void handleResponse(String response) {
-        System.out.println(response);
-    }
+    
 
     public SerialPort openSP() {
         sp.openPort();
