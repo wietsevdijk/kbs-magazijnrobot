@@ -111,7 +111,7 @@ public class TSPtestscherm extends JFrame implements ActionListener {
                     breedteMagazijn = Integer.parseInt(breedteMagazijnField.getText());
                     hoogteMagazijn = Integer.parseInt(hoogteMagazijnField.getText());
                 }
-                if(aantalCoordinaten != 0 && breedteMagazijn != 0 && hoogteMagazijn != 0) {
+                if(aantalCoordinaten > 0 && aantalCoordinaten < 100 && breedteMagazijn > 0 && breedteMagazijn < 100 && hoogteMagazijn > 0 && hoogteMagazijn < 100) {
                     TSPAlgoritme algoritme = new TSPAlgoritme(breedteMagazijn, hoogteMagazijn, aantalCoordinaten);
                     gridPanel = new GridTekenPanel(breedteMagazijn, hoogteMagazijn, 600, 600);
                     panel.add(gridPanel);
