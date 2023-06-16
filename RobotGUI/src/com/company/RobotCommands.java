@@ -78,6 +78,8 @@ public class RobotCommands implements SerialPortDataListener {
                 if(receivedData.endsWith(";")){
                     System.out.println(message);
                     //op dit punt moet er iets gebeuren met de message
+                    setMessage(parseReceivedMessage(message)); //stel message in voor object
+                    System.out.println(message);
                     message = "";
                     System.out.println("MESSAGE MODE DISABLED");
                     buildUpMessage = false;
@@ -173,6 +175,12 @@ public class RobotCommands implements SerialPortDataListener {
             System.out.println("Failed to open port :(");
         }
         return sp;
+    }
+
+    public String parseReceivedMessage(String receivedMessage){
+        receivedMessage = receivedMessage.replace("-", "");
+        receivedMessage = receivedMessage.replace(";", "");
+        return receivedMessage;
     }
 
     public String getMessage() {

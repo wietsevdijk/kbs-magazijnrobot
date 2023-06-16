@@ -176,12 +176,12 @@ public class Hoofdscherm extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 try {
                     rc.sendCommandMode(sp);
-                    if(rc.getMessage().endsWith("modustrue")){
+                    if(rc.getMessage().equals("modustrue")){
                         System.out.println("modus is aan");
                         rc.setMessage("");
                     }
 
-                    if(rc.getMessage().endsWith("modusfalse")){
+                    if(rc.getMessage().equals("modusfalse")){
                         System.out.println("modus is uit");
                         rc.setMessage("");
                     }
