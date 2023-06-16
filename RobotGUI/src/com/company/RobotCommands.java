@@ -61,7 +61,7 @@ public class RobotCommands implements SerialPortDataListener {
 
             @Override
             public void serialEvent(SerialPortEvent event) {
-                message += new String(event.getReceivedData());
+                message = new String(event.getReceivedData());
                 System.out.println(message);
             }
         });
