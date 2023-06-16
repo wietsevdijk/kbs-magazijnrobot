@@ -11,17 +11,17 @@ public class TSPtestscherm extends JFrame implements ActionListener {
 
     private JPanel panel;
     private JPanel gridPanel;
-    private static JTextField aantalCoordinatenField;
-    private static int aantalCoordinaten = 0;
-    private static JTextField breedteMagazijnField;
-    private static int breedteMagazijn = 0;
-    private static JTextField hoogteMagazijnField;
-    private static int hoogteMagazijn = 0;
-    private static JButton goKnop;
-    private static JLabel inputText;
-    private static JLabel outputText;
-    private static JLabel afstandText;
-    private static JLabel tijdText;
+    private JTextField aantalCoordinatenField;
+    private int aantalCoordinaten = 0;
+    private JTextField breedteMagazijnField;
+    private int breedteMagazijn = 0;
+    private JTextField hoogteMagazijnField;
+    private int hoogteMagazijn = 0;
+    private JButton goKnop;
+    private JLabel inputText;
+    private JLabel outputText;
+    private JLabel afstandText;
+    private JLabel tijdText;
     private boolean allesIngevuld;
     private SpringLayout springLayout;
     public TSPtestscherm() {
