@@ -10,7 +10,7 @@ import java.util.Objects;
 public class TSPtestscherm extends JFrame implements ActionListener {
 
     private JPanel panel;
-    private JPanel gridPanel;
+    private GridTekenPanel gridPanel;
     private JTextField aantalCoordinatenField;
     private int aantalCoordinaten = 0;
     private JTextField breedteMagazijnField;
@@ -34,7 +34,7 @@ public class TSPtestscherm extends JFrame implements ActionListener {
         panel.setPreferredSize(new Dimension(650, 100));
         panel.setLayout(new SpringLayout());
 
-        gridPanel = new JPanel();
+        gridPanel = new GridTekenPanel(0,0,0,0);
         add(panel);
         panel.add(gridPanel);
 
@@ -120,11 +120,11 @@ public class TSPtestscherm extends JFrame implements ActionListener {
                 }
                 if(aantalCoordinaten > 0 && aantalCoordinaten < 100 && breedteMagazijn > 0 && breedteMagazijn < 100 && hoogteMagazijn > 0 && hoogteMagazijn < 100) {
                     TSPAlgoritme algoritme = new TSPAlgoritme(breedteMagazijn, hoogteMagazijn, aantalCoordinaten);
-                    gridPanel = new GridTekenPanel(breedteMagazijn, hoogteMagazijn, 600, 600);
+                    gridPanel = new GridTekenPanel(breedteMagazijn, hoogteMagazijn, 600, 600, algoritme.getVolgorde());
+                    gridPanel.setTSPtest(true);
                     panel.add(gridPanel);
                     springLayout.putConstraint(SpringLayout.NORTH, gridPanel, 165, SpringLayout.NORTH, panel);
                     springLayout.putConstraint(SpringLayout.WEST, gridPanel, 15, SpringLayout.WEST, panel);
-
                     String input = algoritme.toStringBegincoordinaten();
                     inputText.setText(input);
                     String output = algoritme.toStringVolgorde();

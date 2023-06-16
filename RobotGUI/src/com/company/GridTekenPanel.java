@@ -6,6 +6,8 @@ import java.util.ArrayList;
 public class GridTekenPanel extends JPanel {
 
     private boolean isTSPLine;
+    private boolean TSPtest;
+    private ArrayList<Coordinaat> coordinaten;
     private int maxY;
     private int maxX;
     public int vak1;
@@ -26,6 +28,17 @@ public class GridTekenPanel extends JPanel {
         setPreferredSize(new Dimension(breedte, hoogte));
     }
 
+    public GridTekenPanel(int aantalX, int aantalY, int breedte, int hoogte, ArrayList<Coordinaat> coordinaten) {
+        this.coordinaten = new ArrayList<>();
+        this.coordinaten.addAll(coordinaten);
+        maxX = aantalX;
+        maxY = aantalY;
+
+        plekken = new ArrayList<>(aantalX * aantalY);
+
+        setPreferredSize(new Dimension(breedte, hoogte));
+    }
+
     //Berekent afstand tussen 2 locaties in de grid
     public double distanceTo(int currentX, int currentY, int xLocation, int yLocation){
         int xDistance = Math.abs(currentX) - xLocation;
@@ -38,6 +51,10 @@ public class GridTekenPanel extends JPanel {
 
     public void setTSPLine(boolean TSPLine) {
         isTSPLine = TSPLine;
+    }
+
+    public void setTSPtest(boolean TSPtest) {
+        this.TSPtest = TSPtest;
     }
 
     public boolean isTSPLine() {
@@ -86,6 +103,13 @@ public class GridTekenPanel extends JPanel {
                 plekken.add(plek);
 
                 g.fillRect(xstart, ystart, xsize, ysize);
+            }
+        }
+
+        if(TSPtest) {
+            g.setColor(Color.RED);
+            g.setFont(new Font("Courier New", Font.BOLD, 30));
+            for(Coordinaat coordinaat: coordinaten) {
             }
         }
 
