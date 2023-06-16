@@ -5,17 +5,18 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class TSPtestscherm extends JFrame implements ActionListener {
 
     private JPanel panel;
     private JPanel gridPanel;
     private static JTextField aantalCoordinatenField;
-    private static int aantalCoordinaten;
+    private static int aantalCoordinaten = 0;
     private static JTextField breedteMagazijnField;
-    private static int breedteMagazijn;
+    private static int breedteMagazijn = 0;
     private static JTextField hoogteMagazijnField;
-    private static int hoogteMagazijn;
+    private static int hoogteMagazijn = 0;
     private static JButton goKnop;
     private static JLabel inputText;
     private static JLabel outputText;
@@ -105,25 +106,29 @@ public class TSPtestscherm extends JFrame implements ActionListener {
         goKnop.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 panel.remove(gridPanel);
-                aantalCoordinaten = Integer.parseInt(aantalCoordinatenField.getText());
-                breedteMagazijn = Integer.parseInt(breedteMagazijnField.getText());
-                hoogteMagazijn = Integer.parseInt(hoogteMagazijnField.getText());
-                TSPAlgoritme algoritme = new TSPAlgoritme(breedteMagazijn, hoogteMagazijn, aantalCoordinaten);
-                gridPanel = new GridTekenPanel(breedteMagazijn, hoogteMagazijn, 600, 600);
-                panel.add(gridPanel);
-                springLayout.putConstraint(SpringLayout.NORTH, gridPanel, 165, SpringLayout.NORTH, panel);
-                springLayout.putConstraint(SpringLayout.WEST, gridPanel, 15, SpringLayout.WEST, panel);
+                if(!Objects.equals(aantalCoordinatenField.getText(), "") && !Objects.equals(breedteMagazijnField.getText(), "") && !Objects.equals(hoogteMagazijnField.getText(), "")) {
+                    aantalCoordinaten = Integer.parseInt(aantalCoordinatenField.getText());
+                    breedteMagazijn = Integer.parseInt(breedteMagazijnField.getText());
+                    hoogteMagazijn = Integer.parseInt(hoogteMagazijnField.getText());
+                }
+                if(aantalCoordinaten != 0 && breedteMagazijn != 0 && hoogteMagazijn != 0) {
+                    TSPAlgoritme algoritme = new TSPAlgoritme(breedteMagazijn, hoogteMagazijn, aantalCoordinaten);
+                    gridPanel = new GridTekenPanel(breedteMagazijn, hoogteMagazijn, 600, 600);
+                    panel.add(gridPanel);
+                    springLayout.putConstraint(SpringLayout.NORTH, gridPanel, 165, SpringLayout.NORTH, panel);
+                    springLayout.putConstraint(SpringLayout.WEST, gridPanel, 15, SpringLayout.WEST, panel);
 
-                String input = algoritme.toStringBegincoordinaten();
-                inputText.setText(input);
-                String output = algoritme.toStringVolgorde();
-                outputText.setText(output);
-                String afstand = algoritme.toStringAfstand();
-                afstandText.setText(afstand);
-                String tijd = algoritme.toStringTijd();
-                tijdText.setText(tijd);
-                panel.revalidate();
-                panel.repaint();
+                    String input = algoritme.toStringBegincoordinaten();
+                    inputText.setText(input);
+                    String output = algoritme.toStringVolgorde();
+                    outputText.setText(output);
+                    String afstand = algoritme.toStringAfstand();
+                    afstandText.setText(afstand);
+                    String tijd = algoritme.toStringTijd();
+                    tijdText.setText(tijd);
+                    panel.revalidate();
+                    panel.repaint();
+                }
             }
         });
     }
