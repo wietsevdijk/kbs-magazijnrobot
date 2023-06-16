@@ -33,9 +33,17 @@ int x_position_old [6] = {0, 30, 730, 1431, 2145, 2841}; //oude posities voordat
 int x_position [6] = {0, 80, 770, 1470, 2170, 2870};
 int y_position [6] = {0, 2251, 1737, 1233, 715, 185};
 
+
+//TEST
+int testPakketNummer = 1;
+
 //Coordinates to find when homing
 int findX = 1;
 int findY = 5;
+
+//Location for the end point
+int endX = 4700;
+int endY = 160;
 
 
 //byte for communication between arduino's
@@ -47,7 +55,7 @@ String command = "";
 //Int to store pulses from encoder
 volatile int Count_pulses_x = 0;
 volatile int Count_pulses_y = 0;
-volatile int distanceZ;
+volatile float distanceZ;
 
 int dirX;
 int dirY;
@@ -207,15 +215,61 @@ void recieveMode() {
   }
 }
 
-void slideOut() {
-  if (Read_z_encoder() < 18) {
+//NOTE: Bij de slide functies moet Read_z_encoder() opnieuw worden aangeroepen
+//i.p.v. distanceZ gebruiken, omdat deze tijdens het zoeken van een coordinaat niet
+//globaal wordt aangeroepen
+void slideOut(int pakketNummer) {
+  int slideOutTarget = 18; //standaardwaarde, schuift arm helemaal uit
+
+  //voor nummers 2 en 3, schuif minder ver uit:
+  if(pakketNummer == 2){slideOutTarget = 14;} 
+  if(pakketNummer == 3){slideOutTarget = 10;} 
+
+  while (Read_z_encoder() < slideOutTarget) {
     digitalWrite(directionZ, LOW);
     digitalWrite(brakeZ, LOW);
     analogWrite(pwmZ, 200);
-  } else {
-    digitalWrite(brakeZ, HIGH);
-    analogWrite(pwmZ, 0);
   }
+    digitalWrite(brakeZ, HIGH);
+}
+
+void slideIn() {
+  while (Read_z_encoder() >= 6.6) {
+    digitalWrite(directionZ, HIGH);
+    digitalWrite(brakeZ, LOW);
+    analogWrite(pwmZ, 200);
+    Serial.print("Z: ");
+    Serial.println(Read_z_encoder());
+  }
+    Serial.print("ENDED AT: ");
+    Serial.println(Read_z_encoder());
+    digitalWrite(brakeZ, HIGH);
+}
+
+void pickUp() {
+  //Bepaal hoever robot moet bewegen
+  int pickUpTarget = (Count_pulses_y + 100);
+
+  while(Count_pulses_y < pickUpTarget){
+    moveUp();
+  } 
+  stopMoving();
+}
+
+void moveToEnd() {
+
+  while(Count_pulses_x < endX){
+    moveRight();
+  } 
+  stopMoving();
+
+  while(Count_pulses_y > endY){
+    moveDown();
+  } 
+  stopMoving();
+
+
+Serial.println("----- ARRIVED AT END -----");
 
 }
 
@@ -305,7 +359,7 @@ void loop() {
       digitalWrite(directionZ, LOW);
       digitalWrite(brakeZ, LOW);
       analogWrite(pwmZ, 200);
-    } else if (command.equals("ACHTER") && distanceZ > 6) {  //STUUR NAAR ACHTER
+    } else if (command.equals("ACHTER") && distanceZ > 6.7) {  //STUUR NAAR ACHTER
       digitalWrite(directionZ, HIGH);
       digitalWrite(brakeZ, LOW);
       analogWrite(pwmZ, 200);
@@ -325,11 +379,6 @@ void loop() {
 
   //recieve mode
   recieveMode();
-
-  //slide out
-  if (command.equals("UITSCHUIVEN")) {
-    slideOut();
-  }
 
   // //Get state of limit switch on X-axis and do something
   int stateX = limitSwitchX.getState();
@@ -415,7 +464,17 @@ void loop() {
     goToY(Y);
 
     if(foundXPos && foundYPos){
+      slideOut(testPakketNummer);
+      delay(500); //TODO: HAAL WEG
+      pickUp();
+      delay(500); //TODO: HAAL WEG
+      slideIn();
       sendArrived();
+      testPakketNummer++;
+    }
+
+    if(testPakketNummer == 4){
+      moveToEnd();
     }
 
   }
