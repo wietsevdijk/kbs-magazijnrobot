@@ -33,6 +33,7 @@ int x_position_old [6] = {0, 30, 730, 1431, 2145, 2841}; //oude posities voordat
 int x_position [6] = {0, 80, 770, 1470, 2170, 2870};
 int y_position [6] = {0, 2251, 1737, 1233, 715, 185};
 
+
 //TEST
 int testPakketNummer = 1;
 
@@ -51,8 +52,6 @@ String command = "";
 volatile int Count_pulses_x = 0;
 volatile int Count_pulses_y = 0;
 volatile int distanceZ;
-
-int pickUpTarget;
 
 int dirX;
 int dirY;
@@ -241,14 +240,16 @@ void slideIn() {
 
 void pickUp() {
   //Bepaal hoever robot moet bewegen
-  pickUpTarget = (Count_pulses_y + 100);
+  int pickUpTarget = (Count_pulses_y + 100);
 
   while(Count_pulses_y < pickUpTarget){
     moveUp();
   } 
-
   stopMoving();
-  
+}
+
+void moveToEnd() {
+
 }
 
 //functions to send X and Y movement commands to master

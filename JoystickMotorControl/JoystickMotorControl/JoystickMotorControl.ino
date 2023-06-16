@@ -414,9 +414,9 @@ void goToStartingPoint() {
       // dit moet volledig worden weggehaald wanneer coordinaat ontvangen
       // vanaf Java compleet is
       Serial.println("SENDING TEST COORDS");
-      sendToCoord("2.4");
+      sendToCoord("5.5");
       sendToCoord("3.3");
-      sendToCoord("4.2");
+      sendToCoord("1.1");
 
       // ---    
 
