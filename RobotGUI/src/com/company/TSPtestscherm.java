@@ -22,6 +22,7 @@ public class TSPtestscherm extends JFrame implements ActionListener {
     private static JLabel outputText;
     private static JLabel afstandText;
     private static JLabel tijdText;
+    private boolean allesIngevuld;
     private SpringLayout springLayout;
     public TSPtestscherm() {
         setTitle("TSP Testscherm");
@@ -110,6 +111,12 @@ public class TSPtestscherm extends JFrame implements ActionListener {
                     aantalCoordinaten = Integer.parseInt(aantalCoordinatenField.getText());
                     breedteMagazijn = Integer.parseInt(breedteMagazijnField.getText());
                     hoogteMagazijn = Integer.parseInt(hoogteMagazijnField.getText());
+                    allesIngevuld = true;
+                } else {
+                    allesIngevuld = false;
+                    aantalCoordinaten = 0;
+                    breedteMagazijn = 0;
+                    hoogteMagazijn = 0;
                 }
                 if(aantalCoordinaten > 0 && aantalCoordinaten < 100 && breedteMagazijn > 0 && breedteMagazijn < 100 && hoogteMagazijn > 0 && hoogteMagazijn < 100) {
                     TSPAlgoritme algoritme = new TSPAlgoritme(breedteMagazijn, hoogteMagazijn, aantalCoordinaten);
@@ -126,6 +133,26 @@ public class TSPtestscherm extends JFrame implements ActionListener {
                     afstandText.setText(afstand);
                     String tijd = algoritme.toStringTijd();
                     tijdText.setText(tijd);
+                    panel.revalidate();
+                    panel.repaint();
+                } else {
+                    String foutmelding = "Alle waarden moeten tussen de 1 en 99 zijn!";
+                    inputText.setText(foutmelding);
+                    outputText.setText("");
+                    afstandText.setText("");
+                    tijdText.setText("");
+                    panel.revalidate();
+                    panel.repaint();
+                }
+                if(!allesIngevuld) {
+                    String foutmelding = "Alles moet worden ingevuld!";
+                    inputText.setText(foutmelding);
+                    aantalCoordinaten = 0;
+                    breedteMagazijn = 0;
+                    hoogteMagazijn = 0;
+                    outputText.setText("");
+                    afstandText.setText("");
+                    tijdText.setText("");
                     panel.revalidate();
                     panel.repaint();
                 }
