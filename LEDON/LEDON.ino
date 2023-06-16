@@ -1,0 +1,77 @@
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>       // LiquidCrystal_I2C library
+LiquidCrystal_I2C lcd(0x27, 20, 4);  // 0x27 is the i2c address of the LCM1602 IIC v1 module (might differ)
+
+#define LED 6
+byte receivedChar;
+bool coordMode = false;
+
+String response;
+
+void setup() {
+  // put your setup code here, to run once:
+  lcd.init();  // initialize the lcd
+  lcd.backlight();
+  lcd.clear();
+  pinMode(LED, OUTPUT);
+  Serial.begin(9600);
+  Serial.setTimeout(10);
+
+  while (!Serial) {
+    ;  // wait for serial port to connect.
+  }
+
+  lcd.setCursor(0, 0);
+  lcd.print("Init done");
+  //delay(1000);
+  lcd.clear();
+}
+
+void sendToHMI(String input) {
+  //Add start and end character to input
+  input = ("-" + input + ";");
+  response = input;
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  String HMIcommand = "";  //convert decimal bytes to String
+  response = ""; //clear response every loop
+  if (Serial.available()) {
+    // wait a bit for the entire message to arrive
+    HMIcommand = String(Serial.readString());
+  
+  }
+
+  if (HMIcommand == "COORDS") {
+
+      // if(coordMode == false){
+      // sendToHMI("modustrue");
+      // coordMode = true;
+      // }
+
+      // if(coordMode == true){
+      //   sendToHMI("modusfalse");
+      //   coordMode = false;
+      // }
+
+      sendToHMI("modustrue");
+
+    }
+
+  if (HMIcommand == "DOWN") {
+    response = "omlaag";
+  }
+
+  if (HMIcommand == "LEFT") {
+    response = "links";
+  }
+
+  if (HMIcommand == "RIGHT") {
+    response = "rechts";
+  }
+
+  lcd.print(HMIcommand);
+  //Send response to HMI
+  Serial.print(response);
+}

@@ -45,11 +45,13 @@ public class Artikelscherm {
         goToLocation.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                /*
                 try {
-                    rc.moveRobotToLocation(sp,productlocatie);
+                   rc.moveRobotToLocation(sp,productlocatie);
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
+                */
             }
         });
 

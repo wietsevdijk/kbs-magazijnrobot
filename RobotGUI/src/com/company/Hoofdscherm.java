@@ -6,6 +6,7 @@ import java.awt.event.*;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Scanner;
 
 import com.fazecast.jSerialComm.*;
@@ -17,13 +18,14 @@ public class Hoofdscherm extends JFrame {
     ArrayList<Klant> klanten = db.retrieveAllCustomers();
     ArrayList<Product> producten = db.retrieveAllProducts();
     ArrayList<Order> orders = db.retrieveAllOrders(producten);
-
+    boolean coordModus;
 
 
     Artikelscherm as = new Artikelscherm();
     RobotCommands rc = new RobotCommands();
     DBLocationToHMILocation DBtoHMI = new DBLocationToHMILocation();
-    SerialPort sp = rc.getSp();
+
+    SerialPort sp = rc.openSP();
     GridTekenPanel grid;
 
     private Color DarkGreen = new Color(0, 205, 0);
@@ -44,6 +46,7 @@ public class Hoofdscherm extends JFrame {
 
     public Hoofdscherm() throws SQLException {
         addStartScherm("HMI Startscherm", 1250, 450);
+
     }
 
     public void addStartScherm(String titel, int breedte, int hoogte) {
@@ -51,6 +54,7 @@ public class Hoofdscherm extends JFrame {
         setTitle(titel);
         setSize(breedte, hoogte);
         setResizable(false);
+        requestFocus();
 
         setLayout(new GridLayout(1, 3)); //Zet de layout klaar voor 3 panels
 
@@ -164,6 +168,36 @@ public class Hoofdscherm extends JFrame {
             }
         });
 
+        JButton coordMode = new JButton("Coord Mode");
+        buttonpanel.add(coordMode);
+
+        coordMode.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    rc.sendCommandMode(sp, "COORDS");
+
+                    if(rc.getMessage().equals("modustrue")){
+                        System.out.println("modus is aan");
+                        //rc.setMessage("");
+                    }
+
+                    if(rc.getMessage().equals("modusfalse")){;
+                        System.out.println("modus is uit");
+                        //rc.setMessage("");
+                    }
+
+                    if(rc.getMessage().equals("")){
+                        System.out.println("Geen reactie van Arduino");
+                    }
+
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
+
         //doet nog niks. moet later een command sturen naar robot op producten op te halen
         JButton orderOphalen = new JButton("Producten ophalen");
         buttonpanel.add(orderOphalen);
@@ -171,7 +205,14 @@ public class Hoofdscherm extends JFrame {
         orderOphalen.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                db.shipOrder(db.getOrderID());
+                ArrayList<String> productLocaties = db.getProductLocatie(db.getOrderID());
+                try {
+                    rc.sendLocation(sp, "test");
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+
+                //db.shipOrder(db.getOrderID());
             }
         });
 
@@ -247,15 +288,9 @@ public class Hoofdscherm extends JFrame {
                 @Override
                 public void keyPressed(KeyEvent event) {
                     if (event.getKeyCode() == KeyEvent.VK_UP) {
-                        System.out.println("UP");
                         if (sp.openPort()) { // opent de port
                             try {
                                 rc.moveRobotUp(rc.getSp()); // stuurt commando over port
-                                Scanner data = new Scanner(rc.getSp().getInputStream()); // Krijgt iets terug van de serial
-                                while (data.hasNextLine()) {
-                                    //print vanuit de arduino serial MAAR loopt één commando achter EN werkt heel langzaam
-                                    System.out.println(data.nextLine());
-                                }
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -263,14 +298,9 @@ public class Hoofdscherm extends JFrame {
                     }
 
                     if (event.getKeyCode() == KeyEvent.VK_DOWN) {
-                        System.out.println("DOWN");
                         if (sp.openPort()) { // opent de port
                             try {
                                 rc.moveRobotDown(rc.getSp()); // stuurt commando over port
-                                Scanner data = new Scanner(rc.getSp().getInputStream());
-                                while (data.hasNextLine()) {
-                                    System.out.println(data.nextLine());
-                                }
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -278,14 +308,9 @@ public class Hoofdscherm extends JFrame {
                     }
 
                     if (event.getKeyCode() == KeyEvent.VK_LEFT) {
-                        System.out.println("LEFT");
                         if (sp.openPort()) { // opent de port
                             try {
                                 rc.moveRobotLeft(rc.getSp()); // stuurt commando over port
-                                Scanner data = new Scanner(rc.getSp().getInputStream());
-                                while (data.hasNextLine()) {
-                                    System.out.println(data.nextLine());
-                                }
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -293,14 +318,9 @@ public class Hoofdscherm extends JFrame {
                     }
 
                     if (event.getKeyCode() == KeyEvent.VK_RIGHT) {
-                        System.out.println("RIGHT");
                         if (sp.openPort()) { // opent de port
                             try {
                                 rc.moveRobotRight(rc.getSp()); // stuurt commando over port
-                                Scanner data = new Scanner(rc.getSp().getInputStream());
-                                while (data.hasNextLine()) {
-                                    System.out.println(data.nextLine());
-                                }
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
