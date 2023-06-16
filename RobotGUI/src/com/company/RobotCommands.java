@@ -14,9 +14,11 @@ import java.util.Scanner;
 public class RobotCommands implements SerialPortDataListener {
     SerialPort sp;
     private String message = "";
+    private boolean buildUpMessage;
+    private String receivedData;
 
     public RobotCommands(){
-        sp = SerialPort.getCommPort("COM5"); // selecteer je gebruikte COM port
+        sp = SerialPort.getCommPort("COM6"); // selecteer je gebruikte COM port
         sp.setComPortParameters(9600, 8, 1, 0); //Set Serial baudrate
         sp.setComPortTimeouts(SerialPort.TIMEOUT_NONBLOCKING, 0, 0); //timeouts uitzetten
 
@@ -61,11 +63,24 @@ public class RobotCommands implements SerialPortDataListener {
 
             @Override
             public void serialEvent(SerialPortEvent event) {
-                message += new String(event.getReceivedData());
+                receivedData = new String(event.getReceivedData());
 
-                if(message.endsWith(";")){
+                if(receivedData.startsWith("-")){ //Check of bericht starting prefix heeft
+                    buildUpMessage = true; //Zo ja, sta bericht opbouwen toe
+                    System.out.println("MESSAGE MODE ENABLED");
+                }
+
+                if(buildUpMessage = true) {
+                    System.out.println("RECEIVED DATA");
+                    message += receivedData;
+                }
+
+                if(receivedData.endsWith(";")){
                     System.out.println(message);
+                    //op dit punt moet er iets gebeuren met de message
                     message = "";
+                    System.out.println("MESSAGE MODE DISABLED");
+                    buildUpMessage = false;
                 }
             }
         });

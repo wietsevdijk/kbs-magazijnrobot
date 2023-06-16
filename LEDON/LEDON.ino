@@ -6,6 +6,8 @@ LiquidCrystal_I2C lcd(0x27, 20, 4);  // 0x27 is the i2c address of the LCM1602 I
 byte receivedChar;
 bool coordMode = false;
 
+String response;
+
 void setup() {
   // put your setup code here, to run once:
   lcd.init();  // initialize the lcd
@@ -25,10 +27,15 @@ void setup() {
   lcd.clear();
 }
 
+void sendToHMI(String input) {
+  input = ("-" + input + ";");
+  response = input;
+}
+
 void loop() {
   // put your main code here, to run repeatedly:
   String HMIcommand = "";  //convert decimal bytes to String
-  String response = "";
+  response = ""; //clear response every loop
   if (Serial.available()) {
     // wait a bit for the entire message to arrive
     HMIcommand = String(Serial.readString());
@@ -38,12 +45,12 @@ void loop() {
   if (HMIcommand == "COORDS") {
 
       if(coordMode == false){
-      response = "modustrue;";
+      sendToHMI("modustrue");
       coordMode = true;
       }
 
       if(coordMode == true){
-        response = "modusfalse;";
+        sendToHMI("modusfalse");
         coordMode = false;
       }
 
