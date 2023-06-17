@@ -130,7 +130,7 @@ public class GridTekenPanel extends JPanel {
             }
             g.setColor(Color.GREEN);
             g.setFont(new Font("Courier New", Font.BOLD, 50));
-            g.drawString(".", xsize / 2 - 15, (maxYpixel - (ysize / 2)) + 3);
+            g.drawString(".", ((maxXpixel / maxX) - (xsize / 2)) - 15, maxYpixel - (((maxYpixel / maxY)- (ysize / 2))) + 1);
         }
 
         if (isTSPLine()) {

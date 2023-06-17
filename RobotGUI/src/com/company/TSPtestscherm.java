@@ -28,7 +28,6 @@ public class TSPtestscherm extends JFrame implements ActionListener {
     public TSPtestscherm() {
         setTitle("TSP Testscherm");
         setSize(650, 900);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
 
         panel = new JPanel();
