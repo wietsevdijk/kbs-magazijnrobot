@@ -257,13 +257,16 @@ void pickUp() {
 }
 
 void moveToEnd() {
+  Serial.println("ENDING...");
 
   while(Count_pulses_x < endX){
+    Serial.println("MOVING TO END X");
     moveRight();
   } 
   stopMoving();
 
   while(Count_pulses_y > endY){
+    Serial.println("MOVING TO END Y");
     moveDown();
   } 
   stopMoving();
@@ -479,7 +482,9 @@ void loop() {
 
   }
 
-  if(command.equals("END")) { //Stuur naar eindpunt
+  if(command.endsWith("END")) { //Stuur naar eindpunt
+    message = "";
+
     Serial.println("GOING TO END");
     moveToEnd();
     sendArrived();

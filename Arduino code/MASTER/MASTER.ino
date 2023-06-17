@@ -130,14 +130,14 @@ void loop() {
     switch (currentCommandMode)
       {
       case coordinaten:
-        sendToHMI("Going to coord " + HMIcommand);
+        //sendToHMI("Going to coord " + HMIcommand);
         sendToCoord(HMIcommand);
         sendToHMI("ARRIVED");
 
         break;
 
       case eindPunt:
-        sendToHMI("Going to end");
+        //sendToHMI("Going to end");
         moveToEnd();
         sendToHMI("ARRIVED");
         
@@ -351,6 +351,9 @@ void sendToCoord(String coordinate){
 }
 
 void moveToEnd (){
+  if(debug){Serial.println("STARTING END COMMAND");}
+  String response;
+  //Reset boolean
   foundCoord = false;
 
   //Send end to slave
@@ -363,7 +366,7 @@ void moveToEnd (){
     //Start listening to slave Arduino for commands
     response = receiveMotorCommandFromSlave();
 
-        //X AXIS CONTROL
+    //X AXIS CONTROL
     if(response.endsWith("xMoveL")){
       goLeft();
     } else if(response.endsWith("xMoveR")){
