@@ -168,33 +168,13 @@ public class Hoofdscherm extends JFrame {
             }
         });
 
-        JButton coordMode = new JButton("Coord Mode");
+        JButton coordMode = new JButton("Open coordinaten scherm");
         buttonpanel.add(coordMode);
 
         coordMode.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    rc.sendCommandMode(sp, "COORDS");
-
-                    if(rc.getMessage().equals("Command mode enabled")){
-                        System.out.println("modus is goed");
-                        rc.sendCommandMode(sp, "3.3");
-                        //rc.setMessage("");
-                    }
-
-                    if(rc.getMessage().equals("in Case Coordinaten")){;
-                        System.out.println("toppie");
-                        //rc.setMessage("");
-                    }
-
-                    if(rc.getMessage().equals("")){
-                        System.out.println("Geen reactie van Arduino");
-                    }
-
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
+                Coordinatenscherm cs = new Coordinatenscherm();
             }
         });
 
