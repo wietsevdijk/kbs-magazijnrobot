@@ -6,6 +6,8 @@ import java.util.ArrayList;
 public class GridTekenPanel extends JPanel {
 
     private boolean isTSPLine;
+    private boolean TSPtest;
+    private ArrayList<Coordinaat> coordinaten;
     private int maxY;
     private int maxX;
     public int vak1;
@@ -17,14 +19,24 @@ public class GridTekenPanel extends JPanel {
     private ArrayList<Magazijnplek> plekken;
 
     //Teken een door jouw gedefineerde grid
-    public GridTekenPanel(int aantalX, int aantalY) {
+    public GridTekenPanel(int aantalX, int aantalY, int breedte, int hoogte) {
         maxX = aantalX;
         maxY = aantalY;
 
         plekken = new ArrayList<>(aantalX * aantalY);
 
-        setBackground(Color.black);
-        setPreferredSize(new Dimension(400, 400));
+        setPreferredSize(new Dimension(breedte, hoogte));
+    }
+
+    public GridTekenPanel(int aantalX, int aantalY, int breedte, int hoogte, ArrayList<Coordinaat> coordinaten) {
+        this.coordinaten = new ArrayList<>();
+        this.coordinaten.addAll(coordinaten);
+        maxX = aantalX;
+        maxY = aantalY;
+
+        plekken = new ArrayList<>(aantalX * aantalY);
+
+        setPreferredSize(new Dimension(breedte, hoogte));
     }
 
     //Berekent afstand tussen 2 locaties in de grid
@@ -39,6 +51,10 @@ public class GridTekenPanel extends JPanel {
 
     public void setTSPLine(boolean TSPLine) {
         isTSPLine = TSPLine;
+    }
+
+    public void setTSPtest(boolean TSPtest) {
+        this.TSPtest = TSPtest;
     }
 
     public boolean isTSPLine() {
@@ -61,8 +77,8 @@ public class GridTekenPanel extends JPanel {
         int xstart;
         int width = getWidth();
         int height = getHeight();
-        int ysize = (height / maxY);
-        int xsize = (width / maxX);
+        int ysize = height / maxY;
+        int xsize = width / maxX;
 
         super.paintComponent(g);
 
@@ -88,6 +104,33 @@ public class GridTekenPanel extends JPanel {
 
                 g.fillRect(xstart, ystart, xsize, ysize);
             }
+        }
+
+        if(TSPtest) {
+            g.setColor(Color.ORANGE);
+            g.setFont(new Font("Courier New", Font.BOLD, 30));
+            int maxXpixel = (xsize * maxX) - 10;
+            int maxYpixel = (ysize * maxY) + 1;
+            int vorigeX = xsize / 2;
+            int vorigeY = maxYpixel - (ysize / 2);
+            for(Coordinaat coordinaat: coordinaten) {
+                int x_positie = ((maxXpixel / maxX) * coordinaat.getX_as()) - (xsize / 2);
+                int y_positie = maxYpixel - (((maxYpixel / maxY) * coordinaat.getY_as()) - (ysize / 2));
+                if(x_positie < xsize * 9) {
+                    int correctie = xsize * 9 - x_positie;
+                    x_positie = x_positie - (int)(correctie * (maxX * 0.002));
+                } else {
+                    int correctie = x_positie - xsize * 9;
+                    x_positie = x_positie + (int)(correctie * (maxX * 0.002));
+                }
+                g.drawString(".", x_positie, y_positie);
+                g.drawLine(vorigeX, vorigeY, x_positie + 9, y_positie - 2);
+                vorigeX = x_positie + 9;
+                vorigeY = y_positie - 2;
+            }
+            g.setColor(Color.GREEN);
+            g.setFont(new Font("Courier New", Font.BOLD, 50));
+            g.drawString(".", ((maxXpixel / maxX) - (xsize / 2)) - 15, maxYpixel - (((maxYpixel / maxY)- (ysize / 2))) + 1);
         }
 
         if (isTSPLine()) {
