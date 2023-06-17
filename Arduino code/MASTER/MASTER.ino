@@ -116,14 +116,14 @@ void loop() {
   if(HMIcommand.length() > 0){ //Check of er een commando binnen is gekomen
 
     if (HMIcommand.equals("COORDS")) {
-      currentCommandMode = coordinaten;
       sendToHMI("Switched to coordinate mode");
+      currentCommandMode = coordinaten;
     } else if(HMIcommand.equals("END")){
-      currentCommandMode = eindPunt;
       sendToHMI("Switched to endpoint mode");
+      currentCommandMode = eindPunt;
     } else if(HMIcommand.equals("MANUAL")){
-      currentCommandMode = manualControl;
       sendToHMI("Switched to manual mode");
+      currentCommandMode = manualControl;
     } else {
     //Als het commando niet 1 van de commandomodussen is, dan:
     //Handel ingekomen commando af op basis van huidige commandomodus
@@ -138,7 +138,7 @@ void loop() {
 
       case eindPunt:
         sendToHMI("Going to end");
-        sendCommand("END");
+        moveToEnd();
         sendToHMI("ARRIVED");
         
         break;
@@ -352,6 +352,12 @@ void sendToCoord(String coordinate){
 
 void moveToEnd (){
   foundCoord = false;
+
+  //Send end to slave
+  sendCommand("END");
+
+  //lees commando maar doe er niks mee, cleart buffer
+  receiveMotorCommandFromSlave();
 
   while(foundCoord = false){
     //Start listening to slave Arduino for commands

@@ -88,6 +88,9 @@ public class RobotCommands implements SerialPortDataListener {
             sp.getOutputStream().write(bytes);
             System.out.println("Sent location: " + location);
 
+        //wachten voor reactie
+        sleepWithDelay();
+
     }
 
     public void sendCommandMode(SerialPort sp, String mode) throws IOException {
@@ -95,6 +98,7 @@ public class RobotCommands implements SerialPortDataListener {
             byte[] bytes;
             bytes = mode.getBytes(StandardCharsets.UTF_8); //Zet string om naar bytes en stuurt naar arduino
             sp.getOutputStream().write(bytes);
+            System.out.println("Sent commandmode: " + mode);
 
         //wachten voor reactie
         sleepWithDelay();
