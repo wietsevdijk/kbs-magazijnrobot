@@ -116,13 +116,13 @@ void loop() {
   if(HMIcommand.length() > 0){ //Check of er een commando binnen is gekomen
 
     if (HMIcommand.equals("COORDS")) {
-      sendToHMI("Switched to coordinate mode");
+      sendToHMI("ModeCoords");
       currentCommandMode = coordinaten;
     } else if(HMIcommand.equals("END")){
-      sendToHMI("Switched to endpoint mode");
+      sendToHMI("ModeEnd");
       currentCommandMode = eindPunt;
     } else if(HMIcommand.equals("MANUAL")){
-      sendToHMI("Switched to manual mode");
+      sendToHMI("ModeManual");
       currentCommandMode = manualControl;
     } else {
     //Als het commando niet 1 van de commandomodussen is, dan:

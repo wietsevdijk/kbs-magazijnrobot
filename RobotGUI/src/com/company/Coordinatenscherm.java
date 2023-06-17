@@ -12,15 +12,14 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class Coordinatenscherm {
-    public Coordinatenscherm(){
-        RobotCommands rc = new RobotCommands();
+    public Coordinatenscherm(SerialPort serialPort, RobotCommands robotCommands){
+        RobotCommands rc = robotCommands;
 
-        ArrayList<Coordinaat> lijst = new ArrayList<>();
         //TSPAlgoritme algoritme2 = new TSPAlgoritme(5, 5, 3);
         //System.out.println(algoritme2);
 
 
-        SerialPort sp = rc.getSp();
+        SerialPort sp = serialPort;
 
         JFrame frame = new JFrame("Stuur naar coordinaten");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -71,14 +70,17 @@ public class Coordinatenscherm {
             public void actionPerformed(ActionEvent e) {
                 int nummer = 1;
                 boolean arrived = false;
+                ArrayList<Coordinaat> lijst = new ArrayList<>();
+
                 lijst.add(new Coordinaat(Integer.parseInt(coordfield1X.getText()), Integer.parseInt(coordfield1Y.getText())));
                 lijst.add(new Coordinaat(Integer.parseInt(coordfield2X.getText()), Integer.parseInt(coordfield2Y.getText())));
                 lijst.add(new Coordinaat(Integer.parseInt(coordfield3X.getText()), Integer.parseInt(coordfield3Y.getText())));
                 TSPAlgoritme algoritme1 = new TSPAlgoritme(5, 5, lijst);
+                lijst = algoritme1.getVolgorde();
 
                 try {
                     rc.sendCommandMode(sp, "COORDS");
-                    if(rc.getMessage().equals("Command mode enabled")){
+                    if(rc.getMessage().equals("ModeCoords")){
 
                         System.out.println("modus is goed");
 
@@ -86,26 +88,34 @@ public class Coordinatenscherm {
                             arrived = false;
                             rc.sendLocation(sp, product.buildStringVolgorde());
                             while (!arrived){
-                                if (Objects.equals(rc.getMessage(), "ARRIVED")){
+                                if (rc.getMessage().equals("ARRIVED")){
+                                    rc.setMessage("");
                                     arrived = true;
+                                } else{
+                                    Thread.sleep(100);
                                 }
                             }
                         }
                         //rc.setMessage("");
                     }
 
-                    if(rc.getMessage().equals("in Case Coordinaten")){;
-                        System.out.println("toppie");
-                        //rc.setMessage("");
-                    }
 
                     if(rc.getMessage().equals("")){
                         System.out.println("Geen reactie van Arduino");
                     }
 
+                    //rc.sendCommandMode(sp, "END");
+                    //rc.sendLocation(sp, "GO");
+
                 } catch (IOException ex) {
                     ex.printStackTrace();
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
                 }
+
+
+
+                System.out.println("KLAAR");
             }
         });
 

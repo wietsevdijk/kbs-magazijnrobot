@@ -17,10 +17,10 @@ public class RobotCommands implements SerialPortDataListener {
     private String localMessage = "";
     private boolean buildUpMessage;
     private String receivedData;
-    private int arduinoDelay = 50;
+    private int arduinoDelay = 100;
 
     public RobotCommands(){
-        sp = SerialPort.getCommPort("COM7"); // selecteer je gebruikte COM port
+        sp = SerialPort.getCommPort("COM4"); // selecteer je gebruikte COM port
         sp.setComPortParameters(9600, 8, 1, 0); //Set Serial baudrate
         sp.setComPortTimeouts(SerialPort.TIMEOUT_NONBLOCKING, 0, 0); //timeouts uitzetten
 

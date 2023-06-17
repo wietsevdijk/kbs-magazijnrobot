@@ -472,13 +472,22 @@ void loop() {
       pickUp();
       delay(500); //TODO: HAAL WEG
       slideIn();
+      delay(500);
       sendArrived();
+      if(debug){
+        Serial.print("PAKKETNUMMER PRE: ");
+        Serial.println(testPakketNummer);
+      }
       testPakketNummer++; //TODO: HAAL WEG
+      if(debug){
+        Serial.print("PAKKETNUMMER POST: ");
+        Serial.println(testPakketNummer);
+      }
     }
 
-    if(testPakketNummer == 4){
-      moveToEnd();
-    }
+    // if(testPakketNummer == 4){
+    //   moveToEnd();
+    // }
 
   }
 
