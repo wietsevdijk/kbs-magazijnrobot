@@ -34,7 +34,8 @@ int jSwitchCurrent;
 
 enum CommandMode { //Commandmodussen voor switch-case
   coordinaten,
-  eindPunt
+  eindPunt,
+  manualControl
 };
 
 CommandMode currentCommandMode;
@@ -114,20 +115,36 @@ void loop() {
 
   if(HMIcommand.length() > 0){ //Check of er een commando binnen is gekomen
 
-    if (HMIcommand == "COORDS") {
+    if (HMIcommand.equals("COORDS")) {
       currentCommandMode = coordinaten;
-      sendToHMI("Command mode enabled");
-    } else if(HMIcommand == "END"){
+      sendToHMI("Switched to coordinate mode");
+    } else if(HMIcommand.equals("END")){
       currentCommandMode = eindPunt;
-      sendToHMI("End mode enabled");
+      sendToHMI("Switched to endpoint mode");
+    } else if(HMIcommand.equals("MANUAL")){
+      currentCommandMode = manualControl;
+      sendToHMI("Switched to manual mode");
     } else {
     //Als het commando niet 1 van de commandomodussen is, dan:
     //Handel ingekomen commando af op basis van huidige commandomodus
     switch (currentCommandMode)
       {
       case coordinaten:
-        sendToCoord(HMIcommand);
         sendToHMI("Going to coord " + HMIcommand);
+        sendToCoord(HMIcommand);
+        sendToHMI("ARRIVED");
+
+        break;
+
+      case eindPunt:
+        sendToHMI("Going to end");
+        sendCommand("END");
+        sendToHMI("ARRIVED");
+        
+        break;
+
+      case manualControl:
+
         break;
       
       default:
@@ -330,6 +347,39 @@ void sendToCoord(String coordinate){
       if(debug){Serial.println(" !!!!!! ROBOT HAS ARRIVED AT " + coordinate);}
       foundCoord = true;
     }
+  }
+}
+
+void moveToEnd (){
+  foundCoord = false;
+
+  while(foundCoord = false){
+    //Start listening to slave Arduino for commands
+    response = receiveMotorCommandFromSlave();
+
+        //X AXIS CONTROL
+    if(response.endsWith("xMoveL")){
+      goLeft();
+    } else if(response.endsWith("xMoveR")){
+      goRight();
+    } else if(response.endsWith("dontMv")) {
+      brakeX();
+    }
+
+    //X AXIS CONTROL
+    if(response.endsWith("yMoveU")){
+      goUp();
+    } else if(response.endsWith("yMoveD")){
+      goDown();
+    } else if(response.endsWith("dontMv")){
+      brakeY();
+    }
+
+    if(response.endsWith("CoordF")){
+      if(debug){Serial.println(" !!!!!! ROBOT HAS ARRIVED AT END");}
+      foundCoord = true;
+    }
+    
   }
 }
 

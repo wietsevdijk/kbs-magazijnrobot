@@ -188,7 +188,9 @@ public class Hoofdscherm extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 ArrayList<String> productLocaties = db.getProductLocatie(db.getOrderID());
                 try {
-                    rc.sendLocation(sp, "test");
+                    rc.sendCommandMode(sp, "COORDS");
+                    rc.sendLocation(sp, "3.3");
+
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }

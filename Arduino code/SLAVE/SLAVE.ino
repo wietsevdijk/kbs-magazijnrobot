@@ -470,7 +470,7 @@ void loop() {
       delay(500); //TODO: HAAL WEG
       slideIn();
       sendArrived();
-      testPakketNummer++;
+      testPakketNummer++; //TODO: HAAL WEG
     }
 
     if(testPakketNummer == 4){
@@ -479,7 +479,14 @@ void loop() {
 
   }
 
+  if(command.equals("END")) { //Stuur naar eindpunt
+    Serial.println("GOING TO END");
+    moveToEnd();
+    sendArrived();
+  }
+
 }
+
 
 //Send robot to X coordinate
 void goToX(int X){
