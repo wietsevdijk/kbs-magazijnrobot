@@ -183,6 +183,7 @@ public class Hoofdscherm extends JFrame {
         JButton orderOphalen = new JButton("Producten ophalen");
         buttonpanel.add(orderOphalen);
 
+        /* uncomment voor testknop
         orderOphalen.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -195,9 +196,11 @@ public class Hoofdscherm extends JFrame {
                     ex.printStackTrace();
                 }
 
-                //db.shipOrder(db.getOrderID());
+
             }
         });
+        */
+
 
         //Switch tussen automatisch en handmatig besuren. Werkt maar alleen in het HMI. Moet nog command doorsturen naar robot
         JButton toggleModus = new JButton("Automatisch/Handmatig");

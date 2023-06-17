@@ -8,11 +8,19 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Objects;
 
 public class Coordinatenscherm {
     public Coordinatenscherm(){
         RobotCommands rc = new RobotCommands();
-        SerialPort sp = rc.openSP();
+
+        ArrayList<Coordinaat> lijst = new ArrayList<>();
+        //TSPAlgoritme algoritme2 = new TSPAlgoritme(5, 5, 3);
+        //System.out.println(algoritme2);
+
+
+        SerialPort sp = rc.getSp();
 
         JFrame frame = new JFrame("Stuur naar coordinaten");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -61,12 +69,28 @@ public class Coordinatenscherm {
         submitCoords.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                int nummer = 1;
+                boolean arrived = false;
+                lijst.add(new Coordinaat(Integer.parseInt(coordfield1X.getText()), Integer.parseInt(coordfield1Y.getText())));
+                lijst.add(new Coordinaat(Integer.parseInt(coordfield2X.getText()), Integer.parseInt(coordfield2Y.getText())));
+                lijst.add(new Coordinaat(Integer.parseInt(coordfield3X.getText()), Integer.parseInt(coordfield3Y.getText())));
+                TSPAlgoritme algoritme1 = new TSPAlgoritme(5, 5, lijst);
+
                 try {
                     rc.sendCommandMode(sp, "COORDS");
-
                     if(rc.getMessage().equals("Command mode enabled")){
+
                         System.out.println("modus is goed");
-                        rc.sendCommandMode(sp, "3.3");
+
+                        for (Coordinaat product: lijst) {
+                            arrived = false;
+                            rc.sendLocation(sp, product.buildStringVolgorde());
+                            while (!arrived){
+                                if (Objects.equals(rc.getMessage(), "ARRIVED")){
+                                    arrived = true;
+                                }
+                            }
+                        }
                         //rc.setMessage("");
                     }
 
@@ -86,6 +110,7 @@ public class Coordinatenscherm {
         });
 
         //laat alles zien
+        frame.requestFocus();
         frame.setLocationRelativeTo(null);
         frame.pack();
         frame.setVisible(true);

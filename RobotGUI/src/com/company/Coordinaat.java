@@ -20,4 +20,10 @@ public class Coordinaat {
     public String toString() {
         return "(" + x_as + ", " + y_as + ")";
     }
+
+    public String buildStringVolgorde() {
+        String message = this.x_as + "." + this.y_as;
+        System.out.println(message);
+        return message;
+    }
 }

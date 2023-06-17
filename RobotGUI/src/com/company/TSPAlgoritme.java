@@ -117,4 +117,5 @@ public class TSPAlgoritme {
     public String toStringTijd() {
         return "Verstreken tijd: " + verstrekenTijd + " ms";
     }
+
 }
