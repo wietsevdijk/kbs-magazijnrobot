@@ -107,15 +107,30 @@ public class GridTekenPanel extends JPanel {
         }
 
         if(TSPtest) {
-            g.setColor(Color.RED);
+            g.setColor(Color.ORANGE);
             g.setFont(new Font("Courier New", Font.BOLD, 30));
             int maxXpixel = (xsize * maxX) - 10;
             int maxYpixel = (ysize * maxY) + 1;
+            int vorigeX = xsize / 2;
+            int vorigeY = maxYpixel - (ysize / 2);
             for(Coordinaat coordinaat: coordinaten) {
                 int x_positie = ((maxXpixel / maxX) * coordinaat.getX_as()) - (xsize / 2);
                 int y_positie = maxYpixel - (((maxYpixel / maxY) * coordinaat.getY_as()) - (ysize / 2));
+                if(x_positie < xsize * 9) {
+                    int correctie = xsize * 9 - x_positie;
+                    x_positie = x_positie - (int)(correctie * (maxX * 0.002));
+                } else {
+                    int correctie = x_positie - xsize * 9;
+                    x_positie = x_positie + (int)(correctie * (maxX * 0.002));
+                }
                 g.drawString(".", x_positie, y_positie);
+                g.drawLine(vorigeX, vorigeY, x_positie + 9, y_positie - 2);
+                vorigeX = x_positie + 9;
+                vorigeY = y_positie - 2;
             }
+            g.setColor(Color.GREEN);
+            g.setFont(new Font("Courier New", Font.BOLD, 50));
+            g.drawString(".", xsize / 2 - 15, (maxYpixel - (ysize / 2)) + 3);
         }
 
         if (isTSPLine()) {

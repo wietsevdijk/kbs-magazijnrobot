@@ -23,6 +23,7 @@ public class TSPtestscherm extends JFrame implements ActionListener {
     private JLabel afstandText;
     private JLabel tijdText;
     private boolean allesIngevuld;
+    private boolean juisteWaarde;
     private SpringLayout springLayout;
     public TSPtestscherm() {
         setTitle("TSP Testscherm");
@@ -118,7 +119,7 @@ public class TSPtestscherm extends JFrame implements ActionListener {
                     breedteMagazijn = 0;
                     hoogteMagazijn = 0;
                 }
-                if(aantalCoordinaten > 0 && aantalCoordinaten < 100 && breedteMagazijn > 0 && breedteMagazijn < 100 && hoogteMagazijn > 0 && hoogteMagazijn < 100) {
+                if(aantalCoordinaten > 0 && aantalCoordinaten < 100 && breedteMagazijn > 0 && breedteMagazijn < 61 && hoogteMagazijn > 0 && hoogteMagazijn < 61) {
                     TSPAlgoritme algoritme = new TSPAlgoritme(breedteMagazijn, hoogteMagazijn, aantalCoordinaten);
                     gridPanel = new GridTekenPanel(breedteMagazijn, hoogteMagazijn, 600, 600, algoritme.getVolgorde());
                     gridPanel.setTSPtest(true);
@@ -135,8 +136,16 @@ public class TSPtestscherm extends JFrame implements ActionListener {
                     tijdText.setText(tijd);
                     panel.revalidate();
                     panel.repaint();
+                } else if(aantalCoordinaten <= 0 || aantalCoordinaten >= 100) {
+                    String foutmelding = "Aantal coördinaten moet tussen de 1 en 99 zijn!";
+                    inputText.setText(foutmelding);
+                    outputText.setText("");
+                    afstandText.setText("");
+                    tijdText.setText("");
+                    panel.revalidate();
+                    panel.repaint();
                 } else {
-                    String foutmelding = "Alle waarden moeten tussen de 1 en 99 zijn!";
+                    String foutmelding = "Breedte en hoogte moeten tussen de 1 en 60 zijn!";
                     inputText.setText(foutmelding);
                     outputText.setText("");
                     afstandText.setText("");
