@@ -1,6 +1,5 @@
 #include <Wire.h>      // Master/slave library
 #include <ezButton.h>  // Button library
-#include <SharpIR.h>   // measuring distance library
 
 #define Encoder_output_x 2   // encoder output X-axis
 #define Encoder_output_y 3   // encoder output Y-axis
@@ -16,10 +15,6 @@
 #define directionX 5
 #define directionY 7
 
-// Distance measuring unit
-#define ir A0       //signal pin for distance measuring unit
-#define model 1080  // used 1080 because model GP2Y0A21YK0F is used
-//SharpIR IR_prox(ir, model);
 
 //Value used for debug prints
 bool debug = true;
