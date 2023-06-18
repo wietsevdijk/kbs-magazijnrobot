@@ -65,7 +65,7 @@ public class TSPAlgoritme {
     public ArrayList<Coordinaat> zetInJuisteVolgorde() {
         ArrayList<Coordinaat> juisteVolgorde = new ArrayList<>();
         int huidige_x = 1;
-        int huidige_y = 1;
+        int huidige_y = hoogte;
         for(int i = 0; i < aantalCoordinaten; i++) {
             int index = 0;
             int dichtstbijzijndeIndex = 0;

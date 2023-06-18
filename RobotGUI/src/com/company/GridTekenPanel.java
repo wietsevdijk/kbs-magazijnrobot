@@ -115,7 +115,7 @@ public class GridTekenPanel extends JPanel {
             int vorigeY = maxYpixel - (ysize / 2);
             for(Coordinaat coordinaat: coordinaten) {
                 int x_positie = ((maxXpixel / maxX) * coordinaat.getX_as()) - (xsize / 2);
-                int y_positie = maxYpixel - (((maxYpixel / maxY) * coordinaat.getY_as()) - (ysize / 2));
+                int y_positie = (((maxYpixel / maxY) * coordinaat.getY_as()) - (ysize / 2));
                 if(x_positie < xsize * 9) {
                     int correctie = xsize * 9 - x_positie;
                     x_positie = x_positie - (int)(correctie * (maxX * 0.002));
