@@ -420,7 +420,6 @@ bool modeSwitch() {
 
 //make robot go up
 void goUp() {
-  sendCommand("UP");
   digitalWrite(13, LOW);  //Establishes up direction of Channel B
   digitalWrite(8, LOW);   //Disengage the Brake for Channel B
   analogWrite(11, 255);   //Spins the motor on Channel B at full speed
@@ -428,7 +427,6 @@ void goUp() {
 
 //make robot go down
 void goDown() {
-  sendCommand("DOWN");
   digitalWrite(13, HIGH);  //Establishes down direction of Channel B
   digitalWrite(8, LOW);    //Disengage the Brake for Channel B
   analogWrite(11, 200);    //Spins the motor on Channel B at full speed
@@ -441,7 +439,6 @@ void brakeY() {
 
 //make robot go left
 void goLeft() {
-  sendCommand("LEFT");
   digitalWrite(12, LOW);  //Establishes backward direction of Channel A
   digitalWrite(9, LOW);   //Disengage the Brake for Channel A
   analogWrite(3, 200);    //Spins the motor on Channel A at full speed
@@ -449,7 +446,6 @@ void goLeft() {
 
 //make robot go right
 void goRight() {
-  sendCommand("RIGHT");
   digitalWrite(12, HIGH);  //Establishes forward direction of Channel A
   digitalWrite(9, LOW);    //Disengage the Brake for Channel A
   analogWrite(3, 200);     //Spins the motor on Channel A at full speed
