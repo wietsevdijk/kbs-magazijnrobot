@@ -154,39 +154,39 @@ void loop() {
     }
   }
 
-  if (HMIcommand == "UP") {
-    response = "omhoog";
-    goUp();
-    //delay(1000);
-  }
+  // if (HMIcommand == "UP") {
+  //   response = "omhoog";
+  //   goUp();
+  //   //delay(1000);
+  // }
 
-  if (HMIcommand == "DOWN") {
-    response = "omlaag";
-    goDown();
-    //delay(1000);
-  }
+  // if (HMIcommand == "DOWN") {
+  //   response = "omlaag";
+  //   goDown();
+  //   //delay(1000);
+  // }
 
-  if (HMIcommand == "LEFT") {
-    response = "links";
-    goLeft();
-    //delay(1000);
-  }
+  // if (HMIcommand == "LEFT") {
+  //   response = "links";
+  //   goLeft();
+  //   //delay(1000);
+  // }
 
-  if (HMIcommand == "RIGHT") {
-    goRight();
-    response = "rechts";
-    //delay(1000);
-  }
+  // if (HMIcommand == "RIGHT") {
+  //   goRight();
+  //   response = "rechts";
+  //   //delay(1000);
+  // }
 
-  if (HMIcommand == "FORWARDS") {
-    //z-axis
-    response = "naar voren";
-  }
+  // if (HMIcommand == "FORWARDS") {
+  //   //z-axis
+  //   response = "naar voren";
+  // }
 
-  if (HMIcommand == "BACKWARDS") {
-    //z-axis
-    response = "naar achteren";
-  }
+  // if (HMIcommand == "BACKWARDS") {
+  //   //z-axis
+  //   response = "naar achteren";
+  // }
 
 
 
