@@ -127,12 +127,17 @@ public class Hoofdscherm extends JFrame {
                 //vertaal Database positie naar HMI positie
                 int []positie = DBtoHMI.positie();
                 //Zorgt dat we kunnen tekenen op de grid
-                grid.setTSPLine(true);
+                grid.setTSPtest(true);
 
                 //Geef posities door aan grid
-                grid.setVak1(getRandomNumber(0,24));
-                grid.setVak2(getRandomNumber(0,24));
-                grid.setVak3(getRandomNumber(0,24));
+                ArrayList<Coordinaat> lijst = new ArrayList<>();
+
+                lijst.add(new Coordinaat((int)(Math.random() * 5) + 1, (int)(Math.random() * 5) + 1));
+                lijst.add(new Coordinaat((int)(Math.random() * 5) + 1, (int)(Math.random() * 5) + 1));
+                lijst.add(new Coordinaat((int)(Math.random() * 5) + 1, (int)(Math.random() * 5) + 1));
+                TSPAlgoritme algoritme1 = new TSPAlgoritme(5, 5, lijst);
+                lijst = algoritme1.getVolgorde();
+                grid.setCoordinaten(lijst);
 
                 showLatestorder();
                 rechts.repaint();
