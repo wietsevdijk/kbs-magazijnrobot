@@ -174,7 +174,7 @@ public class Hoofdscherm extends JFrame {
         coordMode.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Coordinatenscherm cs = new Coordinatenscherm(sp, rc);
+                Coordinatenscherm cs = new Coordinatenscherm(sp, rc, grid);
             }
         });
 

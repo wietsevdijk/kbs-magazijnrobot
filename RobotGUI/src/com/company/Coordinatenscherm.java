@@ -1,6 +1,5 @@
 package com.company;
 
-import com.company.RobotCommands;
 import com.fazecast.jSerialComm.SerialPort;
 
 import javax.swing.*;
@@ -9,10 +8,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class Coordinatenscherm {
-    public Coordinatenscherm(SerialPort serialPort, RobotCommands robotCommands){
+    public Coordinatenscherm(SerialPort serialPort, RobotCommands robotCommands, GridTekenPanel grid){
         RobotCommands rc = robotCommands;
 
         SerialPort sp = serialPort;
@@ -82,6 +80,13 @@ public class Coordinatenscherm {
                 TSPAlgoritme algoritme1 = new TSPAlgoritme(5, 5, lijst);
                 lijst = algoritme1.getVolgorde();
 
+                grid.setTSPLine(true);
+                grid.setVak1(translatePixelToGrid(Integer.parseInt(coordfield1X.getText()), Integer.parseInt(coordfield1Y.getText())));
+                grid.setVak2(translatePixelToGrid(Integer.parseInt(coordfield2X.getText()), Integer.parseInt(coordfield2Y.getText())));
+                grid.setVak3(translatePixelToGrid(Integer.parseInt(coordfield3X.getText()), Integer.parseInt(coordfield3Y.getText())));
+                grid.repaint();
+                grid.revalidate();
+
                 try {
                     rc.sendCommandMode(sp, "COORDS");
                     if(rc.getMessage().equals("ModeCoords")){
@@ -127,5 +132,112 @@ public class Coordinatenscherm {
         frame.pack();
         frame.setVisible(true);
         frame.setResizable(true);
+    }
+
+    public int translatePixelToGrid(int pixelX, int pixelY){
+        int locatie = -1;
+
+        if(pixelX == 1 && pixelY == 1){
+            locatie = 0;
+        }
+
+        if(pixelX == 2 && pixelY == 1){
+            locatie = 1;
+        }
+
+        if(pixelX == 3 && pixelY == 1){
+            locatie = 2;
+        }
+
+        if(pixelX == 4 && pixelY == 1){
+            locatie = 3;
+        }
+
+        if(pixelX == 5 && pixelY == 1){
+            locatie = 4;
+        }
+
+        if(pixelX == 1 && pixelY == 2){
+            locatie = 5;
+        }
+
+        if(pixelX == 2 && pixelY == 2){
+            locatie = 6;
+        }
+
+        if(pixelX == 3 && pixelY == 2){
+            locatie = 7;
+        }
+
+        if(pixelX == 4 && pixelY == 2){
+            locatie = 8;
+        }
+
+        if(pixelX == 5 && pixelY == 2){
+            locatie = 9;
+        }
+
+        if(pixelX == 1 && pixelY == 3){
+            locatie = 10;
+        }
+
+        if(pixelX == 2 && pixelY == 3){
+            locatie = 11;
+        }
+
+        if(pixelX == 3 && pixelY == 3){
+            locatie = 12;
+        }
+
+        if(pixelX == 4 && pixelY == 3){
+            locatie = 13;
+        }
+
+        if(pixelX == 5 && pixelY == 3){
+            locatie = 14;
+        }
+
+        if(pixelX == 1 && pixelY == 4){
+            locatie = 15;
+        }
+
+        if(pixelX == 2 && pixelY == 4){
+            locatie = 16;
+        }
+
+        if(pixelX == 3 && pixelY == 4){
+            locatie = 17;
+        }
+
+        if(pixelX == 4 && pixelY == 4){
+            locatie = 18;
+        }
+
+        if(pixelX == 5 && pixelY == 4){
+            locatie = 19;
+        }
+
+        if(pixelX == 1 && pixelY == 5){
+            locatie = 20;
+        }
+
+        if(pixelX == 2 && pixelY == 5){
+            locatie = 21;
+        }
+
+        if(pixelX == 3 && pixelY == 5){
+            locatie = 22;
+        }
+
+        if(pixelX == 4 && pixelY == 5){
+            locatie = 23;
+        }
+
+        if(pixelX == 5 && pixelY == 5){
+            locatie = 24;
+        }
+
+        return locatie;
+
     }
 }
