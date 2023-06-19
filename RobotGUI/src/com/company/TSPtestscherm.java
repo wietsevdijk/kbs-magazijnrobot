@@ -23,7 +23,6 @@ public class TSPtestscherm extends JFrame implements ActionListener {
     private JLabel afstandText;
     private JLabel tijdText;
     private boolean allesIngevuld;
-    private boolean juisteWaarde;
     private SpringLayout springLayout;
     public TSPtestscherm() {
         setTitle("TSP Testscherm");
@@ -167,7 +166,6 @@ public class TSPtestscherm extends JFrame implements ActionListener {
             }
         });
     }
-
     public void actionPerformed(ActionEvent e) {
     }
 }
