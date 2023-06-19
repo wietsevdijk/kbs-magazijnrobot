@@ -19,7 +19,7 @@ public class Coordinatenscherm {
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setResizable(false);
         frame.setPreferredSize(new Dimension(400,225));
-        frame.setLayout(new GridLayout(7, 2));
+        frame.setLayout(new GridLayout(8, 2));
 
         JLabel coordlabel1X = new JLabel("Coordinaat 1: X");
         JTextField coordfield1X = new JTextField(30);
@@ -49,6 +49,8 @@ public class Coordinatenscherm {
 
         JButton submitCoords = new JButton("Stuur coordinaten");
 
+        JButton tekenPad = new JButton("Teken pad (tijdelijk)");
+
         frame.add(coordlabel1X);
         frame.add(coordfield1X);
         frame.add(coordlabel1Y);
@@ -64,13 +66,25 @@ public class Coordinatenscherm {
         frame.add(coordlabel3Y);
         frame.add(coordfield3Y);
 
+        frame.add(tekenPad);
         frame.add(submitCoords);
         frame.add(cancel);
+
+        tekenPad.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                grid.setTSPLine(true);
+                grid.setVak1(translatePixelToGrid(Integer.parseInt(coordfield1X.getText()), Integer.parseInt(coordfield1Y.getText())));
+                grid.setVak2(translatePixelToGrid(Integer.parseInt(coordfield2X.getText()), Integer.parseInt(coordfield2Y.getText())));
+                grid.setVak3(translatePixelToGrid(Integer.parseInt(coordfield3X.getText()), Integer.parseInt(coordfield3Y.getText())));
+                grid.repaint();
+                grid.revalidate();
+            }
+        });
 
         submitCoords.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int nummer = 1;
                 boolean arrived = false;
                 ArrayList<Coordinaat> lijst = new ArrayList<>();
 
@@ -80,12 +94,6 @@ public class Coordinatenscherm {
                 TSPAlgoritme algoritme1 = new TSPAlgoritme(5, 5, lijst);
                 lijst = algoritme1.getVolgorde();
 
-                grid.setTSPLine(true);
-                grid.setVak1(translatePixelToGrid(Integer.parseInt(coordfield1X.getText()), Integer.parseInt(coordfield1Y.getText())));
-                grid.setVak2(translatePixelToGrid(Integer.parseInt(coordfield2X.getText()), Integer.parseInt(coordfield2Y.getText())));
-                grid.setVak3(translatePixelToGrid(Integer.parseInt(coordfield3X.getText()), Integer.parseInt(coordfield3Y.getText())));
-                grid.repaint();
-                grid.revalidate();
 
                 try {
                     rc.sendCommandMode(sp, "COORDS");

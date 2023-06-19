@@ -53,6 +53,10 @@ public class GridTekenPanel extends JPanel {
         isTSPLine = TSPLine;
     }
 
+    public boolean getTSPLine(){
+        return isTSPLine;
+    }
+
     public void setTSPtest(boolean TSPtest) {
         this.TSPtest = TSPtest;
     }
