@@ -66,27 +66,8 @@ public class Coordinatenscherm {
         frame.add(coordlabel3Y);
         frame.add(coordfield3Y);
 
-        frame.add(tekenPad);
         frame.add(submitCoords);
         frame.add(cancel);
-
-        tekenPad.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ArrayList<Coordinaat> lijst = new ArrayList<>();
-
-                lijst.add(new Coordinaat(Integer.parseInt(coordfield1X.getText()), Integer.parseInt(coordfield1Y.getText())));
-                lijst.add(new Coordinaat(Integer.parseInt(coordfield2X.getText()), Integer.parseInt(coordfield2Y.getText())));
-                lijst.add(new Coordinaat(Integer.parseInt(coordfield3X.getText()), Integer.parseInt(coordfield3Y.getText())));
-                TSPAlgoritme algoritme1 = new TSPAlgoritme(5, 5, lijst);
-                lijst = algoritme1.getVolgorde();
-                grid.setCoordinaten(lijst);
-                grid.setTSPtest(true);
-
-                grid.repaint();
-                grid.revalidate();
-            }
-        });
 
         submitCoords.addActionListener(new ActionListener() {
             @Override
@@ -99,6 +80,12 @@ public class Coordinatenscherm {
                 lijst.add(new Coordinaat(Integer.parseInt(coordfield3X.getText()), Integer.parseInt(coordfield3Y.getText())));
                 TSPAlgoritme algoritme1 = new TSPAlgoritme(5, 5, lijst);
                 lijst = algoritme1.getVolgorde();
+
+                grid.setCoordinaten(lijst);
+                grid.setTSPtest(true);
+
+                grid.repaint();
+                grid.revalidate();
 
 
                 try {
