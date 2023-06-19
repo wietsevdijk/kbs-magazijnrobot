@@ -500,7 +500,7 @@ void loop() {
 
 }
 
-
+//OUD, WORDT NIET MEER GEBRUIKT
 //Send robot to X coordinate
 void goToX(int X){
 
@@ -535,6 +535,7 @@ void goToX(int X){
 
 }
 
+//OUD, WORDT NIET MEER GEBRUIKT
 //Send robot to Y coordinate
 void goToY(int Y){
   
