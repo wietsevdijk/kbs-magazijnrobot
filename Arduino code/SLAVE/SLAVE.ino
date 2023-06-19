@@ -248,7 +248,7 @@ void pickUp() {
   while(Count_pulses_y < pickUpTarget){
     moveUp();
   } 
-  stopMoving();
+  stopMovingY();
 }
 
 void moveToEnd() {
@@ -258,13 +258,13 @@ void moveToEnd() {
     Serial.println("MOVING TO END X");
     moveRight();
   } 
-  stopMoving();
+  stopMovingX();
 
   while(Count_pulses_y > endY){
     Serial.println("MOVING TO END Y");
     moveDown();
   } 
-  stopMoving();
+  stopMovingY();
 
 
 Serial.println("----- ARRIVED AT END -----");
@@ -292,8 +292,13 @@ void moveDown(){
   requestEvent();
 }
 
-void stopMoving(){
-  message = "dontMv";
+void stopMovingX(){
+  message = "dontMX";
+  requestEvent();
+}
+
+void stopMovingY(){
+  message = "dontMY";
   requestEvent();
 }
 
@@ -458,8 +463,7 @@ void loop() {
 
     Serial.println("-----");
 
-    goToX(X);
-    goToY(Y);
+    goToXandY(X, Y);
 
     if(foundXPos && foundYPos){
       slideOut(testPakketNummer);
@@ -502,7 +506,7 @@ void goToX(int X){
 
   //first check if robot is already at correct point on axis to prevent unnecessary movement
     if ((x_position[X] -30) < Count_pulses_x  && Count_pulses_x <= (x_position[X] + 30)){
-      stopMoving();
+      stopMovingX();
       foundXPos = true;
       Serial.println("----- ALREADY AT X -----");
     }
@@ -517,7 +521,7 @@ void goToX(int X){
       } 
 
       if ((x_position[X] -1) < Count_pulses_x  && Count_pulses_x <= (x_position[X] + 1)) {
-        stopMoving();
+        stopMovingX();
         foundXPos = true;
         Serial.println("----- FOUND X -----");
         Serial.print("TARGET:");
@@ -536,7 +540,7 @@ void goToY(int Y){
   
   //first check if robot is already at correct point on axis to prevent unnecessary movement
   if ((y_position[Y] -30) < Count_pulses_y  && Count_pulses_y <= (y_position[Y] + 30)){
-    stopMoving();
+    stopMovingY();
     foundYPos = true;
     Serial.println("----- ALREADY AT Y -----");
   }
@@ -552,7 +556,7 @@ void goToY(int Y){
       } 
 
       if ((y_position[Y] -1) < Count_pulses_y  && Count_pulses_y <= (y_position[Y] + 1)) {
-        stopMoving();
+        stopMovingY();
         foundYPos = true;
         Serial.println("----- FOUND Y -----");
         Serial.print("TARGET:");
@@ -561,6 +565,69 @@ void goToY(int Y){
         Serial.println(Count_pulses_y);
         Serial.println("-----");
         delay(10); //ik weet het, delays zijn slecht, sorry ~Wietse
+      }
+    }
+
+}
+
+void goToXandY(int X, int Y){
+
+
+  //first check if robot is already at correct point on axis to prevent unnecessary movement
+  if ((x_position[X] -30) < Count_pulses_x  && Count_pulses_x <= (x_position[X] + 30)){
+    stopMovingX();
+    foundXPos = true;
+    Serial.println("----- ALREADY AT X -----");
+  }
+
+  if ((y_position[Y] -30) < Count_pulses_y  && Count_pulses_y <= (y_position[Y] + 30)){
+    stopMovingY();
+    foundYPos = true;
+    Serial.println("----- ALREADY AT Y -----");
+  }
+
+    //if robot is not already at correct point, start moving until it is found
+    while(!foundXPos || !foundYPos){
+
+      if(!foundXPos){
+
+        if (Count_pulses_x < (x_position[X])) {
+          moveRight();
+        } else if (Count_pulses_x >= (x_position[X])) {
+          moveLeft();
+        } 
+
+        if ((x_position[X] -1) < Count_pulses_x  && Count_pulses_x <= (x_position[X] + 1)) {
+          stopMovingX();
+          foundXPos = true;
+          Serial.println("----- FOUND X -----");
+          Serial.print("TARGET:");
+          Serial.println(x_position[X]);
+          Serial.print("CURRENT POS:");
+          Serial.println(Count_pulses_x);
+          Serial.println("-----");
+          delay(10); //ik weet het, delays zijn slecht, sorry ~Wietse
+        }
+      }
+
+      if(!foundYPos){
+        if (Count_pulses_y < (y_position[Y])) {
+          moveUp();
+        } else if (Count_pulses_y >= (y_position[Y])) {
+          moveDown();
+        } 
+
+        if ((y_position[Y] -1) < Count_pulses_y  && Count_pulses_y <= (y_position[Y] + 1)) {
+          stopMovingY();
+          foundYPos = true;
+          Serial.println("----- FOUND Y -----");
+          Serial.print("TARGET:");
+          Serial.println(y_position[Y]);
+          Serial.print("CURRENT POS:");
+          Serial.println(Count_pulses_y);
+          Serial.println("-----");
+          delay(10); //ik weet het, delays zijn slecht, sorry ~Wietse
+        }
       }
     }
 
