@@ -40,7 +40,7 @@ public class Coordinatenscherm {
 
 
 
-        JButton cancel = new JButton("cancel");
+        JButton cancel = new JButton("Annuleren");
         cancel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
