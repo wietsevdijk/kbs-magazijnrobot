@@ -73,10 +73,16 @@ public class Coordinatenscherm {
         tekenPad.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                grid.setTSPLine(true);
-                grid.setVak1(translatePixelToGrid(Integer.parseInt(coordfield1X.getText()), Integer.parseInt(coordfield1Y.getText())));
-                grid.setVak2(translatePixelToGrid(Integer.parseInt(coordfield2X.getText()), Integer.parseInt(coordfield2Y.getText())));
-                grid.setVak3(translatePixelToGrid(Integer.parseInt(coordfield3X.getText()), Integer.parseInt(coordfield3Y.getText())));
+                ArrayList<Coordinaat> lijst = new ArrayList<>();
+
+                lijst.add(new Coordinaat(Integer.parseInt(coordfield1X.getText()), Integer.parseInt(coordfield1Y.getText())));
+                lijst.add(new Coordinaat(Integer.parseInt(coordfield2X.getText()), Integer.parseInt(coordfield2Y.getText())));
+                lijst.add(new Coordinaat(Integer.parseInt(coordfield3X.getText()), Integer.parseInt(coordfield3Y.getText())));
+                TSPAlgoritme algoritme1 = new TSPAlgoritme(5, 5, lijst);
+                lijst = algoritme1.getVolgorde();
+                grid.setCoordinaten(lijst);
+                grid.setTSPtest(true);
+
                 grid.repaint();
                 grid.revalidate();
             }

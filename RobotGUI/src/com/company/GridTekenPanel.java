@@ -375,6 +375,7 @@ public class GridTekenPanel extends JPanel {
         this.vak3 = vak3;
     }
 
-
-
+    public void setCoordinaten(ArrayList<Coordinaat> coordinaten) {
+        this.coordinaten = coordinaten;
+    }
 }
