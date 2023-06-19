@@ -126,7 +126,7 @@ public class Coordinatenscherm {
                     throw new RuntimeException(ex);
                 }
 
-                System.out.println("KLAAR");
+                System.out.println("KLAAR MET PAKKETJES");
             }
         });
 
