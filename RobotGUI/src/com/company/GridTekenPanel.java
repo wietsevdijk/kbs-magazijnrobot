@@ -83,6 +83,8 @@ public class GridTekenPanel extends JPanel {
         int height = getHeight();
         int ysize = height / maxY;
         int xsize = width / maxX;
+        int x_locatie = 0;
+        int y_locatie = 0;
 
         super.paintComponent(g);
 
@@ -131,10 +133,14 @@ public class GridTekenPanel extends JPanel {
                 g.drawLine(vorigeX, vorigeY, x_positie + 9, y_positie - 2);
                 vorigeX = x_positie + 9;
                 vorigeY = y_positie - 2;
+                x_locatie = x_positie;
+                y_locatie = y_positie;
             }
             g.setColor(Color.GREEN);
             g.setFont(new Font("Courier New", Font.BOLD, 50));
             g.drawString(".", ((maxXpixel / maxX) - (xsize / 2)) - 15, maxYpixel - (((maxYpixel / maxY)- (ysize / 2))) + 1);
+            g.setColor(Color.RED);
+            g.drawString(".", x_locatie - 6, y_locatie + 1);
         }
 
         if (isTSPLine()) {
