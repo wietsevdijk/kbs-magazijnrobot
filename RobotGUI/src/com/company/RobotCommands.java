@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 
 public class RobotCommands implements SerialPortDataListener {
@@ -17,10 +19,10 @@ public class RobotCommands implements SerialPortDataListener {
     private String localMessage = "";
     private boolean buildUpMessage;
     private String receivedData;
-    private int arduinoDelay = 50;
+    private int arduinoDelay = 100;
 
     public RobotCommands(){
-        sp = SerialPort.getCommPort("COM6"); // selecteer je gebruikte COM port
+        sp = SerialPort.getCommPort("COM7"); // selecteer je gebruikte COM port
         sp.setComPortParameters(9600, 8, 1, 0); //Set Serial baudrate
         sp.setComPortTimeouts(SerialPort.TIMEOUT_NONBLOCKING, 0, 0); //timeouts uitzetten
 
@@ -49,7 +51,8 @@ public class RobotCommands implements SerialPortDataListener {
                     //System.out.println(message);
                     //op dit punt moet er iets gebeuren met de message
                     setMessage(parseReceivedMessage(localMessage)); //stel message in voor object
-                    System.out.println(message);
+                    System.out.print("ARDUINO RESPONSE: \"" + message + "\" at ");
+                    System.out.println(java.time.LocalTime.now());
                     localMessage = "";
                     //System.out.println("MESSAGE MODE DISABLED");
                     buildUpMessage = false;
@@ -88,6 +91,9 @@ public class RobotCommands implements SerialPortDataListener {
             sp.getOutputStream().write(bytes);
             System.out.println("Sent location: " + location);
 
+        //wachten voor reactie
+        sleepWithDelay();
+
     }
 
     public void sendCommandMode(SerialPort sp, String mode) throws IOException {
@@ -95,6 +101,7 @@ public class RobotCommands implements SerialPortDataListener {
             byte[] bytes;
             bytes = mode.getBytes(StandardCharsets.UTF_8); //Zet string om naar bytes en stuurt naar arduino
             sp.getOutputStream().write(bytes);
+            System.out.println("Sent commandmode: " + mode);
 
         //wachten voor reactie
         sleepWithDelay();

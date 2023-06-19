@@ -5,6 +5,7 @@ import com.fazecast.jSerialComm.SerialPort;
 import java.io.IOException;
 import java.awt.event.*;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 
@@ -14,9 +15,5 @@ public class Main {
 
         // write your code here
         Hoofdscherm hs = new Hoofdscherm();
-        RobotCommands rc = new RobotCommands();
+        }
     }
-}
-
-
-

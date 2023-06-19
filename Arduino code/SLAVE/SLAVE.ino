@@ -1,6 +1,5 @@
 #include <Wire.h>      // Master/slave library
 #include <ezButton.h>  // Button library
-#include <SharpIR.h>   // measuring distance library
 
 #define Encoder_output_x 2   // encoder output X-axis
 #define Encoder_output_y 3   // encoder output Y-axis
@@ -16,10 +15,6 @@
 #define directionX 5
 #define directionY 7
 
-// Distance measuring unit
-#define ir A0       //signal pin for distance measuring unit
-#define model 1080  // used 1080 because model GP2Y0A21YK0F is used
-//SharpIR IR_prox(ir, model);
 
 //Value used for debug prints
 bool debug = true;
@@ -257,13 +252,16 @@ void pickUp() {
 }
 
 void moveToEnd() {
+  Serial.println("ENDING...");
 
   while(Count_pulses_x < endX){
+    Serial.println("MOVING TO END X");
     moveRight();
   } 
   stopMoving();
 
   while(Count_pulses_y > endY){
+    Serial.println("MOVING TO END Y");
     moveDown();
   } 
   stopMoving();
@@ -469,17 +467,35 @@ void loop() {
       pickUp();
       delay(500); //TODO: HAAL WEG
       slideIn();
+      delay(500);
       sendArrived();
-      testPakketNummer++;
+      if(debug){
+        Serial.print("PAKKETNUMMER PRE: ");
+        Serial.println(testPakketNummer);
+      }
+      testPakketNummer++; //TODO: HAAL WEG
+      if(debug){
+        Serial.print("PAKKETNUMMER POST: ");
+        Serial.println(testPakketNummer);
+      }
     }
 
-    if(testPakketNummer == 4){
-      moveToEnd();
-    }
+    // if(testPakketNummer == 4){
+    //   moveToEnd();
+    // }
 
   }
 
+  if(command.endsWith("END")) { //Stuur naar eindpunt
+    message = "";
+
+    Serial.println("GOING TO END");
+    moveToEnd();
+    sendArrived();
+  }
+
 }
+
 
 //Send robot to X coordinate
 void goToX(int X){

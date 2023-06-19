@@ -70,7 +70,7 @@ public class Hoofdscherm extends JFrame {
 
     public void addGrid(){
         //draw grid van 5x5
-        grid = new GridTekenPanel(5, 5);
+        grid = new GridTekenPanel(5, 5, 400, 400);
         rechts.add(grid);
     }
 
@@ -168,32 +168,13 @@ public class Hoofdscherm extends JFrame {
             }
         });
 
-        JButton coordMode = new JButton("Coord Mode");
+        JButton coordMode = new JButton("Open coordinaten scherm");
         buttonpanel.add(coordMode);
 
         coordMode.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    rc.sendCommandMode(sp, "COORDS");
-
-                    if(rc.getMessage().equals("modustrue")){
-                        System.out.println("modus is aan");
-                        //rc.setMessage("");
-                    }
-
-                    if(rc.getMessage().equals("modusfalse")){;
-                        System.out.println("modus is uit");
-                        //rc.setMessage("");
-                    }
-
-                    if(rc.getMessage().equals("")){
-                        System.out.println("Geen reactie van Arduino");
-                    }
-
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
+                Coordinatenscherm cs = new Coordinatenscherm(sp, rc, grid);
             }
         });
 
@@ -202,19 +183,23 @@ public class Hoofdscherm extends JFrame {
         JButton orderOphalen = new JButton("Producten ophalen");
         buttonpanel.add(orderOphalen);
 
+        //uncomment voor testknop
         orderOphalen.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 ArrayList<String> productLocaties = db.getProductLocatie(db.getOrderID());
                 try {
-                    rc.sendLocation(sp, "test");
+                    rc.sendCommandMode(sp, "COORDS");
+                    rc.sendLocation(sp, "2.2");
+
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
 
-                //db.shipOrder(db.getOrderID());
+
             }
         });
+
 
         //Switch tussen automatisch en handmatig besuren. Werkt maar alleen in het HMI. Moet nog command doorsturen naar robot
         JButton toggleModus = new JButton("Automatisch/Handmatig");
@@ -254,6 +239,16 @@ public class Hoofdscherm extends JFrame {
             }
         });
         buttonpanel.add(noodstop);
+
+        //Voegt TSP test knop toe
+        JButton TSPtester = new JButton("TSP Tester");
+        buttonpanel.add(TSPtester);
+        TSPtester.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new TSPtestscherm();
+            }
+        });
     }
 
     //Laat een dialog box zien op basis van je gekozen waarde (Automatisch, Handmatig, Noodstop)
