@@ -15,10 +15,6 @@ public class Coordinatenscherm {
     public Coordinatenscherm(SerialPort serialPort, RobotCommands robotCommands){
         RobotCommands rc = robotCommands;
 
-        //TSPAlgoritme algoritme2 = new TSPAlgoritme(5, 5, 3);
-        //System.out.println(algoritme2);
-
-
         SerialPort sp = serialPort;
 
         JFrame frame = new JFrame("Stuur naar coordinaten");
@@ -45,6 +41,14 @@ public class Coordinatenscherm {
 
 
         JButton cancel = new JButton("cancel");
+        cancel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frame.dispose();
+                //sluit coordinatenscherm
+            }
+        });
+
         JButton submitCoords = new JButton("Stuur coordinaten");
 
         frame.add(coordlabel1X);
