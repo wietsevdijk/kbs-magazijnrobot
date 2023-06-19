@@ -331,7 +331,7 @@ void sendToCoord(String coordinate){
       goLeft();
     } else if(response.endsWith("xMoveR")){
       goRight();
-    } else if(response.endsWith("dontMv")) {
+    } else if(response.endsWith("dontMX")) {
       brakeX();
     }
 
@@ -340,7 +340,7 @@ void sendToCoord(String coordinate){
       goUp();
     } else if(response.endsWith("yMoveD")){
       goDown();
-    } else if(response.endsWith("dontMv")){
+    } else if(response.endsWith("dontMY")){
       brakeY();
     }
 
@@ -374,7 +374,7 @@ void moveToEnd (){
       goLeft();
     } else if(response.endsWith("xMoveR")){
       goRight();
-    } else if(response.endsWith("dontMv")) {
+    } else if(response.endsWith("dontMX")) {
       brakeX();
     }
 
@@ -383,7 +383,7 @@ void moveToEnd (){
       goUp();
     } else if(response.endsWith("yMoveD")){
       goDown();
-    } else if(response.endsWith("dontMv")){
+    } else if(response.endsWith("dontMY")){
       brakeY();
     }
 
