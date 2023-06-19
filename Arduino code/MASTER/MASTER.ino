@@ -362,9 +362,11 @@ void moveToEnd (){
   //lees commando maar doe er niks mee, cleart buffer
   receiveMotorCommandFromSlave();
 
-  while(foundCoord = false){
+  while(foundCoord == false){
     //Start listening to slave Arduino for commands
     response = receiveMotorCommandFromSlave();
+
+    if(debug){Serial.println("FINDING ENDPOINT");}
 
     //X AXIS CONTROL
     if(response.endsWith("xMoveL")){
@@ -389,6 +391,8 @@ void moveToEnd (){
       foundCoord = true;
     }
     
+    if(debug){Serial.println("DONE!!!");}
+
   }
 }
 
@@ -514,8 +518,10 @@ void goToStartingPoint() {
       // vanaf Java compleet is
       // if(debug){Serial.println("SENDING TEST COORDS");}
       // sendToCoord("5.5");
-      // sendToCoord("3.3");
+      //sendToCoord("3.3");
       // sendToCoord("1.1");
+
+      //moveToEnd();
 
       // ---    
 

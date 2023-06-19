@@ -118,7 +118,10 @@ public class Coordinatenscherm {
 
 
                     if(rc.getMessage().equals("")){
-                        System.out.println("Geen reactie van Arduino");
+                        System.out.println("Geen reactie van Arduino, ga naar eindpunt");
+
+                        rc.sendCommandMode(sp, "END");
+                        rc.sendLocation(sp, "GO");
                     }
 
                     //rc.sendCommandMode(sp, "END");
