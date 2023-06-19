@@ -84,8 +84,8 @@ public class Coordinatenscherm {
                 grid.setCoordinaten(lijst);
                 grid.setTSPtest(true);
 
-                grid.repaint();
                 grid.revalidate();
+                grid.repaint();
 
 
                 try {
