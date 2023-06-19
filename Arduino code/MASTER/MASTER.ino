@@ -140,6 +140,7 @@ void loop() {
         //sendToHMI("Going to end");
         moveToEnd();
         sendToHMI("ARRIVED");
+        sendCommand("");
         
         break;
 
