@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 
 public class RobotCommands implements SerialPortDataListener {
@@ -49,7 +51,8 @@ public class RobotCommands implements SerialPortDataListener {
                     //System.out.println(message);
                     //op dit punt moet er iets gebeuren met de message
                     setMessage(parseReceivedMessage(localMessage)); //stel message in voor object
-                    System.out.println("ARDUINO RESPONSE: \"" + message + "\"");
+                    System.out.print("ARDUINO RESPONSE: \"" + message + "\" at ");
+                    System.out.println(java.time.LocalTime.now());
                     localMessage = "";
                     //System.out.println("MESSAGE MODE DISABLED");
                     buildUpMessage = false;

@@ -87,16 +87,16 @@ public class Coordinatenscherm {
                         for (Coordinaat product: lijst) {
                             arrived = false;
                             rc.sendLocation(sp, product.buildStringVolgorde());
+
                             while (!arrived){
+                                //niet de meest elegante oplossing, test dit meer
+                                Thread.sleep(1000);
                                 if (rc.getMessage().equals("ARRIVED")){
                                     rc.setMessage("");
                                     arrived = true;
-                                } else{
-                                    Thread.sleep(100);
                                 }
                             }
                         }
-                        //rc.setMessage("");
                     }
 
 
@@ -112,8 +112,6 @@ public class Coordinatenscherm {
                 } catch (InterruptedException ex) {
                     throw new RuntimeException(ex);
                 }
-
-
 
                 System.out.println("KLAAR");
             }
