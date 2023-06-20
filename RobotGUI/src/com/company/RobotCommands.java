@@ -107,6 +107,7 @@ public class RobotCommands implements SerialPortDataListener {
         sleepWithDelay();
     }
 
+    //OUD, NIET MEER GEBRUIKT
     public void moveRobotUp(SerialPort sp) throws IOException {
         //Send data to arduino
         for (int i = 0; i < 1; ++i) {
@@ -116,6 +117,7 @@ public class RobotCommands implements SerialPortDataListener {
         }
     }
 
+    //OUD, NIET MEER GEBRUIKT
     public void moveRobotDown(SerialPort sp) throws IOException {
 
         for (int i = 0; i < 1; ++i) {
@@ -125,6 +127,7 @@ public class RobotCommands implements SerialPortDataListener {
         }
     }
 
+    //OUD, NIET MEER GEBRUIKT
     public void moveRobotLeft(SerialPort sp) throws IOException {
         for (int i = 0; i < 1; ++i) {
             byte[] bytes;
